@@ -7,9 +7,15 @@
     <version>1.0-SNAPSHOT</version>
     <name>jeecms Maven Webapp</name>
     <url>http://maven.apache.org</url>
-    <dependencies>
 
+    <dependencies>
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>5.5.23</version>
+        </dependency>
     </dependencies>
+
     <build>
         <resources>
             <resource>
