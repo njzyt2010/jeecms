@@ -53,3 +53,4 @@ $RECYCLE.BIN/
 *.msp
 .idea
 *.iml
+target/*
