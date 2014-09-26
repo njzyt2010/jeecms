@@ -11,13 +11,13 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
  * 安装类
- * 
  */
 public class Install {
 	public static void dbXml(String fileName, String dbHost, String dbPort,
@@ -147,7 +147,7 @@ public class Install {
 				new FileInputStream(fileName), UTF8));
 		List<String> sqlList = new ArrayList<String>();
 		StringBuilder sqlSb = new StringBuilder();
-		String s = "";
+		String s = null;
 		while ((s = br.readLine()) != null) {
 			if (s.startsWith("/*") || s.startsWith("#")
 					|| StringUtils.isBlank(s)) {

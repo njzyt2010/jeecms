@@ -1,5 +1,6 @@
 package com.jeecms.cms.service;
 
+
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
@@ -68,6 +69,7 @@ public class ContentCountCacheImpl implements ContentCountCache, DisposableBean 
 	private ContentCountMng contentCountMng;
 
 	private Ehcache cache;
+	
 
 	/**
 	 * 刷新间隔时间
@@ -88,5 +90,7 @@ public class ContentCountCacheImpl implements ContentCountCache, DisposableBean 
 	public void setCache(@Qualifier("contentCount") Ehcache cache) {
 		this.cache = cache;
 	}
+	
+	
 
 }

@@ -190,5 +190,18 @@ public class LocalizedMessages {
 		return getMessage(request,
 				"fck.connector.invalid_current_folder_specified"); //$NON-NLS-1$
 	}
+	
+	public static String getInvalidFileSuffixSpecified(HttpServletRequest request) {
+		return getMessage(request,
+				"fck.connector.invalid_file_suffix_specified"); //$NON-NLS-1$
+	}
+	
+	public static String getInvalidFileToLargeSpecified(HttpServletRequest request,String filename,Integer max) {
+		return getMessage(request,"fck.connector.invalid_file_toolarge_specified",filename,max); //$NON-NLS-1$
+	}
+	
+	public static String getInvalidUploadDailyLimitSpecified(HttpServletRequest request,String lavesize) {
+		return getMessage(request,"fck.connector.invalid_file_dailylimit_specified",lavesize); //$NON-NLS-1$
+	}
 
 }

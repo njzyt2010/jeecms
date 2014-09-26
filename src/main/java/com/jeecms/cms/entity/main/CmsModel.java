@@ -74,7 +74,6 @@ public class CmsModel extends BaseCmsModel {
 		}
 		return fileList;
 	}
-	
 
 	public void init() {
 		if (getDisabled() == null) {

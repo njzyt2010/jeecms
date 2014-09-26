@@ -5,12 +5,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.MarkConfig;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.fck.Command;
 import com.jeecms.common.fck.ResourceType;
 import com.jeecms.common.fck.UploadResponse;
@@ -33,14 +32,18 @@ import com.jeecms.common.image.ImageUtils;
 import com.jeecms.common.upload.FileRepository;
 import com.jeecms.common.upload.UploadUtils;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.entity.MarkConfig;
+import com.jeecms.core.manager.CmsUserMng;
 import com.jeecms.core.manager.DbFileMng;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * FCK服务器端接口
  * 
  * 为了更好、更灵活的处理fck上传，重新实现FCK服务器端接口。
- * 
  */
 @Controller
 public class FckAct {
@@ -53,6 +56,7 @@ public class FckAct {
 	// return null;
 	// }
 
+	@RequiresPermissions("fck:upload")
 	@RequestMapping(value = "/fck/upload.do", method = RequestMethod.POST)
 	public void upload(
 			@RequestParam(value = "Command", required = false) String commandStr,
@@ -110,6 +114,7 @@ public class FckAct {
 			}
 			String fileUrl;
 			CmsSite site = CmsUtils.getSite(request);
+			CmsUser user = CmsUtils.getUser(request);
 			MarkConfig conf = site.getConfig().getMarkConfig();
 			if (mark == null) {
 				mark = conf.getOn();
@@ -154,6 +159,7 @@ public class FckAct {
 				// 加上部署路径
 				fileUrl = request.getContextPath() + fileUrl;
 			}
+			cmsUserMng.updateUploadSize(user.getId(), Integer.parseInt(String.valueOf(uplFile.getSize()/1024)));
 			return UploadResponse.getOK(request, fileUrl);
 		} catch (IOException e) {
 			return UploadResponse.getFileUploadWriteError(request);
@@ -169,6 +175,28 @@ public class FckAct {
 	private UploadResponse validateUpload(HttpServletRequest request,
 			String commandStr, String typeStr, String currentFolderStr) {
 		// TODO 是否允许上传
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		MultipartFile uplFile = multipartRequest.getFileMap().entrySet().iterator().next().getValue();
+		String filename = FilenameUtils.getName(uplFile.getOriginalFilename());
+		int fileSize = (int) (uplFile.getSize() / 1024);
+		String ext = FilenameUtils.getExtension(filename).toLowerCase(Locale.ENGLISH);
+		CmsUser user =CmsUtils.getUser(request);
+		//非允许的后缀
+		if(!user.isAllowSuffix(ext)){
+			return UploadResponse.getInvalidFileSuffixError(request);
+		}
+		//超过附件大小限制
+		if(!user.isAllowMaxFile((int)(uplFile.getSize()/1024))){
+			return UploadResponse.getInvalidFileTooLargeError(request,filename,user.getGroup().getAllowMaxFile());
+		}
+		//超过每日上传限制
+		if (!user.isAllowPerDay(fileSize)) {
+			long laveSize=user.getGroup().getAllowPerDay()-user.getUploadSize();
+			if(laveSize<0){
+				laveSize=0;
+			}
+			return UploadResponse.getInvalidUploadDailyLimitError(request, String.valueOf(laveSize));
+		}
 		if (!Command.isValidForPost(commandStr)) {
 			return UploadResponse.getInvalidCommandError(request);
 		}
@@ -205,6 +233,8 @@ public class FckAct {
 	private DbFileMng dbFileMng;
 	private ImageScale imageScale;
 	private RealPathResolver realPathResolver;
+	@Autowired
+	private CmsUserMng cmsUserMng;
 
 	@Autowired
 	public void setFileRepository(FileRepository fileRepository) {

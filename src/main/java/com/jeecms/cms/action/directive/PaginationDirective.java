@@ -3,19 +3,19 @@ package com.jeecms.cms.action.directive;
 import static com.jeecms.cms.Constants.TPLDIR_STYLE_PAGE;
 import static com.jeecms.cms.Constants.TPL_STYLE_PAGE_CONTENT;
 import static com.jeecms.cms.Constants.TPL_SUFFIX;
-import static com.jeecms.cms.web.FrontUtils.PARAM_SYS_PAGE;
-import static com.jeecms.cms.web.FrontUtils.PARAM_USER_PAGE;
-import static com.jeecms.cms.web.FrontUtils.getTplPath;
 import static com.jeecms.common.web.Constants.UTF8;
+import static com.jeecms.core.web.util.FrontUtils.PARAM_SYS_PAGE;
+import static com.jeecms.core.web.util.FrontUtils.PARAM_USER_PAGE;
+import static com.jeecms.core.web.util.FrontUtils.getTplPath;
 
 import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.freemarker.DirectiveUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.FrontUtils;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;

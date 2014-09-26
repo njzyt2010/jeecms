@@ -1,11 +1,11 @@
 function checkAll(){
-	if($("#ids").attr("checked")){
+	if($("#ids").prop("checked")){
 		$("input[name='ids']").each(function(i){
-			$(this).attr("checked","checked");
+			$(this).prop("checked","checked");
 		 });
 		}else{
 			$("input[name='ids']").each(function(i){
-				$(this).attr("checked","");
+				$(this).prop("checked","");
 			 });
 		}
 }
@@ -13,7 +13,7 @@ function checkAll(){
 function toTrash(){
 	var ids=new Array();
 	$("input[name='ids']").each(function(i){
-		if($(this).attr("checked")){
+		if($(this).prop("checked")){
 			ids.push($(this).val());
 		}
 	 });
@@ -60,7 +60,7 @@ function forward(){
 function empty(){
 	var ids=new Array();
 	$("input[name='ids']").each(function(i){
-		if($(this).attr("checked")){
+		if($(this).prop("checked")){
 			ids.push($(this).val());
 		}
 	 });
@@ -101,7 +101,7 @@ function emptySingle(id){
 function revert(){
 	var ids=new Array();
 	$("input[name='ids']").each(function(i){
-		if($(this).attr("checked")){
+		if($(this).prop("checked")){
 			ids.push($(this).val());
 		}
 	 });

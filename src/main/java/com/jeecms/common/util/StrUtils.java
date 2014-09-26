@@ -14,6 +14,7 @@ import org.wltea.analyzer.core.Lexeme;
 
 /**
  * 字符串的帮助类，提供静态方法，不可以实例化。
+ * 
  */
 public class StrUtils {
 	/**
@@ -213,6 +214,78 @@ public class StrUtils {
 		}
 		return buffer.toString();
 	}
+	
+	/**
+	 * p换行
+	 * @param inputString
+	 * @return
+	 */
+	public static String removeHtmlTagP(String inputString) {  
+	    if (inputString == null)  
+	        return null;  
+	    String htmlStr = inputString; // 含html标签的字符串  
+	    String textStr = "";  
+	    java.util.regex.Pattern p_script;  
+	    java.util.regex.Matcher m_script;  
+	    java.util.regex.Pattern p_style;  
+	    java.util.regex.Matcher m_style;  
+	    java.util.regex.Pattern p_html;  
+	    java.util.regex.Matcher m_html;  
+	    try {  
+	        //定义script的正则表达式{或<script[^>]*?>[\\s\\S]*?<\\/script>  
+	        String regEx_script = "<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>";   
+	        //定义style的正则表达式{或<style[^>]*?>[\\s\\S]*?<\\/style>  
+	        String regEx_style = "<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>";   
+	        String regEx_html = "<[^>]+>"; // 定义HTML标签的正则表达式  
+	        p_script = Pattern.compile(regEx_script, Pattern.CASE_INSENSITIVE);  
+	        m_script = p_script.matcher(htmlStr);  
+	        htmlStr = m_script.replaceAll(""); // 过滤script标签  
+	        p_style = Pattern.compile(regEx_style, Pattern.CASE_INSENSITIVE);  
+	        m_style = p_style.matcher(htmlStr);  
+	        htmlStr = m_style.replaceAll(""); // 过滤style标签  
+	        htmlStr.replace("</p>", "\n");
+	        p_html = Pattern.compile(regEx_html, Pattern.CASE_INSENSITIVE);  
+	        m_html = p_html.matcher(htmlStr);  
+	        htmlStr = m_html.replaceAll(""); // 过滤html标签  
+	        textStr = htmlStr;  
+	    } catch (Exception e) {  
+	        e.printStackTrace();  
+	    }  
+	    return textStr;// 返回文本字符串  
+	}  
+	
+	public static String removeHtmlTag(String inputString) {  
+	    if (inputString == null)  
+	        return null;  
+	    String htmlStr = inputString; // 含html标签的字符串  
+	    String textStr = "";  
+	    java.util.regex.Pattern p_script;  
+	    java.util.regex.Matcher m_script;  
+	    java.util.regex.Pattern p_style;  
+	    java.util.regex.Matcher m_style;  
+	    java.util.regex.Pattern p_html;  
+	    java.util.regex.Matcher m_html;  
+	    try {  
+	        //定义script的正则表达式{或<script[^>]*?>[\\s\\S]*?<\\/script>  
+	        String regEx_script = "<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>";   
+	        //定义style的正则表达式{或<style[^>]*?>[\\s\\S]*?<\\/style>  
+	        String regEx_style = "<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>";   
+	        String regEx_html = "<[^>]+>"; // 定义HTML标签的正则表达式  
+	        p_script = Pattern.compile(regEx_script, Pattern.CASE_INSENSITIVE);  
+	        m_script = p_script.matcher(htmlStr);  
+	        htmlStr = m_script.replaceAll(""); // 过滤script标签  
+	        p_style = Pattern.compile(regEx_style, Pattern.CASE_INSENSITIVE);  
+	        m_style = p_style.matcher(htmlStr);  
+	        htmlStr = m_style.replaceAll(""); // 过滤style标签  
+	        p_html = Pattern.compile(regEx_html, Pattern.CASE_INSENSITIVE);  
+	        m_html = p_html.matcher(htmlStr);  
+	        htmlStr = m_html.replaceAll(""); // 过滤html标签  
+	        textStr = htmlStr;  
+	    } catch (Exception e) {  
+	        e.printStackTrace();  
+	    }  
+	    return textStr;// 返回文本字符串  
+	}  
 
 	/**
 	 * 检查字符串中是否包含被搜索的字符串。被搜索的字符串可以使用通配符'*'。
@@ -241,11 +314,42 @@ public class StrUtils {
 		}
 		return false;
 	}
+	
+	
+	public static String addCharForString(String str, int strLength,char c,int position) {
+		  int strLen = str.length();
+		  if (strLen < strLength) {
+			  while (strLen < strLength) {
+			  StringBuffer sb = new StringBuffer();
+			  if(position==1){
+				  //右補充字符c
+				  sb.append(c).append(str);
+			  }else{
+				//左補充字符c
+				  sb.append(str).append(c);
+			  }
+			  str = sb.toString();
+			  strLen = str.length();
+			  }
+			}
+		  return str;
+	 }
 
 	// 将""和'转义
 	public static String replaceKeyString(String str) {
 		if (containsKeyString(str)) {
 			return str.replace("'", "\\'").replace("\"", "\\\"").replace("\r",
+					"\\r").replace("\n", "\\n").replace("\t", "\\t").replace(
+					"\b", "\\b").replace("\f", "\\f");
+		} else {
+			return str;
+		}
+	}
+	
+	//单引号转化成双引号
+	public static String replaceString(String str) {
+		if (containsKeyString(str)) {
+			return str.replace("'", "\"").replace("\"", "\\\"").replace("\r",
 					"\\r").replace("\n", "\\n").replace("\t", "\\t").replace(
 					"\b", "\\b").replace("\f", "\\f");
 		} else {

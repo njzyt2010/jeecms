@@ -24,7 +24,7 @@ $(function() {
 			//将列表框中已选中的项复制到隐藏表单中
 			var s="";
 			$("#channels${site_index}").children().each(function(){
-				if($(this).attr("selected")) {
+				if($(this).prop("selected")) {
 					s += "<input type='hidden' name='viewGroupIds' value='" +$(this).val()+ "'/>";
 				}
 			});
@@ -46,7 +46,7 @@ $(function() {
 			//将列表框中已选中的项复制到隐藏表单中
 			var s="";
 			$("#channelsContri${site_index}").children().each(function(){
-				if($(this).attr("selected")) {
+				if($(this).prop("selected")) {
 					s += "<input type='hidden' name='contriGroupIds' value='" +$(this).val()+ "'/>";
 				}
 			});
@@ -60,7 +60,7 @@ $(function() {
 			//获取数据
 			$.get("v_channels_add.do",{"siteId":${site.id}},function(s) {
 				$(s).appendTo("#channels${site_index}");
-			});
+			},"html");
 			channels_opened_${site_index} = true;
 		}
 		$('#channelDialog${site_index}').dialog('open');
@@ -69,11 +69,11 @@ $(function() {
 	var channels_contri_opened_${site_index} = false;
 	$('#channelContri${site_index}').click(function(){
 		//第一次打开，需要获取数据。
-		if(!channels_contri_opened) {
+		if(!channels_contri_opened_${site_index}) {
 			//获取数据
 			$.get("v_channels_add.do",{"siteId":${site.id}},function(s) {
 				$(s).appendTo("#channelsContri${site_index}");
-			});
+			},"html");
 			channels_contri_opened_${site_index} = true;
 		}
 		$('#channelDialogContri${site_index}').dialog('open');
@@ -83,16 +83,16 @@ $(function() {
 });
 function allChannels(chk,i) {
 	if(chk) {
-		$("#channels"+i).children().each(function(){$(this).attr("selected","selected")});
+		$("#channels"+i).children().each(function(){$(this).prop("selected","selected")});
 	}else{
-		$("#channels"+i).children().each(function(){$(this).attr("selected","")});
+		$("#channels"+i).children().each(function(){$(this).prop("selected","")});
 	} 
 }
 function allChannelsContri(chk,i) {
 	if(chk) {
-		$("#channelsContri"+i).children().each(function(){$(this).attr("selected","selected")});
+		$("#channelsContri"+i).children().each(function(){$(this).prop("selected","selected")});
 	}else{
-		$("#channelsContri"+i).children().each(function(){$(this).attr("selected","")});
+		$("#channelsContri"+i).children().each(function(){$(this).prop("selected","")});
 	} 
 }
 </script>

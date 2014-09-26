@@ -1,9 +1,6 @@
 package com.jeecms.cms.web;
 
-import static com.jeecms.common.web.Constants.MESSAGE;
-import static com.jeecms.core.action.front.LoginAct.PROCESS_URL;
-import static com.jeecms.core.action.front.LoginAct.RETURN_URL;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,21 +8,23 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.common.web.CookieUtils;
-import com.jeecms.common.web.session.SessionProvider;
-import com.jeecms.common.web.springmvc.MessageResolver;
-import com.jeecms.core.manager.AuthenticationMng;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.security.CmsAuthorizingRealm;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * CMS上下文信息拦截器
@@ -33,37 +32,28 @@ import com.jeecms.core.manager.AuthenticationMng;
  * 包括登录信息、权限信息、站点信息
  */
 public class AdminContextInterceptor extends HandlerInterceptorAdapter {
-	private static final Logger log = Logger
-			.getLogger(AdminContextInterceptor.class);
+	private static final Logger log = Logger.getLogger(AdminContextInterceptor.class);
+	
 	public static final String SITE_PARAM = "_site_id_param";
 	public static final String SITE_COOKIE = "_site_id_cookie";
+	public static final String SITE_PATH_PARAM = "path";
 	public static final String PERMISSION_MODEL = "_permission_key";
 
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler) throws Exception {
 		// 获得站点
+		CmsSite oldSite=getByCookie(request);
 		CmsSite site = getSite(request, response);
 		CmsUtils.setSite(request, site);
 		// Site加入线程变量
 		CmsThreadVariable.setSite(site);
-
 		// 获得用户
 		CmsUser user = null;
-		if (adminId != null) {
-			// 指定管理员（开发状态）
-			user = cmsUserMng.findById(adminId);
-			if (user == null) {
-				throw new IllegalStateException("User ID=" + adminId
-						+ " not found!");
-			}
-		} else {
-			// 正常状态
-			Integer userId = authMng
-					.retrieveUserIdFromSession(session, request);
-			if (userId != null) {
-				user = cmsUserMng.findById(userId);
-			}
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isAuthenticated()) {
+			String username =  (String) subject.getPrincipal();
+			user = cmsUserMng.findByUsername(username);
 		}
 		// 此时用户可以为null
 		CmsUtils.setUser(request, user);
@@ -71,38 +61,14 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 		CmsThreadVariable.setUser(user);
 
 		String uri = getURI(request);
-		// 不在验证的范围内
 		if (exclude(uri)) {
 			return true;
 		}
-		// 用户为null跳转到登陆页面
-		if (user == null) {
-			response.sendRedirect(getLoginUrl(request));
-			return false;
+		//切换站点移除shiro缓存
+		if(oldSite!=null&&!oldSite.equals(site)&&user!=null){
+			authorizingRealm.removeUserAuthorizationInfoCache(user.getUsername().toString());
 		}
-		// 用户不是管理员，提示无权限。
-		if (!user.getAdmin()) {
-			request.setAttribute(MESSAGE, MessageResolver.getMessage(request,
-					"login.notAdmin"));
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
-			return false;
-		}
-		// 不属于该站点的管理员，提示无权限。
-		if (!user.getSites().contains(site)) {
-			request.setAttribute(MESSAGE, MessageResolver.getMessage(request,
-					"login.notInSite"));
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
-			return false;
-		}
-		boolean viewonly = user.getViewonlyAdmin();
-		// 没有访问权限，提示无权限。
-		if (auth && !user.isSuper()
-				&& !permistionPass(uri, user.getPerms(), viewonly)) {
-			request.setAttribute(MESSAGE, MessageResolver.getMessage(request,
-					"login.notPermission"));
-			response.sendError(HttpServletResponse.SC_FORBIDDEN);
-			return false;
-		}
+		createJsessionId(request, response, site);
 		return true;
 	}
 
@@ -111,11 +77,12 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response, Object handler, ModelAndView mav)
 			throws Exception {
 		CmsUser user = CmsUtils.getUser(request);
+		CmsSite site=CmsUtils.getSite(request);
 		// 不控制权限时perm为null，PermistionDirective标签将以此作为依据不处理权限问题。
 		if (auth && user != null && !user.isSuper() && mav != null
 				&& mav.getModelMap() != null && mav.getViewName() != null
 				&& !mav.getViewName().startsWith("redirect:")) {
-			mav.getModelMap().addAttribute(PERMISSION_MODEL, user.getPerms());
+			mav.getModelMap().addAttribute(PERMISSION_MODEL, getUserPermission(site, user));
 		}
 	}
 
@@ -126,35 +93,6 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 		// Sevlet容器有可能使用线程池，所以必须手动清空线程变量。
 		CmsThreadVariable.removeUser();
 		CmsThreadVariable.removeSite();
-	}
-
-	private String getLoginUrl(HttpServletRequest request) {
-		StringBuilder buff = new StringBuilder();
-		if (loginUrl.startsWith("/")) {
-			String ctx = request.getContextPath();
-			if (!StringUtils.isBlank(ctx)) {
-				buff.append(ctx);
-			}
-		}
-		buff.append(loginUrl).append("?");
-		buff.append(RETURN_URL).append("=").append(returnUrl);
-		if (!StringUtils.isBlank(processUrl)) {
-			buff.append("&").append(PROCESS_URL).append("=").append(
-					getProcessUrl(request));
-		}
-		return buff.toString();
-	}
-
-	private String getProcessUrl(HttpServletRequest request) {
-		StringBuilder buff = new StringBuilder();
-		if (loginUrl.startsWith("/")) {
-			String ctx = request.getContextPath();
-			if (!StringUtils.isBlank(ctx)) {
-				buff.append(ctx);
-			}
-		}
-		buff.append(processUrl);
-		return buff.toString();
 	}
 
 	/**
@@ -181,6 +119,7 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 			return site;
 		}
 	}
+	
 
 	private CmsSite getByParams(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -217,11 +156,11 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 		}
 		return null;
 	}
-
+	
 	private CmsSite getByDomain(HttpServletRequest request) {
 		String domain = request.getServerName();
 		if (!StringUtils.isBlank(domain)) {
-			return cmsSiteMng.findByDomain(domain, true);
+			return cmsSiteMng.findByDomain(domain);
 		}
 		return null;
 	}
@@ -245,33 +184,14 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 		}
 		return false;
 	}
-
-	private boolean permistionPass(String uri, Set<String> perms,
-			boolean viewOnly) {
-		String u = null;
-		int i;
-		for (String perm : perms) {
-			if (uri.startsWith(perm)) {
-				// 只读管理员
-				if (viewOnly) {
-					// 获得最后一个 '/' 的URI地址。
-					i = uri.lastIndexOf("/");
-					if (i == -1) {
-						throw new RuntimeException("uri must start width '/':"
-								+ uri);
-					}
-					u = uri.substring(i + 1);
-					// 操作型地址被禁止
-					if (u.startsWith("o_")) {
-						return false;
-					}
-				}
-				return true;
-			}
-		}
-		return false;
+	
+	private void createJsessionId(HttpServletRequest request,HttpServletResponse response,CmsSite site){
+		 String JSESSIONID = request.getSession().getId();//获取当前JSESSIONID （不管是从主域还是二级域访问产生）
+		 Cookie cookie = new Cookie("JSESSIONID", JSESSIONID);
+		 cookie.setDomain(site.getBaseDomain()); //关键在这里，将cookie设成主域名访问，确保不同域之间都能获取到该cookie的值，从而确保session统一
+		 response.addCookie(cookie);  //将cookie返回到客户端
 	}
-
+	
 	/**
 	 * 获得第三个路径分隔符的位置
 	 * 
@@ -292,30 +212,36 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 			start = uri.indexOf('/', start + 1);
 			i++;
 		}
+		
 		if (start <= 0) {
 			throw new IllegalStateException(
-					"admin access path not like '/jeeadmin/jspgou/...' pattern: "
+					"admin access path not like '/jeeadmin/jeecms/...' pattern: "
 							+ uri);
 		}
 		return uri.substring(start);
 	}
-
-	private SessionProvider session;
-	private AuthenticationMng authMng;
+	
+	
+	private Set<String>getUserPermission(CmsSite site,CmsUser user){
+		Set<String>viewPermissionSet=new HashSet<String>();
+		Set<String> perms = user.getPerms(site.getId(),viewPermissionSet);
+		Set<String> userPermission=new HashSet<String>();
+		for(String perm:perms){
+			perm="/"+perm;
+			if(perm.contains(":")){
+				perm=perm.replace(":", "/").replace("*", "");
+			}
+			userPermission.add(perm);
+		}
+		return userPermission;
+	}
 	private CmsSiteMng cmsSiteMng;
 	private CmsUserMng cmsUserMng;
-	private Integer adminId;
 	private boolean auth = true;
 	private String[] excludeUrls;
-
-	private String loginUrl;
-	private String processUrl;
-	private String returnUrl;
-
+	
 	@Autowired
-	public void setSession(SessionProvider session) {
-		this.session = session;
-	}
+	private CmsAuthorizingRealm authorizingRealm;
 
 	@Autowired
 	public void setCmsSiteMng(CmsSiteMng cmsSiteMng) {
@@ -327,11 +253,6 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 		this.cmsUserMng = cmsUserMng;
 	}
 
-	@Autowired
-	public void setAuthMng(AuthenticationMng authMng) {
-		this.authMng = authMng;
-	}
-
 	public void setAuth(boolean auth) {
 		this.auth = auth;
 	}
@@ -339,21 +260,4 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 	public void setExcludeUrls(String[] excludeUrls) {
 		this.excludeUrls = excludeUrls;
 	}
-
-	public void setAdminId(Integer adminId) {
-		this.adminId = adminId;
-	}
-
-	public void setLoginUrl(String loginUrl) {
-		this.loginUrl = loginUrl;
-	}
-
-	public void setProcessUrl(String processUrl) {
-		this.processUrl = processUrl;
-	}
-
-	public void setReturnUrl(String returnUrl) {
-		this.returnUrl = returnUrl;
-	}
-
 }

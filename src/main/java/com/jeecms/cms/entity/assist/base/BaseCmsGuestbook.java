@@ -46,7 +46,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	 */
 	public BaseCmsGuestbook (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		com.jeecms.cms.entity.assist.CmsGuestbookCtg ctg,
 		java.lang.String ip,
 		java.util.Date createTime,
@@ -83,9 +83,9 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	private com.jeecms.cms.entity.assist.CmsGuestbookExt ext;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsUser member;
-	private com.jeecms.cms.entity.main.CmsUser admin;
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsUser member;
+	private com.jeecms.core.entity.CmsUser admin;
+	private com.jeecms.core.entity.CmsSite site;
 	private com.jeecms.cms.entity.assist.CmsGuestbookCtg ctg;
 
 
@@ -211,7 +211,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	/**
 	 * Return the value associated with the column: member_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getMember () {
+	public com.jeecms.core.entity.CmsUser getMember () {
 		return member;
 	}
 
@@ -219,7 +219,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	 * Set the value related to the column: member_id
 	 * @param member the member_id value
 	 */
-	public void setMember (com.jeecms.cms.entity.main.CmsUser member) {
+	public void setMember (com.jeecms.core.entity.CmsUser member) {
 		this.member = member;
 	}
 
@@ -227,7 +227,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	/**
 	 * Return the value associated with the column: admin_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getAdmin () {
+	public com.jeecms.core.entity.CmsUser getAdmin () {
 		return admin;
 	}
 
@@ -235,7 +235,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	 * Set the value related to the column: admin_id
 	 * @param admin the admin_id value
 	 */
-	public void setAdmin (com.jeecms.cms.entity.main.CmsUser admin) {
+	public void setAdmin (com.jeecms.core.entity.CmsUser admin) {
 		this.admin = admin;
 	}
 
@@ -243,7 +243,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -251,7 +251,7 @@ public abstract class BaseCmsGuestbook  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

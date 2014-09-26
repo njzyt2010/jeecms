@@ -35,7 +35,7 @@
 		<many-to-one
 			name="user"
 			column="user_id"
-			class="com.jeecms.cms.entity.main.CmsUser"
+			class="com.jeecms.core.entity.CmsUser"
 			not-null="true"
 		>
 		</many-to-one>

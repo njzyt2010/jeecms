@@ -24,9 +24,45 @@ Pn.getParam = function(key) {
  */
 Pn.checkbox = function(name, checked) {
 	$("input[type=checkbox][name=" + name + "]").each(function() {
-		$(this).attr("checked", checked);
+		$(this).prop("checked", checked);
 	});
+	if(checked){
+		$("tbody tr").each(function(){
+			$(this).prop("bgColor","#b8d8e2");
+			$(this).unbind();
+		});
+	}else{
+		$("tbody tr").each(function(){
+			$(this).prop("bgColor","#dbedf4");
+			$(this).bind('mouseover', function() {
+				$(this).prop("bgColor","#b8d8e2");
+			});
+			$(this).bind('mouseout', function() {
+				$(this).prop("bgColor","#dbedf4");
+			});
+		});
+	}
 }
+
+Pn.selectCheckBox = function(value, checked) {
+	var checkbox=$("input[type=checkbox][value=" + value + "]");
+	var tr=checkbox.parent().parent();
+	checkbox.prop("checked", checked);
+	if(checked){
+		tr.prop("bgColor","#b8d8e2");
+		tr.unbind("mouseout");
+		tr.unbind("mouseover");
+	}else{
+		tr.prop("bgColor","#dbedf4");
+		tr.bind('mouseout', function() {
+			tr.prop("bgColor","#dbedf4");
+		});
+		tr.bind('mouseover', function() {
+			tr.attr("bgColor","#b8d8e2");
+		});
+	}
+}
+
 /**
  * 复选框选中的个数
  * 
@@ -43,6 +79,7 @@ Pn.checkedCount = function(name) {
 	}
 	return count;
 }
+
 /**
  * 颜色选择器
  */
@@ -60,8 +97,9 @@ Pn.ColorPicker = function(input) {
 	this.out = function() {
 		$(this).css("border", "1px solid #fff");
 	}
+	//title获取不到改成获取id属性
 	this.click = function() {
-		var color = $(this).attr("title");
+		var color = $(this).attr("id");
 		obj.setColor(color);
 		this.isShow = false;
 		obj.picker.hide();
@@ -83,9 +121,14 @@ Pn.ColorPicker = function(input) {
 		// 列数
 		var col = 8;
 		for (var i = 0, len = c.length;i < len; i++) {
+			/*
 			s += "<td width='15'><div class='c' style='width:13px;height:13px;"
 					+ "border:1px solid #fff;cursor:pointer;background-color:"
-					+ c[i] + "' title='" + c[i] + "'>&nbsp;<div></td>";
+					+ c[i] + "' title='" + c[i] + "'>&nbsp;</div></td>";
+					*/
+			s += "<td width='15'><div class='c' id='"+c[i]+"' title='"+c[i]+"' style='width:13px;height:13px;"
+				+ "border:1px solid #fff;cursor:pointer;background-color:"
+				+ c[i] + "'>&nbsp;</div></td>";
 			if ((i + 1) != c.length && (i + 1) % col == 0) {
 				s += "</tr><tr height='15'>";
 			}

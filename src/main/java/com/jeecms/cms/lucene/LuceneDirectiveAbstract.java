@@ -63,14 +63,15 @@ public abstract class LuceneDirectiveAbstract implements TemplateDirectiveModel 
 			throws TemplateException {
 		return DirectiveUtils.getDate(PARAM_END_DATE, params);
 	}
-	
+
 	protected String getCategory(Map<String, TemplateModel> params)
-		throws TemplateException {
+			throws TemplateException {
 		return DirectiveUtils.getString(PARAM_CATEGORY, params);
 	}
-	
+
 	protected String getWorkplace(Map<String, TemplateModel> params)
-		throws TemplateException {
+			throws TemplateException {
 		return DirectiveUtils.getString(PARAM_WORKPLACE, params);
 	}
+
 }

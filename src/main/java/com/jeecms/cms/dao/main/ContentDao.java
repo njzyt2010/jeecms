@@ -1,6 +1,7 @@
 package com.jeecms.cms.dao.main;
 
 import java.util.List;
+import java.util.Map;
 
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.entity.main.Content.ContentStatus;
@@ -65,10 +66,10 @@ public interface ContentDao {
 	 * @param pageSize
 	 * @return
 	 */
-	public Pagination getPage(String title, Integer typeId,
+	public Pagination getPage(String title, Integer typeId,Integer currUserId,
 			Integer inputUserId, boolean topLevel, boolean recommend,
-			ContentStatus status, Byte checkStep, Integer siteId,
-			Integer channelId, int orderBy, int pageNo, int pageSize);
+			ContentStatus status, Byte checkStep, Integer siteId,Integer modelId,
+			Integer channelId,int orderBy, int pageNo, int pageSize);
 
 	/**
 	 * 获得自己发布的内容列表
@@ -102,7 +103,7 @@ public interface ContentDao {
 	public Pagination getPageBySelf(String title, Integer typeId,
 			Integer inputUserId, boolean topLevel, boolean recommend,
 			ContentStatus status, Byte checkStep, Integer siteId,
-			Integer channelId, Integer userId, int orderBy, int pageNo,
+			Integer channelId,Integer userId, int orderBy, int pageNo,
 			int pageSize);
 
 	/**
@@ -136,10 +137,10 @@ public interface ContentDao {
 	 * @param pageSize
 	 * @return
 	 */
-	public Pagination getPageByRight(String title, Integer typeId,
+	public Pagination getPageByRight(String title, Integer typeId,Integer currUserId,
 			Integer inputUserId, boolean topLevel, boolean recommend,
 			ContentStatus status, Byte checkStep, Integer siteId,
-			Integer channelId, Integer userId, boolean selfData, int orderBy,
+			Integer channelId,Integer userId, boolean selfData, int orderBy,
 			int pageNo, int pageSize);
 
 	/**
@@ -171,49 +172,49 @@ public interface ContentDao {
 
 	public Pagination getPageBySiteIdsForTag(Integer[] siteIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int pageNo, int pageSize);
+			String title, Map<String,String[]>attr,int orderBy, int pageNo, int pageSize);
 
 	public List<Content> getListBySiteIdsForTag(Integer[] siteIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, Integer first, Integer count);
+			String title,Map<String,String[]>attr, int orderBy, Integer first, Integer count);
 
 	public Pagination getPageByChannelIdsForTag(Integer[] channelIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int option, int pageNo, int pageSize);
+			String title,Map<String,String[]>attr, int orderBy, int option, int pageNo, int pageSize);
 
 	public List<Content> getListByChannelIdsForTag(Integer[] channelIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int option, Integer first, Integer count);
+			String title, Map<String,String[]>attr, int orderBy, int option,Integer first, Integer count);
 
 	public Pagination getPageByChannelPathsForTag(String[] paths,
 			Integer[] siteIds, Integer[] typeIds, Boolean titleImg,
-			Boolean recommend, String title, int orderBy, int pageNo,
+			Boolean recommend, String title,Map<String,String[]>attr, int orderBy, int pageNo,
 			int pageSize);
 
 	public List<Content> getListByChannelPathsForTag(String[] paths,
 			Integer[] siteIds, Integer[] typeIds, Boolean titleImg,
-			Boolean recommend, String title, int orderBy, Integer first,
+			Boolean recommend, String title, Map<String,String[]>attr,int orderBy, Integer first,
 			Integer count);
 
 	public Pagination getPageByTopicIdForTag(Integer topicId,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
-			Boolean titleImg, Boolean recommend, String title, int orderBy,
+			Boolean titleImg, Boolean recommend, String title, Map<String,String[]>attr,int orderBy,
 			int pageNo, int pageSize);
 
 	public List<Content> getListByTopicIdForTag(Integer topicId,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
-			Boolean titleImg, Boolean recommend, String title, int orderBy,
+			Boolean titleImg, Boolean recommend, String title, Map<String,String[]>attr,int orderBy,
 			Integer first, Integer count);
 
 	public Pagination getPageByTagIdsForTag(Integer[] tagIds,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
 			Integer excludeId, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int pageNo, int pageSize);
+			String title, Map<String,String[]>attr,int orderBy, int pageNo, int pageSize);
 
 	public List<Content> getListByTagIdsForTag(Integer[] tagIds,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
 			Integer excludeId, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, Integer first, Integer count);
+			String title, Map<String,String[]>attr,int orderBy, Integer first, Integer count);
 	
 	public Pagination getPageForCollection(Integer siteId, Integer memberId, int pageNo, int pageSize);
 
@@ -226,4 +227,5 @@ public interface ContentDao {
 	public Content updateByUpdater(Updater<Content> updater);
 
 	public Content deleteById(Integer id);
+
 }

@@ -5,26 +5,24 @@
 <title></title>
 <#include "/jeecms_sys/head.html"/>
 <script type="text/javascript">
-$(function() {
-	$("#jvForm").validate( {
-		submitHandler : function(form) {
-			var button = $("#createButton");
-			var value = button.val();
-			button.val("<@s.m "cmsStatic.wait"/>").attr("disabled","disabled");
-			$(form).ajaxSubmit( {
-				"success" : function(data) {
-					button.val(value).removeAttr("disabled");
-					if(data.success) {
-						alert("<@s.m "cmsContent.regenerateSucc"/>"+data.count);
-					} else {
-						alert(data.msg);
-					}
-				},
-				"dataType" : "json"
-			});
-		}
-	});
-});
+function regenerate() {
+	var button = $("#createButton");
+	var value = button.val();
+	button.val("<@s.m 'cmsResetGenerate.wait'/>").attr("disabled","disabled");
+	$.post("o_reset_generate.do",
+		{
+			channelId:$("#channelId option:selected").val(),
+			containChild:$("input[name='containChild']:checked").val()
+		},
+		function(data) {
+			button.val(value).removeAttr("disabled");	
+			if(data.success) {
+				$.alert("<@s.m 'global.prompt'/>","<@s.m 'cmsContent.regenerateSucc'/>"+data.count);
+			} else {
+				$.alert("<@s.m 'global.prompt'/>",data.msg);			
+			}
+		}, "json");
+}
 </script>
 </head>
 <body>
@@ -36,10 +34,10 @@ $(function() {
 </div>
 <div class="body-box">
 <@p.form id="jvForm" action="o_reset_generate.do">
-<@p.select label="cmsStatic.channel" name="channelId" list=channelList listKey="id" listValue="name" listDeep="deep" headerKey="" headerValue="cmsStatic.allChannel"/>
-<@p.radio label="cmsStatic.containChild" name="containChild" value="true" list={"true":"global.true","false":"global.false"}/>
+<@p.select label="cmsStatic.channel" name="channelId" id="channelId" list=channelList listKey="id" listValue="name" listDeep="deep" headerKey="" headerValue="cmsStatic.allChannel"/>
+<@p.radio label="cmsStatic.containChild" name="containChild"  value="true" list={"true":"global.true","false":"global.false"}/>
 <@p.td>
-	<input class="reset" id="createButton" type="submit" value="<@s.m "cmsContent.regenerate"/>"/>
+	<input class="reset" id="createButton" type="button" value="<@s.m "cmsContent.regenerate"/>" onclick="regenerate()"/>
 </@p.td>
 </@p.form>
 </div>

@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,26 +17,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsComment;
 import com.jeecms.cms.entity.assist.CmsCommentExt;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsCommentMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsCommentAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsCommentAct.class);
 
+	@RequiresPermissions("comment:v_list")
 	@RequestMapping("/comment/v_list.do")
 	public String list(Integer queryContentId, Boolean queryChecked,
 			Boolean queryRecommend, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
-		if (queryRecommend == null) {
-			queryRecommend = false;
-		}
 		CmsSite site = CmsUtils.getSite(request);
 		Pagination pagination = manager.getPage(site.getId(), queryContentId,
 				null, queryChecked, queryRecommend, true, cpn(pageNo),
@@ -44,11 +43,13 @@ public class CmsCommentAct {
 		return "comment/list";
 	}
 
+	@RequiresPermissions("comment:v_add")
 	@RequestMapping("/comment/v_add.do")
 	public String add(ModelMap model) {
 		return "comment/add";
 	}
 
+	@RequiresPermissions("comment:v_edit")
 	@RequestMapping("/comment/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -59,6 +60,7 @@ public class CmsCommentAct {
 		return "comment/edit";
 	}
 
+	@RequiresPermissions("comment:o_update")
 	@RequestMapping("/comment/o_update.do")
 	public String update(Integer queryContentId, Boolean queryChecked,
 			Boolean queryRecommend,String reply, CmsComment bean, CmsCommentExt ext,
@@ -68,8 +70,9 @@ public class CmsCommentAct {
 			return errors.showErrorPage(model);
 		}
 		//若回复内容不为空而且回复更新，则设置回复时间，已最新回复时间为准
-		if(StringUtils.isNotBlank(ext.getReply())&&!reply.equals(ext.getReply())){
+		if(StringUtils.isNotBlank(ext.getReply())){
 			bean.setReplayTime(new Date());
+			bean.setReplayUser(CmsUtils.getUser(request));
 		}
 		bean = manager.update(bean, ext);
 		log.info("update CmsComment id={}.", bean.getId());
@@ -79,6 +82,7 @@ public class CmsCommentAct {
 				request, model);
 	}
 
+	@RequiresPermissions("comment:o_delete")
 	@RequestMapping("/comment/o_delete.do")
 	public String delete(Integer queryContentId, Boolean queryChecked,
 			Boolean queryRecommend, Integer[] ids, Integer pageNo,
@@ -95,6 +99,44 @@ public class CmsCommentAct {
 		}
 		return list(queryContentId, queryChecked, queryRecommend, pageNo,
 				request, model);
+	}
+	
+	@RequiresPermissions("comment:o_check")
+	@RequestMapping("/comment/o_check.do")
+	public String check(Integer queryCtgId, Boolean queryRecommend,
+			Boolean queryChecked, Integer[] ids, Integer pageNo,
+			HttpServletRequest request, ModelMap model) {
+		WebErrors errors = validateDelete(ids, request);
+		if (errors.hasErrors()) {
+			return errors.showErrorPage(model);
+		}
+		CmsComment[] beans = manager.checkByIds(ids,CmsUtils.getUser(request),true);
+		for (CmsComment bean : beans) {
+			log.info("delete CmsGuestbook id={}", bean.getId());
+			cmsLogMng.operating(request, "cmsComment.log.check", "id="
+					+ bean.getId() + ";title=" + bean.getReplayHtml());
+		}
+		return list(queryCtgId, queryRecommend, queryChecked, pageNo, request,
+				model);
+	}
+	
+	@RequiresPermissions("comment:o_check_cancel")
+	@RequestMapping("/comment/o_check_cancel.do")
+	public String cancelCheck(Integer queryCtgId, Boolean queryRecommend,
+			Boolean queryChecked, Integer[] ids, Integer pageNo,
+			HttpServletRequest request, ModelMap model) {
+		WebErrors errors = validateDelete(ids, request);
+		if (errors.hasErrors()) {
+			return errors.showErrorPage(model);
+		}
+		CmsComment[] beans = manager.checkByIds(ids,CmsUtils.getUser(request),false);
+		for (CmsComment bean : beans) {
+			log.info("delete CmsGuestbook id={}", bean.getId());
+			cmsLogMng.operating(request, "cmsComment.log.cancelCheck", "id="
+					+ bean.getId() + ";title=" + bean.getReplayHtml());
+		}
+		return list(queryCtgId, queryRecommend, queryChecked, pageNo, request,
+				model);
 	}
 
 	private WebErrors validateEdit(Integer id, HttpServletRequest request) {

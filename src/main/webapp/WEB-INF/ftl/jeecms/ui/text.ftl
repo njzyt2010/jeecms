@@ -17,6 +17,7 @@
 <#if readonly!=""> readonly="${readonly}"</#if><#rt/>
 <#if rname!=""> rname="${rname}"</#if><#rt/>
 <#if rvalue!=""> rvalue="${rvalue}"</#if><#rt/>
+<#if title?? && title?string!=""> title="<@s.m '${title}'/>"</#if><#rt/>
 <#if value?? && value?string!=""> value="${value?html}"</#if><#rt/>
 <#include "common-attributes.ftl"/><#rt/>
 <#include "scripting-events.ftl"/><#rt/>

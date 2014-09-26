@@ -49,7 +49,7 @@ public abstract class BaseCmsVoteTopic  implements Serializable {
 	 */
 	public BaseCmsVoteTopic (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String title,
 		java.lang.Integer totalCount,
 		java.lang.Integer multiSelect,
@@ -96,7 +96,7 @@ public abstract class BaseCmsVoteTopic  implements Serializable {
 	private java.lang.Boolean def;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsSite site;
 
 	// collections
 	private java.util.Set<com.jeecms.cms.entity.assist.CmsVoteItem> items;
@@ -321,7 +321,7 @@ public abstract class BaseCmsVoteTopic  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -329,7 +329,7 @@ public abstract class BaseCmsVoteTopic  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

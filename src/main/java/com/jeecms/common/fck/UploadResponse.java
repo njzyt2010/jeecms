@@ -32,11 +32,7 @@ public class UploadResponse {
 	protected Object[] parameters;
 
 	/** Error number OK */
-	/**
-	 * 老版本编辑器是0 新版本3.6.5第一个编辑框是2，后面的变动了
-	 * 从request对象中获取CKEditorFuncNum参数为准
-	 */
-	public static final int EN_OK = 2;
+	public static final int EN_OK = 0;
 
 	/** Error number CUSTOM ERROR */
 	public static final int EN_CUSTOM_ERROR = 1;
@@ -52,6 +48,11 @@ public class UploadResponse {
 
 	/** Error number SECURITY ERROR */
 	public static final int EN_SECURITY_ERROR = 203;
+	
+	/**FILE SUFFIX ERROR**/
+	public static final int EN_INVALID_FILE_SUFFIX_ERROR = 204;
+	
+	public static final int EN_INVALID_FILE_TOO_LARGE_ERROR = 205;
 
 	/**
 	 * Constructs a response with a varying amount of arguments.
@@ -110,14 +111,13 @@ public class UploadResponse {
 	/** Creates an <code>OK</code> response. */
 	public static UploadResponse getOK(HttpServletRequest request,
 			String fileUrl) {
-		String callback =request.getParameter("CKEditorFuncNum");
-		return new UploadResponse(Integer.parseInt(callback), fileUrl);
+		return new UploadResponse(getCallBackNum(request), fileUrl);
 	}
 
 	/** Creates a <code>FILE RENAMED</code> warning. */
 	public static UploadResponse getFileRenamedWarning(
 			HttpServletRequest request, String fileUrl, String newFileName) {
-		return new UploadResponse(EN_FILE_RENAMED_WARNING, fileUrl,
+		return new UploadResponse(getCallBackNum(request), fileUrl,
 				newFileName, LocalizedMessages.getFileRenamedWarning(request,
 						newFileName));
 	}
@@ -125,43 +125,61 @@ public class UploadResponse {
 	/** Creates a <code>INVALID FILE TYPE</code> error. */
 	public static UploadResponse getInvalidFileTypeError(
 			HttpServletRequest request) {
-		return new UploadResponse(EN_INVALID_FILE_TYPE_ERROR, LocalizedMessages
+		return new UploadResponse(getCallBackNum(request), LocalizedMessages
 				.getInvalidFileTypeSpecified(request));
 	}
 
 	/** Creates a <code>INVALID COMMAND</code> error. */
 	public static UploadResponse getInvalidCommandError(
 			HttpServletRequest request) {
-		return new UploadResponse(EN_CUSTOM_ERROR, null, null,
+		return new UploadResponse(getCallBackNum(request), null, null,
 				LocalizedMessages.getInvalidCommandSpecified(request));
 	}
 
 	/** Creates a <code>INVALID RESOURCE TYPE</code> error. */
 	public static UploadResponse getInvalidResourceTypeError(
 			HttpServletRequest request) {
-		return new UploadResponse(EN_CUSTOM_ERROR, null, null,
+		return new UploadResponse(getCallBackNum(request), null, null,
 				LocalizedMessages.getInvalidResouceTypeSpecified(request));
 	}
 
 	/** Creates a <code>INVALID CURRENT FOLDER</code> error. */
 	public static UploadResponse getInvalidCurrentFolderError(
 			HttpServletRequest request) {
-		return new UploadResponse(EN_CUSTOM_ERROR, null, null,
+		return new UploadResponse(getCallBackNum(request), null, null,
 				LocalizedMessages.getInvalidCurrentFolderSpecified(request));
 	}
 
 	/** Creates a <code>FILE UPLOAD DISABLED</code> error. */
 	public static UploadResponse getFileUploadDisabledError(
 			HttpServletRequest request) {
-		return new UploadResponse(EN_SECURITY_ERROR, null, null,
+		return new UploadResponse(getCallBackNum(request), null, null,
 				LocalizedMessages.getFileUploadDisabled(request));
 	}
 
 	/** Creates a <code>FILE UPLOAD WRITE</code> error. */
 	public static UploadResponse getFileUploadWriteError(
 			HttpServletRequest request) {
-		return new UploadResponse(EN_CUSTOM_ERROR, null, null,
+		return new UploadResponse(getCallBackNum(request), null, null,
 				LocalizedMessages.getFileUploadWriteError(request));
+	}
+	
+	public static UploadResponse getInvalidFileSuffixError(
+			HttpServletRequest request) {
+		return new UploadResponse(getCallBackNum(request),LocalizedMessages.getInvalidFileSuffixSpecified(request));
+	}
+	
+	public static UploadResponse getInvalidFileTooLargeError(HttpServletRequest request,String filename,Integer max) {
+		return new UploadResponse(getCallBackNum(request),LocalizedMessages.getInvalidFileToLargeSpecified(request,filename,max));
+	}
+	
+	public static UploadResponse getInvalidUploadDailyLimitError(HttpServletRequest request,String lavesize) {
+		return new UploadResponse(getCallBackNum(request),LocalizedMessages.getInvalidUploadDailyLimitSpecified(request,lavesize));
+	}
+	
+	private static int getCallBackNum(HttpServletRequest request){
+		String callback =request.getParameter("CKEditorFuncNum");
+		return Integer.parseInt(callback);
 	}
 
 	/**
@@ -178,10 +196,8 @@ public class UploadResponse {
 		// [fckeditor_dir]/_dev/domain_fix_template.js
 		sb
 				.append("(function(){var d=document.domain;while (true){try{var A=window.parent.document.domain;break;}catch(e) {};d=d.replace(/.*?(?:\\.|$)/,'');if (d.length==0) break;try{document.domain=d;}catch (e){break;}}})();\n");
-		
-	//	sb.append("window.parent.OnUploadCompleted(");
-		//升级ckeditor后调用函数发生变化
 		sb.append("window.parent.CKEDITOR.tools.callFunction(");
+
 		for (Object parameter : parameters) {
 			if (parameter instanceof Integer) {
 				sb.append(parameter);
@@ -197,6 +213,7 @@ public class UploadResponse {
 		sb.deleteCharAt(sb.length() - 1);
 		sb.append(");\n");
 		sb.append("</script>");
+
 		return sb.toString();
 	}
 }

@@ -21,22 +21,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeecms.cms.entity.assist.CmsJobApply;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.CmsUserExt;
-import com.jeecms.cms.entity.main.CmsUserResume;
 import com.jeecms.cms.entity.main.Content;
-import com.jeecms.cms.entity.main.MemberConfig;
 import com.jeecms.cms.manager.assist.CmsJobApplyMng;
-import com.jeecms.cms.manager.main.CmsUserExtMng;
-import com.jeecms.cms.manager.main.CmsUserResumeMng;
 import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.CmsUserExt;
+import com.jeecms.core.entity.CmsUserResume;
+import com.jeecms.core.entity.MemberConfig;
+import com.jeecms.core.manager.CmsUserExtMng;
+import com.jeecms.core.manager.CmsUserResumeMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 /**
  * 简历中心Action

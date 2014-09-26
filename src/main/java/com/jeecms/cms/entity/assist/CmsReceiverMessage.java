@@ -22,9 +22,9 @@ public class CmsReceiverMessage extends BaseCmsReceiverMessage {
 	 * Constructor for required fields
 	 */
 	public CmsReceiverMessage(java.lang.Integer id,
-			com.jeecms.cms.entity.main.CmsUser msgReceiverUser,
-			com.jeecms.cms.entity.main.CmsUser msgSendUser,
-			com.jeecms.cms.entity.main.CmsSite site, java.lang.String msgTitle,
+			com.jeecms.core.entity.CmsUser msgReceiverUser,
+			com.jeecms.core.entity.CmsUser msgSendUser,
+			com.jeecms.core.entity.CmsSite site, java.lang.String msgTitle,
 			java.lang.String msgContent, java.util.Date sendTime,
 			boolean msgStatus, java.lang.Integer msgBox) {
 

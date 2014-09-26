@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import com.jeecms.cms.entity.main.CmsSite;
+import com.jeecms.core.entity.CmsSite;
 
 /**
  * 后台（管理员）本地化信息拦截器
@@ -33,7 +33,8 @@ public class AdminLocaleInterceptor extends HandlerInterceptorAdapter {
 			throw new IllegalStateException(
 					"No LocaleResolver found: not in a DispatcherServlet request?");
 		}
-		CmsSite site = CmsUtils.getSite(request);
+	//	CmsSite site = CmsUtils.getSite(request);
+		CmsSite site=CmsThreadVariable.getSite();
 		String newLocale = site.getLocaleAdmin();
 		LocaleEditor localeEditor = new LocaleEditor();
 		localeEditor.setAsText(newLocale);

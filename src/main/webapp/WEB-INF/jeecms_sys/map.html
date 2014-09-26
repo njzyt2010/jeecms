@@ -18,17 +18,17 @@ $(function(){
 <body>
 <div class="body-box">
 <div style="text-align:center; line-height:40px; height:40px; font-size:20px; font-weight:bold;">网站地图</div>
-<table width="95%" cellpadding="2" cellspacing="1" bgcolor="#CCCCCC" style="text-align:center; height:30px; line-height:30px;">
+<table width="98%" align="center" cellpadding="2" cellspacing="1" bgcolor="#CCCCCC" style="text-align:center; height:30px; line-height:30px;">
 	<tr>
-	<td bgcolor="#dfdfdf"><b><@s.m "global.admin.home"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.channel"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.content"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.template"/><@s.m "cms.function.resource"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.assistant"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.maintain"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.generate"/></b></td>
-    <td bgcolor="#dfdfdf"><b><@s.m "cms.function.user"/></b></td>
-	  <td bgcolor="#dfdfdf"><b><@s.m "cms.function.config"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "global.admin.home"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.channel"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.content"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.template"/><@s.m "cms.function.resource"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.assistant"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.maintain"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.generate"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.user"/></b></td>
+		<td bgcolor="#dfdfdf"><b><@s.m "cms.function.config"/></b></td>
 	</tr>
 	<!-- 第一行 -->
 	<tr>
@@ -111,7 +111,7 @@ $(function(){
             <@s.m "cmsModel.function"/>
             </a>
       	 	</@cms_perm>
-      </td>
+	     </td>
 	     <td bgcolor="#FFFFFF">
 			<@cms_perm url="/type/v_list.do">	
             <a href="type/v_list.do" target="rightFrame">
@@ -177,7 +177,7 @@ $(function(){
             <@s.m "cmsModel.function.add"/>
             </a>
       	 	</@cms_perm>
-      </td>
+	     </td>
 	     <td bgcolor="#FFFFFF">
 			<@cms_perm url="/type/v_add.do">	
             <a href="type/v_add.do" target="rightFrame">
@@ -249,8 +249,7 @@ $(function(){
 	     <td bgcolor="#FFFFFF">
 			<@cms_perm url="/guestbook/v_list.do">
 			<a href="guestbook/v_list.do" target="rightFrame">
-            <@s.m "cmsGuestbook.function"/>
-            </a>
+            <@s.m "cmsGuestbook.function"/></a></li>
 			</@cms_perm>
 	     </td>
 	     <td bgcolor="#FFFFFF">
@@ -266,7 +265,7 @@ $(function(){
             <@s.m "cmsContent.regenerateItem"/>
             </a>
 			</@cms_perm>
-		 </td>
+		</td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/group/v_add.do">
 			<a href="group/v_add.do" target="rightFrame">
@@ -298,7 +297,7 @@ $(function(){
             <@s.m "cmsTopic.function.add"/>
             </a>
       	 	</@cms_perm>
-      </td>
+	     </td>
 	     <td bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/guestbook/v_add.do">	
@@ -306,7 +305,7 @@ $(function(){
             <@s.m "cmsGuestbook.function.add"/>
             </a>
       	 	</@cms_perm>
-      </td>
+	     </td>
 	     <td bgcolor="#FFFFFF">
 			<@cms_perm url="/sensitivity/v_list.do">
 			<a href="sensitivity/v_list.do" target="rightFrame">
@@ -345,7 +344,7 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
-		<td colspan="3" rowspan="11" bgcolor="#FFFFFF"></td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/guestbook_ctg/v_list.do">
 			<a href="guestbook_ctg/v_list.do" target="rightFrame">
@@ -354,11 +353,6 @@ $(function(){
 			</@cms_perm>
 		</td>
 		<td bgcolor="#FFFFFF">
-			<!-- 
-			<@cms_perm url="/data/v_list.do">
-			<a href="data/v_list.do" target="rightFrame"><@s.m "db.backup"/></a>
-			</@cms_perm>
-			 -->
 			<@cms_perm url="/content_cycle/v_list.do">
 			<a href="content_cycle/v_list.do" target="rightFrame">
             <@s.m "contentCycle.function"/>
@@ -396,6 +390,7 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/guestbook_ctg/v_add.do">
 			<a href="guestbook_ctg/v_add.do" target="rightFrame">
@@ -404,14 +399,9 @@ $(function(){
 			</@cms_perm>
 		</td>
 		<td bgcolor="#FFFFFF">
-			<!--  
-			<@cms_perm url="/data/v_revert.do">
-			<a href="data/v_revert.do" target="rightFrame"><@s.m "db.revert"/></a>
-			</@cms_perm>
-			-->
-			<@cms_perm url="/file/v_list.do">
-			<a href="file/v_list.do" target="rightFrame">
-            <@s.m "cms.function.attachment"/>
+			<@cms_perm url="/data/v_list.do">
+			<a href="data/v_list.do" target="rightFrame">
+            <@s.m "db.backup"/>
             </a>
 			</@cms_perm>
 		</td>
@@ -446,6 +436,7 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/advertising/v_list.do">
 			<a href="advertising/v_list.do" target="rightFrame">
@@ -453,12 +444,12 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
-		<td colspan="1" rowspan="9" bgcolor="#FFFFFF">
-			<!--  
-			<@cms_perm url="/data/v_listfiles.do">
-			<a href="data/v_listfiles.do" target="rightFrame"><@s.m "db.dir"/></a>
+		<td bgcolor="#FFFFFF">
+			<@cms_perm url="/data/v_revert.do">
+			<a href="data/v_revert.do" target="rightFrame">
+            <@s.m "db.revert"/>
+            </a>
 			</@cms_perm>
-			-->
 		</td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/acquisition/v_progress.do">
@@ -491,6 +482,7 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/advertising/v_add.do">
 			<a href="advertising/v_add.do" target="rightFrame">
@@ -499,7 +491,13 @@ $(function(){
 			</@cms_perm>
 		</td>
 		<td bgcolor="#FFFFFF">
+			<@cms_perm url="/data/v_listfiles.do">
+			<a href="data/v_listfiles.do" target="rightFrame">
+            <@s.m "db.dir"/>
+            </a>
+			</@cms_perm>
 		</td>
+		<td bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/role/v_list.do">
 			<a href="role/v_list.do" target="rightFrame">
@@ -524,6 +522,7 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/advertising_space/v_list.do">
 			<a href="advertising_space/v_list.do" target="rightFrame">
@@ -532,7 +531,13 @@ $(function(){
 			</@cms_perm>
 		</td>
 		<td bgcolor="#FFFFFF">
+			<@cms_perm url="/file/v_list.do">
+			<a href="file/v_list.do" target="rightFrame">
+            <@s.m "cms.function.attachment"/>
+            </a>
+			</@cms_perm>
 		</td>
+		<td bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/role/v_add.do">
 			<a href="role/v_add.do" target="rightFrame">
@@ -557,6 +562,7 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/advertising_space/v_add.do">
 			<a href="advertising_space/v_add.do" target="rightFrame">
@@ -565,13 +571,19 @@ $(function(){
 			</@cms_perm>
 		</td>
 		<td bgcolor="#FFFFFF">
-		</td>
-		<td bgcolor="#FFFFFF">
-			<@cms_perm url="/log/v_list_operating.do">
-			<a href="log/v_list_operating.do" target="rightFrame">
-            <@s.m "cmsLog.function.operating"/>
+			<@cms_perm url="/content/v_list_share.do">
+			<a href="content/v_list_share.do" target="rightFrame">
+            <@s.m "cms.function.share"/>
             </a>
-			</@cms_perm></td>
+			</@cms_perm>
+		</td>
+		<td colspan="1" bgcolor="#FFFFFF"></td>
+		<td bgcolor="#FFFFFF">
+			<@cms_perm url="/department/v_list.do">
+			<a href="department/v_list.do" target="rightFrame">
+            <@s.m "cms.department.function"/>
+            </a>
+			</@cms_perm>
 		</td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/site/v_list.do">
@@ -590,18 +602,19 @@ $(function(){
             </a>
 			</@cms_perm>
 		</td>
+		<td colspan="3" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
 			<@cms_perm url="/friendlink/v_list.do">
 			<a href="friendlink/v_list.do" target="rightFrame">
-            <@s.m "cmsFriendlink.function"/></a>
+            <@s.m "cmsFriendlink.function"/>
+            </a>
 			</@cms_perm>
 		</td>
+		<td colspan="2" bgcolor="#FFFFFF"></td>
 		<td bgcolor="#FFFFFF">
-		</td>
-		<td bgcolor="#FFFFFF">
-			<@cms_perm url="/log/v_list_login_success.do">
-			<a href="log/v_list_login_success.do" target="rightFrame">
-            <@s.m "cmsLog.function.loginSuccess"/>
+			<@cms_perm url="/department/v_add.do">
+			<a href="department/v_add.do" target="rightFrame">
+            <@s.m "cms.department.function.add"/>
             </a>
 			</@cms_perm>
 		</td>
@@ -614,108 +627,127 @@ $(function(){
 		</td>
 	</tr>
 	<!-- 第十三行 -->
-	<tr>
-		<td bgcolor="#FFFFFF">
+	<tr bgcolor="#FFFFFF">
+		<td>
 			<@cms_perm url="/flow_accessPage/v_list.do">
 			<a href="flow_accessPage/v_list.do" target="rightFrame">
             <@s.m "statistic.function.accessPage"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
+		<td colspan="3"></td>
+		<td>
 			<@cms_perm url="/friendlink/v_add.do">
 			<a href="friendlink/v_add.do" target="rightFrame">
             <@s.m "cmsFriendlink.function.add"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
-		</td>
-		<td bgcolor="#FFFFFF">
-			<@cms_perm url="/log/v_list_login_failure.do">
-			<a href="log/v_list_login_failure.do" target="rightFrame">
-            <@s.m "cmsLog.function.loginFailure"/>
+		<td colspan="2"></td>
+		<td><@cms_perm url="/log/v_list_operating.do">
+			<a href="log/v_list_operating.do" target="rightFrame">
+            <@s.m "cmsLog.function.operating"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
-			<@cms_perm url="/site_config/v_company_edit.do">
-			<a href="site_config/v_company_edit.do" target="rightFrame">
-            <@s.m "cmsSiteConfig.function.company"/>
+		<td><@cms_perm url="/workflow/v_list.do">
+			<a href="workflow/v_list.do" target="rightFrame">
+            <@s.m "cms.workflow.function"/>
             </a>
 			</@cms_perm>
 		</td>
 	</tr>
 	<!-- 第十四行 -->
-	<tr>
-		<td bgcolor="#FFFFFF">
+	<tr bgcolor="#FFFFFF">
+		<td>
 			<@cms_perm url="/flow_area/v_list.do">
 			<a href="flow_area/v_list.do" target="rightFrame">
             <@s.m "statistic.function.area"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
+		<td colspan="3"></td>
+		<td>
 			<@cms_perm url="/friendlink_ctg/v_list.do">
 			<a href="friendlink_ctg/v_list.do" target="rightFrame">
             <@s.m "cmsFriendlinkCtg.function"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
-		</td>
-		<td bgcolor="#FFFFFF">
-			<@cms_perm url="/message/v_list.do">
-			<a href="message/v_list.do" target="rightFrame">
-            <@s.m "cmsMessage.function"/>
+		<td colspan="2"></td>
+		<td>
+			<@cms_perm url="/log/v_list_login_success.do">
+			<a href="log/v_list_login_success.do" target="rightFrame">
+            <@s.m "cmsLog.function.loginSuccess"/>
             </a>
 			</@cms_perm>
-        </td>
-		<td bgcolor="#FFFFFF">
-       	   <@cms_perm url="/dictionary/v_list.do">
-			<a href="dictionary/v_list.do" target="rightFrame">
-            <@s.m "cmsDictionary.function"/>
+		</td>
+		<td>
+			<@cms_perm url="/workflow/v_add.do">
+			<a href="workflow/v_add.do" target="rightFrame">
+            <@s.m "ccms.workflow.function.add"/>
             </a>
-		  </@cms_perm>
+			</@cms_perm>
 		</td>
 	</tr>
 	<!-- 第十五行 -->
-	<tr>
-		<td bgcolor="#FFFFFF">
+	<tr bgcolor="#FFFFFF">
+		<td>
 			<@cms_perm url="/statistic_flow/v_init.do">
 			<a href="statistic_flow/v_init.do" target="rightFrame">
             <@s.m "statistic.function.flowinit"/>
             </a>
 	    	</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
+		<td colspan="3"></td>
+		<td>
 			<@cms_perm url="/workloadstatistic/v_list.do">
 			<a href="workloadstatistic/v_list.do" target="rightFrame">
             <@s.m "cms.workload.statistic.function"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
+		<td colspan="2">
 		</td>
-		<td bgcolor="#FFFFFF">
+		<td>
+			<@cms_perm url="/log/v_list_login_failure.do">
+			<a href="log/v_list_login_failure.do" target="rightFrame">
+            <@s.m "cmsLog.function.loginFailure"/>
+            </a>
+			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
+        <td>
+        	<@cms_perm url="/site_config/v_company_edit.do">
+			<a href="site_config/v_company_edit.do" target="rightFrame">
+            <@s.m "cmsSiteConfig.function.company"/>
+            </a>
+			</@cms_perm>
 		</td>
 	</tr>
 	<!-- 第十六行 -->
-	<tr>
-		<td bgcolor="#FFFFFF"></td>
-		<td bgcolor="#FFFFFF">
+	<tr bgcolor="#FFFFFF">
+		<td colspan="4"></td>
+		<td>
 			<@cms_perm url="/jobapply/v_list.do">
 			<a href="jobapply/v_list.do" target="rightFrame">
             <@s.m "cmsJobApply.function"/>
             </a>
 			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF">
+		<td colspan="2"></td>
+		<td>
+			<@cms_perm url="/message/v_list.do">
+			<a href="message/v_list.do" target="rightFrame">
+            <@s.m "cmsMessage.function"/>
+            </a>
+			</@cms_perm>
 		</td>
-		<td bgcolor="#FFFFFF"></td>
-		<td bgcolor="#FFFFFF">
+        <td>
+       	   <@cms_perm url="/dictionary/v_list.do">
+			<a href="dictionary/v_list.do" target="rightFrame">
+            <@s.m "cmsDictionary.function"/>
+            </a>
+			</@cms_perm>
 		</td>
 	</tr>
 </table>

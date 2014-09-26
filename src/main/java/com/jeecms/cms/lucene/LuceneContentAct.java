@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,16 +21,16 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class LuceneContentAct {
-	private static final Logger log = LoggerFactory
-			.getLogger(LuceneContentAct.class);
+	private static final Logger log = LoggerFactory.getLogger(LuceneContentAct.class);
 
+	@RequiresPermissions("lucene:v_index")
 	@RequestMapping(value = "/lucene/v_index.do")
 	public String index(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -42,6 +43,7 @@ public class LuceneContentAct {
 		return "lucene/index";
 	}
 
+	@RequiresPermissions("lucene:o_create")
 	@RequestMapping(value = "/lucene/o_create.do")
 	public void create(Integer siteId, Integer channelId, Date startDate,
 			Date endDate, Integer startId, Integer max,

@@ -13,15 +13,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.MemberConfig;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.image.ImageScale;
 import com.jeecms.common.upload.FileRepository;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.entity.MemberConfig;
 import com.jeecms.core.manager.DbFileMng;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 @Controller
 public class ImageCutAct {

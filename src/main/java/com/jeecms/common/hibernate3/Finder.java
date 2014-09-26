@@ -48,20 +48,17 @@ public class Finder {
 	 * 
 	 * @return
 	 */
+	
 	public String getRowCountHql() {
-		String hql = hqlBuilder.toString();
-
-		int fromIndex = hql.toLowerCase().indexOf(FROM);
-		String projectionHql = hql.substring(0, fromIndex);
-
-		hql = hql.substring(fromIndex);
-		String rowCountHql = hql.replace(HQL_FETCH, "");
-
-		int index = rowCountHql.indexOf(ORDER_BY);
-		if (index > 0) {
-			rowCountHql = rowCountHql.substring(0, index);
-		}
-		return wrapProjection(projectionHql) + rowCountHql;
+		return getRowCountBaseHql(ORDER_BY);
+	}
+	
+	public String getRowCountTotalHql(String selectSql) {
+		return getRowCountTotalBaseHql(ORDER_BY,selectSql);
+	}
+	
+	public String getRowCountHqlByGroup() {
+		return getRowCountBaseHql(GROUP_BY);
 	}
 
 	public int getFirstResult() {
@@ -253,11 +250,52 @@ public class Finder {
 		return query;
 	}
 
+	private String getRowCountBaseHql(String indexKey) {
+		String hql = hqlBuilder.toString();
+
+		int fromIndex = hql.toLowerCase().indexOf(FROM);
+		String projectionHql = hql.substring(0, fromIndex);
+
+		hql = hql.substring(fromIndex);
+		String rowCountHql = hql.replace(HQL_FETCH, "");
+
+		int index = rowCountHql.indexOf(indexKey);
+		if (index > 0) {
+			rowCountHql = rowCountHql.substring(0, index);
+		}
+		return wrapProjection(projectionHql) + rowCountHql;
+	}
+	private String getRowCountTotalBaseHql(String indexKey,String selectSql) {
+		String hql = hqlBuilder.toString();
+
+		int fromIndex = hql.toLowerCase().indexOf(FROM);
+		String projectionHql = hql.substring(0, fromIndex);
+
+		hql = hql.substring(fromIndex);
+		String rowCountHql = hql.replace(HQL_FETCH, "");
+
+		int index = rowCountHql.indexOf(indexKey);
+		if (index > 0) {
+			rowCountHql = rowCountHql.substring(0, index);
+		}
+		//return selectSql+"( "+wrapProjectionBeanId(projectionHql)+rowCountHql+")";
+		return "select count(bean) from "+"( "+projectionHql+rowCountHql+") as a";
+	}
+	
 	private String wrapProjection(String projection) {
 		if (projection.indexOf("select") == -1) {
 			return ROW_COUNT;
 		} else {
 			return projection.replace("select", "select count(") + ") ";
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private String wrapProjectionBeanId(String projection) {
+		if (projection.indexOf("select") == -1) {
+			return "select bean.id ";
+		} else {
+			return projection.replace("select bean", "select bean.id") + " ";
 		}
 	}
 
@@ -349,6 +387,7 @@ public class Finder {
 	public static final String DISTINCT = "distinct";
 	public static final String HQL_FETCH = "fetch";
 	public static final String ORDER_BY = "order";
+	public static final String GROUP_BY = "group";
 
 	public static void main(String[] args) {
 		Finder find = Finder

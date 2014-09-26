@@ -14,7 +14,7 @@ import com.jeecms.common.page.Pagination;
 public class CmsCommentDaoImpl extends HibernateBaseDao<CmsComment, Integer>
 		implements CmsCommentDao {
 	public Pagination getPage(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int pageNo, int pageSize, boolean cacheable) {
 		Finder f = getFinder(siteId, contentId, null,null,greaterThen, checked,
 				recommend, desc, cacheable);
@@ -23,13 +23,14 @@ public class CmsCommentDaoImpl extends HibernateBaseDao<CmsComment, Integer>
 
 	@SuppressWarnings("unchecked")
 	public List<CmsComment> getList(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int count, boolean cacheable) {
 		Finder f = getFinder(siteId, contentId, null,null,greaterThen, checked,
 				recommend, desc, cacheable);
 		f.setMaxResults(count);
 		return find(f);
 	}
+	
 	public Pagination getPageForMember(Integer siteId, Integer contentId,Integer toUserId,Integer fromUserId,
 			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int pageNo, int pageSize,boolean cacheable){
@@ -37,7 +38,6 @@ public class CmsCommentDaoImpl extends HibernateBaseDao<CmsComment, Integer>
 				recommend, desc, cacheable);
 		return find(f, pageNo, pageSize);
 	}
-	
 	@SuppressWarnings("unchecked")
 	public List<CmsComment> getListForDel(Integer siteId, Integer userId,
 			Integer commentUserId, String ip){
@@ -85,9 +85,8 @@ public class CmsCommentDaoImpl extends HibernateBaseDao<CmsComment, Integer>
 			f.setParam("checked", checked);
 		}
 		if(recommend!=null){
-			if (recommend) {
-				f.append(" and bean.recommend=true");
-			}
+			f.append(" and bean.recommend=:recommend");
+			f.setParam("recommend", recommend);
 		}
 		if (desc) {
 			f.append(" order by bean.id desc");

@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,18 +12,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.ContentType;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.ContentTypeMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class ContentTypeAct {
-	private static final Logger log = LoggerFactory
-			.getLogger(ContentTypeAct.class);
-
+	private static final Logger log = LoggerFactory.getLogger(ContentTypeAct.class);
+	
+	@RequiresPermissions("type:v_list")
 	@RequestMapping("/type/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -31,11 +32,13 @@ public class ContentTypeAct {
 		return "type/list";
 	}
 
+	@RequiresPermissions("type:v_add")
 	@RequestMapping("/type/v_add.do")
 	public String add(ModelMap model) {
 		return "type/add";
 	}
 
+	@RequiresPermissions("type:v_edit")
 	@RequestMapping("/type/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -46,6 +49,7 @@ public class ContentTypeAct {
 		return "type/edit";
 	}
 
+	@RequiresPermissions("type:o_save")
 	@RequestMapping("/type/o_save.do")
 	public String save(ContentType bean, HttpServletRequest request,
 			ModelMap model) {
@@ -60,6 +64,7 @@ public class ContentTypeAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("type:o_update")
 	@RequestMapping("/type/o_update.do")
 	public String update(ContentType bean, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
@@ -74,6 +79,7 @@ public class ContentTypeAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("type:o_delete")
 	@RequestMapping("/type/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {

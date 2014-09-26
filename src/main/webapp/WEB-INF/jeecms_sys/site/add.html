@@ -21,13 +21,20 @@ $(function() {
 <div class="body-box">
 <#assign localeDefault><@s.m "cmsSite.locale.default"/></#assign>
 <#assign domainExist><@s.m "cmsSite.error.domainExist"/></#assign>
+<#assign accessPathExist><@s.m "cmsSite.error.accessPathExist"/></#assign>
 <@p.form id="jvForm" action="o_save.do" labelWidth="12">
 <@p.text colspan="1" width="50" label="cmsSite.name" name="name" style="width:260px" required="true" class="required" maxlength="100"/>
 <@p.text colspan="1" width="50" label="cmsSite.shortName" name="shortName" required="true" class="required" maxlength="100"/><@p.tr/>
+
+<@p.text colspan="2" width="100" label="cmsSite.keywords" name="keywords" style="width:560px"  maxlength="255"/><@p.tr/>
+<@p.text colspan="2" width="100" label="cmsSite.description" name="description" style="width:560px"  maxlength="255"/><@p.tr/>
+
 <@p.text colspan="1" width="50" label="cmsSite.domain" name="domain" required="true" maxlength="50" vld="{required:true,remote:'v_checkDomain.do',messages:{remote:'${domainExist}'}}"/>
+
 <@p.text colspan="1" width="50" label="cmsSite.path" name="path" required="true" class="required" maxlength="20" help="cmsSite.path.help"/><@p.tr/>
 <@p.text colspan="1" width="50" label="cmsSite.domainAlias" name="domainAlias" style="width:200px" maxlength="255" help="cmsSite.domainAlias.help"/>
 <@p.text colspan="1" width="50" label="cmsSite.domainRedirect" name="domainRedirect" style="width:200px" maxlength="255" help="cmsSite.domainRedirect.help"/><@p.tr/>
+
 <@p.radio colspan="1" width="50" label="cmsSite.relativePath" name="relativePath" value="false" list={"true":"global.true","false":"global.false"} required="true" help="cmsSite.relativePath.help"/>
 <@p.select colspan="1" width="50" label="cmsSite.protocol" name="protocol" value="http://" list=["http://","https://"] required="true"/><@p.tr/>
 <@p.select colspan="1" width="50" label="cmsSite.dynamicSuffix" name="dynamicSuffix" list=[".jhtml",".htm"] required="true" help="cmsSite.dynamicSuffix.help"/>
@@ -43,10 +50,14 @@ $(function() {
 	<@p.select name="uploadFtpId" list=ftpList listKey="id" listValue="name" headerKey="" headerValue="global.none"/>
 </@p.td>
 <@p.radio colspan="1" width="50" label="cmsSite.resycleOn" name="resycleOn" value="true" list={"true":"global.true","false":"global.false"} required="true"/><@p.tr/>
+
+
 <@p.text colspan="1" width="50" label="cmsSite.finalStep" name="finalStep" value="2" required="true" class="required digits"/>
-<@p.select colspan="1" width="50" label="cmsSite.afterCheck" name="afterCheck" value="2" list={"1":"cmsSite.afterCheck.1","2":"cmsSite.afterCheck.2","3":"cmsSite.afterCheck.3"} required="required"/><@p.tr/>
+<@p.select colspan="1" width="50" label="cmsSite.afterCheck" name="afterCheck" value="3" list={"1":"cmsSite.afterCheck.1","2":"cmsSite.afterCheck.2","3":"cmsSite.afterCheck.3"} required="required"/><@p.tr/>
+<@p.tr/>
 <@p.td colspan="2">
-	<@p.submit code="global.submit"/> &nbsp; <@p.reset code="global.reset"/>
+	<@p.hidden name="root" value=root!/>
+	<@p.submit code="global.submit" /> &nbsp; <@p.reset code="global.reset"/>
 </@p.td>
 </@p.form>
 </div>

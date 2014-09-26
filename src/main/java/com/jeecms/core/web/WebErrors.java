@@ -1,20 +1,13 @@
 package com.jeecms.core.web;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.MessageSource;
 
-public class WebErrors extends com.jeecms.common.web.springmvc.WebErrors {
-	/**
-	 * 默认错误页面
-	 */
-	public static final String ERROR_PAGE = "/common/error_message";
-	/**
-	 * 默认错误信息属性名称
-	 */
-	public static final String ERROR_ATTR_NAME = "errors";
+public class WebErrors extends com.jeecms.core.web.WebCoreErrors {
 
 	/**
 	 * 通过HttpServletRequest创建WebErrors
@@ -44,13 +37,13 @@ public class WebErrors extends com.jeecms.common.web.springmvc.WebErrors {
 		super(messageSource, locale);
 	}
 
-	@Override
-	protected String getErrorAttrName() {
-		return ERROR_ATTR_NAME;
-	}
-
-	@Override
-	protected String getErrorPage() {
-		return ERROR_PAGE;
+	/**
+	 * 非站点内数据
+	 * 
+	 * @param clazz
+	 * @param id
+	 */
+	public void notInSite(Class<?> clazz, Serializable id) {
+		addErrorCode("error.notInSite", clazz.getSimpleName(), id);
 	}
 }

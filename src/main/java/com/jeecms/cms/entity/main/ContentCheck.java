@@ -15,6 +15,10 @@ public class ContentCheck extends BaseContentCheck {
 	 */
 	public static final byte CHECKING = 1;
 	/**
+	 * 退回
+	 */
+	public static final byte REJECT = -1;
+	/**
 	 * 已审核
 	 */
 	public static final byte CHECKED = 2;
@@ -22,6 +26,10 @@ public class ContentCheck extends BaseContentCheck {
 	 * 回收站
 	 */
 	public static final byte RECYCLE = 3;
+	/**
+	 * 投稿
+	 */
+	public static final byte CONTRIBUTE = 4;
 
 	public void init() {
 		byte zero = 0;

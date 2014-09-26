@@ -11,12 +11,12 @@ function getTableForm() {
 }
 function optDelete() {
 	if(Pn.checkedCount('ids')<=0) {
-		alert("<@s.m 'error.checkRecord'/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
-	if(!confirm("<@s.m 'global.confirm.delete'/>")) {
-		return;
-	}
+	$.confirm(doDelete,"<@s.m 'global.confirm'/>","<@s.m 'global.confirm.delete'/>");
+}
+function doDelete(){
 	var f = getTableForm();
 	f.action="o_delete.do";
 	f.submit();
@@ -40,7 +40,7 @@ function toList(box) {
 <input type="hidden" name="msg" value="<@s.m 'cmsMessage.msg'/>"/>
 <@p.table value=pagination;message,i,has_next><#rt/>
 	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"ids\",this.checked)'/>" width="20">
-		<input type='checkbox' name='ids' value='${message.id}' id="id_${message.id!}"/><#t/>
+		<input type='checkbox' name='ids' value='${message.id}' id="id_${message.id!}" onclick="Pn.selectCheckBox('${message.id}',this.checked)"/><#t/>
 	</@p.column><#t/>
 	<@p.column title="ID">${message.id}</@p.column><#t/>
 	<@p.column code="cmsMessage.title">

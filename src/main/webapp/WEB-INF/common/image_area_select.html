@@ -33,8 +33,12 @@
 	</div>
 	<div style="clear:both;"></div>
 </div>
+<link href="${base}/res/common/css/jquery.ui.css" rel="stylesheet" type="text/css"/>
+<link href="${base}/res/common/css/imgareaselect-default.css" rel="stylesheet" type="text/css"/>
 <script src="${base}/res/common/js/jquery.js" type="text/javascript"></script>
-<script src="${base}/res/common/js/jquery.imgareaselect.js" type="text/javascript"></script>
+<script src="${base}/res/common/js/jquery.ext.js" type="text/javascript"></script>
+<script src="${base}/res/common/js/jquery-ui.js" type="text/javascript"></script>
+<script src="${base}/res/common/js/jquery.imgareaselect.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 	var container=500;
 	var imageW = 100;
@@ -66,37 +70,37 @@
 			$('#ferret').css({width:Math.round(scale*imageW)+'px',height:Math.round(scale*imageH)+'px'});
 		}
 		<#if !imgSrc?has_content>
-		alert("<@s.m "imagecut.error.noImageToCut"/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'imagecut.error.noImageToCut'/>");
 		return;
 		</#if>
 		if(imageW<${minWidth}||imageH<${minHeight}) {
-			alert("<@s.m "imagecut.error.origSizeLessThenZoomSize"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'imagecut.error.origSizeLessThenZoomSize'/>");
 			return;
 		}
 		if(imageW==minWidth&&imageH==minHeight) {
-			alert("<@s.m "imagecut.error.origSizeEqualsZoomSize"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'imagecut.error.origSizeEqualsZoomSize'/>");
 			return;
 		}
 		var minSelW = Math.round(${minWidth}*scale);
 		var minSelH = Math.round(${minHeight}*scale);
-		$('img#ferret').imgAreaSelect({selectionOpacity:0,outerOpacity:'0.5',selectionColor:'blue',onSelectChange:preview,minWidth:minSelW,minHeight:minSelH,aspectRatio:'${minWidth}:${minHeight}',x1:0,y1:0,x2:${minWidth},y2:${minHeight}});
+		$('img#ferret').imgAreaSelect({selectionOpacity:0,outerOpacity:'0.5',onSelectChange:preview,minWidth:minSelW,minHeight:minSelH,aspectRatio:'${minWidth}:${minHeight}',x1:0,y1:0,x2:${minWidth},y2:${minHeight}});
 		showCut(${minWidth},${minHeight},0,0);
 	});
 	function resetOption(width,height) {
 		minWidth = parseInt(width);
 		minHeight = parseInt(height);
 		if(imageW<minWidth||imageH<minHeight) {
-			alert("<@s.m "imagecut.error.origSizeLessThenZoomSize"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'imagecut.error.origSizeLessThenZoomSize'/>");
 			return;
 		}
 		if(imageW==minWidth&&imageH==minHeight) {
-			alert("<@s.m "imagecut.error.origSizeEqualsZoomSize"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'imagecut.error.origSizeEqualsZoomSize'/>");
 			return;
 		}
 		$('#imgDiv').css({'width':minWidth+'px','height':minHeight+'px'});
 		var minSelW = Math.round(minWidth*scale);
 		var minSelH = Math.round(minHeight*scale);
-		$('img#ferret').imgAreaSelect({selectionOpacity:0,outerOpacity:'0.5',selectionColor:'blue',onSelectChange:preview,minWidth:minSelW,minHeight:minSelH,aspectRatio:minWidth+':'+minHeight,x1:0,y1:0,x2:minWidth,y2:minHeight});
+		$('img#ferret').imgAreaSelect({selectionOpacity:0,outerOpacity:'0.5',onSelectChange:preview,minWidth:minSelW,minHeight:minSelH,aspectRatio:minWidth+':'+minHeight,x1:0,y1:0,x2:minWidth,y2:minHeight});
 		//showCut(minWidth,minHeight,0,0);
 	}
 </script>

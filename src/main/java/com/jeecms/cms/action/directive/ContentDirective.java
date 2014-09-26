@@ -9,12 +9,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.freemarker.DirectiveUtils;
 import com.jeecms.common.web.freemarker.ParamsRequiredException;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.FrontUtils;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;

@@ -76,7 +76,7 @@ public abstract class BaseCmsAcquisitionTemp  implements Serializable {
 	private java.lang.Integer seq;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsSite site;
 
 
 
@@ -201,7 +201,7 @@ public abstract class BaseCmsAcquisitionTemp  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -209,7 +209,7 @@ public abstract class BaseCmsAcquisitionTemp  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

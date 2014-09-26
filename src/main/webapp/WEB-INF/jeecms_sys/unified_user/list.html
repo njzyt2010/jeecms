@@ -10,12 +10,12 @@ function getTableForm() {
 }
 function optDelete() {
 	if(Pn.checkedCount('ids')<=0) {
-		alert("<@s.m 'error.checkRecord'/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
-	if(!confirm("<@s.m 'global.confirm.delete'/>")) {
-		return;
-	}
+	$.confirm(doDelete,"<@s.m 'global.confirm'/>","<@s.m 'global.confirm.delete'/>");
+}
+function doDelete(){
 	var f = getTableForm();
 	f.action="o_delete.do";
 	f.submit();
@@ -35,7 +35,7 @@ function optDelete() {
 <input type="hidden" name="pageNo" value="${pageNo!}"/>
 <@p.table value=pagination;user,i,has_next><#rt/>
 	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"ids\",this.checked)'/>" width="20">
-		<input type='checkbox' name='ids' value='${user.id}'/><#t/>
+		<input type='checkbox' name='ids' value='${user.id}' onclick="Pn.selectCheckBox('${user.id}',this.checked)"/><#t/>
 	</@p.column><#t/>
 	<@p.column title="ID">${user.id}</@p.column><#t/>
 	<@p.column code="user.username">${user.username}</@p.column><#t/>
@@ -47,7 +47,7 @@ function optDelete() {
 	<@p.column code="user.currentLoginIp" align="center">${user.currentLoginIp}</@p.column><#t/>
 	<@p.column code="global.operate" align="center">
 		<a href="v_edit.do?id=${user.id}&pageNo=${pageNo!}"><@s.m "global.edit"/></a> | <#rt/>
-		<a href="o_delete.do?ids=${user.id}&pageNo=${pageNo!}" onclick="if(!confirm('<@s.m "global.confirm.delete"/>')) {return false;}"><@s.m "global.delete"/></a><#t/>
+		<a href="o_delete.do?ids=${user.id}&pageNo=${pageNo!}" onclick="if(!$.confirmToUrl(this.href)) {return false;}"><@s.m "global.delete"/></a><#t/>
 	</@p.column><#t/>
 </@p.table>
 <div><input type="button" value="<@s.m "global.delete"/>" onclick="optDelete();"/></div>

@@ -24,10 +24,20 @@ Cms.viewCount = function(base, contentId, viewId, commentId, downloadId, upId,
 /**
  * 站点流量统计
  */
-Cms.siteFlow = function(base, page, referer) {
-	$.get(base + "/flow_statistic.jspx", {
+Cms.siteFlow = function(base, page, referer,flag,pvId, visitorId) {
+	pvId = pvId || "pv";
+	visitorId = visitorId || "visitor";
+	flag = flag || 1;
+	$.getJSON(base + "/flow_statistic.jspx", {
 		page : page,
 		referer : referer
+	}, function(data) {
+		if(flag==1){
+			if (data.length > 0) {
+				$("#" + pvId).text(data[0]);
+				$("#" + visitorId).text(data[1]);
+			}
+		}
 	});
 }
 /**
@@ -61,6 +71,40 @@ Cms.down = function(base, contentId, origValue, downId) {
 		contentId : contentId
 	}, function(data) {
 		$("#" + downId).text(origValue + 1);
+	});
+	return true;
+}
+/**
+ * 获取评分选项投票数
+ */
+Cms.scoreCount = function(base, contentId,itemPrefix) {
+	itemPrefix=itemPrefix||"score-item-";
+	$.getJSON(base + "/content_score_items.jspx", {
+		contentId : contentId
+	}, function(data) {
+			$("span[id^='"+itemPrefix+"']").each(function(){
+				var itemId=$(this).prop("id").split(itemPrefix)[1];
+				$(this).text(data.result[itemId]);
+			});
+	});
+}
+/**
+ * 成功返回true，失败返回false。
+ */
+Cms.score = function(base, contentId,itemId,itemPrefix) {
+	itemPrefix=itemPrefix||"score-item-";
+	var score = $.cookie("_cms_score_" + contentId);
+	if (score) {
+		return false;
+	}
+	$.cookie("_cms_score_" + contentId, "1");
+	$.get(base + "/content_score.jspx", {
+		"contentId" : contentId,
+		"itemId":itemId
+	}, function(data) {
+		if(data.succ){
+			$("#"+itemPrefix + itemId).text(data.count);
+		}
 	});
 	return true;
 }

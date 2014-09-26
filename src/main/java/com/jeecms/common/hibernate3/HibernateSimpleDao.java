@@ -85,6 +85,10 @@ public abstract class HibernateSimpleDao {
 		p.setList(list);
 		return p;
 	}
+	
+	protected Pagination findByGroup(Finder finder,String selectSql, int pageNo, int pageSize) {
+		return findByTotalCount(finder, pageNo, pageSize,  countQueryResultByGroup(finder,selectSql));
+	}
 
 	/**
 	 * 通过Finder获得列表数据
@@ -180,6 +184,39 @@ public abstract class HibernateSimpleDao {
 			query.setCacheable(true);
 		}
 		return ((Number) query.iterate().next()).intValue();
+	}
+	
+	protected int countQueryResultByGroup(Finder finder,String selectSql) {
+		Query query = getSession().createQuery(finder.getRowCountTotalHql(selectSql));
+		setParamsToQuery(finder, query);
+		return ((Number) query.iterate().next()).intValue();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Pagination findByTotalCount(Finder finder, int pageNo, int pageSize,int totalCount) {
+		Pagination p = new Pagination(pageNo, pageSize, totalCount);
+		if (totalCount < 1) {
+			p.setList(new ArrayList());
+			return p;
+		}
+		Query query = getSession().createQuery(finder.getOrigHql());
+		finder.setParamsToQuery(query);
+		query.setFirstResult(p.getFirstResult());
+		query.setMaxResults(p.getPageSize());
+		if (finder.isCacheable()) {
+			query.setCacheable(true);
+		}
+		List list = query.list();
+		p.setList(list);
+		return p;
+	}
+	
+	private Query setParamsToQuery(Finder finder,Query query){
+		finder.setParamsToQuery(query);
+		if (finder.isCacheable()) {
+			query.setCacheable(true);
+		}
+		return query;
 	}
 
 	protected SessionFactory sessionFactory;

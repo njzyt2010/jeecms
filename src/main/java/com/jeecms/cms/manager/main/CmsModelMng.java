@@ -6,6 +6,7 @@ import com.jeecms.cms.entity.main.CmsModel;
 
 /**
  * 模型Manager接口
+ * 
  */
 public interface CmsModelMng {
 	/**
@@ -13,8 +14,6 @@ public interface CmsModelMng {
 	 * 
 	 * @param containDisabled
 	 *            是否所有模型（即包含禁用模型）
-	 * @param hasContent
-	 *            是否有内容
 	 * @return
 	 */
 	public List<CmsModel> getList(boolean containDisabled,Boolean hasContent);

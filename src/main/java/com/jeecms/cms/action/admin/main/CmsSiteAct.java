@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,54 +15,60 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.manager.main.CmsConfigMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.manager.CmsConfigMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsSiteMng;
 import com.jeecms.core.manager.FtpMng;
-import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.WebCoreErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsSiteAct {
 	private static final Logger log = LoggerFactory.getLogger(CmsSiteAct.class);
-
+	
+	@RequiresPermissions("site:v_list")
 	@RequestMapping("/site/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
-		List<CmsSite> list = manager.getList();
+		List<CmsSite> list= manager.getList();
 		model.addAttribute("list", list);
 		return "site/list";
 	}
 
+	@RequiresPermissions("site:v_add")
 	@RequestMapping("/site/v_add.do")
 	public String add(ModelMap model) {
 		List<Ftp> ftpList = ftpMng.getList();
+		model.addAttribute("config", configMng.get());
 		model.addAttribute("ftpList", ftpList);
 		return "site/add";
 	}
 
+	@RequiresPermissions("site:v_edit")
 	@RequestMapping("/site/v_edit.do")
-	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validateEdit(id, request);
+	public String edit(Integer id,HttpServletRequest request, ModelMap model) {
+		WebCoreErrors errors = validateEdit(id, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
 		List<Ftp> ftpList = ftpMng.getList();
+		model.addAttribute("config", configMng.get());
 		model.addAttribute("ftpList", ftpList);
 		model.addAttribute("cmsSite", manager.findById(id));
 		return "site/edit";
 	}
 
+	@RequiresPermissions("site:o_save")
 	@RequestMapping("/site/o_save.do")
 	public String save(CmsSite bean, Integer uploadFtpId,
 			HttpServletRequest request, ModelMap model) throws IOException {
 		CmsSite site = CmsUtils.getSite(request);
 		CmsUser user = CmsUtils.getUser(request);
-		WebErrors errors = validateSave(bean, uploadFtpId, request);
+		WebCoreErrors errors = validateSave(bean, uploadFtpId, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
@@ -72,10 +79,11 @@ public class CmsSiteAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("site:o_update")
 	@RequestMapping("/site/o_update.do")
 	public String update(CmsSite bean, Integer uploadFtpId, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validateUpdate(bean.getId(), uploadFtpId, request);
+		WebCoreErrors errors = validateUpdate(bean.getId(), uploadFtpId, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
@@ -83,13 +91,14 @@ public class CmsSiteAct {
 		log.info("update CmsSite id={}.", bean.getId());
 		cmsLogMng.operating(request, "cmsSite.log.update", "id=" + bean.getId()
 				+ ";name=" + bean.getName());
-		return list(pageNo, request, model);
+		return list(pageNo,request, model);
 	}
 
+	@RequiresPermissions("site:o_delete")
 	@RequestMapping("/site/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validateDelete(ids, request);
+		WebCoreErrors errors = validateDelete(ids, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
@@ -102,21 +111,30 @@ public class CmsSiteAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("site:v_checkDomain")
 	@RequestMapping("/site/v_checkDomain.do")
-	public void checkUserJson(String domain, HttpServletResponse response) {
+	public void checkDomainJson(Integer siteId,String domain, HttpServletResponse response) {
 		String pass;
 		if (StringUtils.isBlank(domain)) {
 			pass = "false";
 		} else {
-			pass = manager.findByDomain(domain, false) == null ? "true"
-					: "false";
+			CmsSite s=manager.findByDomain(domain);
+			if(s==null){
+				pass= "true";
+			}else{
+				if(s.getId().equals(siteId)){
+					pass= "true";
+				}else{
+					pass= "false";
+				}
+			}
 		}
 		ResponseUtils.renderJson(response, pass);
 	}
-
-	private WebErrors validateSave(CmsSite bean, Integer uploadFtpId,
+	
+	private WebCoreErrors validateSave(CmsSite bean, Integer uploadFtpId,
 			HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
+		WebCoreErrors errors = WebCoreErrors.create(request);
 		if (vldFtpExist(uploadFtpId, errors)) {
 			return errors;
 		}
@@ -125,17 +143,17 @@ public class CmsSiteAct {
 		return errors;
 	}
 
-	private WebErrors validateEdit(Integer id, HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
+	private WebCoreErrors validateEdit(Integer id, HttpServletRequest request) {
+		WebCoreErrors errors = WebCoreErrors.create(request);
 		if (vldExist(id, errors)) {
 			return errors;
 		}
 		return errors;
 	}
 
-	private WebErrors validateUpdate(Integer id, Integer uploadFtpId,
+	private WebCoreErrors validateUpdate(Integer id, Integer uploadFtpId,
 			HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
+		WebCoreErrors errors = WebCoreErrors.create(request);
 		if (vldExist(id, errors)) {
 			return errors;
 		}
@@ -145,8 +163,8 @@ public class CmsSiteAct {
 		return errors;
 	}
 
-	private WebErrors validateDelete(Integer[] ids, HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
+	private WebCoreErrors validateDelete(Integer[] ids, HttpServletRequest request) {
+		WebCoreErrors errors = WebCoreErrors.create(request);
 		errors.ifEmpty(ids, "ids");
 		for (Integer id : ids) {
 			vldExist(id, errors);
@@ -154,7 +172,7 @@ public class CmsSiteAct {
 		return errors;
 	}
 
-	private boolean vldFtpExist(Integer id, WebErrors errors) {
+	private boolean vldFtpExist(Integer id, WebCoreErrors errors) {
 		if (id == null) {
 			return false;
 		}
@@ -162,7 +180,7 @@ public class CmsSiteAct {
 		return errors.ifNotExist(entity, Ftp.class, id);
 	}
 
-	private boolean vldExist(Integer id, WebErrors errors) {
+	private boolean vldExist(Integer id, WebCoreErrors errors) {
 		if (errors.ifNull(id, "id")) {
 			return true;
 		}

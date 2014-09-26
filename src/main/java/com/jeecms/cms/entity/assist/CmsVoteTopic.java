@@ -49,7 +49,7 @@ public class CmsVoteTopic extends BaseCmsVoteTopic {
 	 */
 	public CmsVoteTopic (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String title,
 		java.lang.Integer totalCount,
 		java.lang.Integer multiSelect,

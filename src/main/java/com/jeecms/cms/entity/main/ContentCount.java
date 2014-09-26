@@ -4,6 +4,10 @@ import com.jeecms.cms.entity.main.base.BaseContentCount;
 
 public class ContentCount extends BaseContentCount {
 	private static final long serialVersionUID = 1L;
+	
+	public enum ContentViewCount{
+		viewTotal,viewMonth,viewWeek,viewDay
+	}
 
 	public void init() {
 		short zero = 0;

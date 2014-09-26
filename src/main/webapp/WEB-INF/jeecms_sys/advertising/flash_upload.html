@@ -4,7 +4,7 @@ function uploadFlash(n) {
 	var af = $('#flashFile'+n);
 	//检查是否选择了文件
 	if(af.val()=='') {
-		alert('<@s.m "advertising.error.noFileSelected"/>');
+		$.alert("<@s.m 'global.prompt'/>",'<@s.m "advertising.error.noFileSelected"/>');
 		return;
 	}
 	//将file移动至上传表单

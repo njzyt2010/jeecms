@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jeecms.cms.entity.assist.CmsFriendlink;
 import com.jeecms.cms.manager.assist.CmsFriendlinkMng;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.freemarker.DirectiveUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;

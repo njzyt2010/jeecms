@@ -6,18 +6,27 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.jeecms.cms.entity.assist.CmsComment;
+import com.jeecms.cms.entity.assist.CmsScoreRecord;
 import com.jeecms.cms.entity.main.Channel.AfterCheckEnum;
 import com.jeecms.cms.entity.main.base.BaseContent;
 import com.jeecms.cms.staticpage.StaticPageUtils;
 import com.jeecms.cms.web.CmsThreadVariable;
+import com.jeecms.common.util.DateUtils;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.web.ContentInterface;
 
 public class Content extends BaseContent implements ContentInterface {
@@ -54,8 +63,14 @@ public class Content extends BaseContent implements ContentInterface {
 		/**
 		 * 回收
 		 */
-		recycle
+		recycle,
+		/**
+		 * 投稿
+		 */
+		contribute
 	};
+	
+	public static int DATA_CONTENT=0;
 
 	private DateFormat df = new SimpleDateFormat("/yyyyMMdd");
 
@@ -80,7 +95,9 @@ public class Content extends BaseContent implements ContentInterface {
 		if (getStaticContent()) {
 			return getUrlStatic(false, 1);
 		} else {
-			return getUrlDynamic(null);
+//			return getUrlDynamic(null);
+			//此处共享了别站信息需要绝句路径，做了更改 于2012-7-26修改
+			return getUrlDynamic(true);
 		}
 	}
 
@@ -229,7 +246,7 @@ public class Content extends BaseContent implements ContentInterface {
 		}
 		set.add(check);
 	}
-
+	
 	public void addToChannels(Channel channel) {
 		Set<Channel> channels = getChannels();
 		if (channels == null) {
@@ -413,7 +430,6 @@ public class Content extends BaseContent implements ContentInterface {
 			throw new RuntimeException("AfterCheckEnum '" + after
 					+ "' did not handled");
 		}
-
 	}
 
 	public void init() {
@@ -462,10 +478,14 @@ public class Content extends BaseContent implements ContentInterface {
 		if (getAttachments() == null) {
 			setAttachments(new ArrayList<ContentAttachment>());
 		}
+		if(getScore()==null){
+			setScore(0);
+		}
 	}
 
 	public int getPageCount() {
 		int txtCount = getTxtCount();
+		/*图片集合应该特殊处理，不能作为文章本身分页依据
 		if (txtCount <= 1) {
 			List<ContentPicture> pics = getPictures();
 			if (pics != null) {
@@ -475,6 +495,7 @@ public class Content extends BaseContent implements ContentInterface {
 				}
 			}
 		}
+		*/
 		return txtCount;
 	}
 
@@ -648,6 +669,34 @@ public class Content extends BaseContent implements ContentInterface {
 			return null;
 		}
 	}
+	
+	public String getTypeImgWhole(){
+		if (!StringUtils.isBlank(getTypeImg())) {
+			CmsSite site=getSite();
+			return site.getProtocol()+site.getDomain()+":"+site.getPort()+getTypeImg();
+		} else {
+			return getTitle();
+		}
+	}
+	
+	public String getTitleImgWhole(){
+		if (!StringUtils.isBlank(getTitleImg())) {
+			CmsSite site= getSite();
+			return site.getProtocol()+site.getDomain()+":"+site.getPort()+getTitleImg();
+		} else {
+			return getTitle();
+		}
+	}
+	
+	public String getContentImgWhole(){
+		if (!StringUtils.isBlank(getContentImg())) {
+			CmsSite site= getSite();
+			return site.getProtocol()+site.getDomain()+":"+site.getPort()+getContentImgWhole();
+		} else {
+			return getTitle();
+		}
+	}
+	
 
 	public String getLink() {
 		ContentExt ext = getContentExt();
@@ -727,6 +776,31 @@ public class Content extends BaseContent implements ContentInterface {
 			return null;
 		}
 	}
+	
+	public Integer getViewsMonth() {
+		ContentCount count = getContentCount();
+		if (count != null) {
+			return count.getViewsMonth();
+		} else {
+			return null;
+		}
+	}
+	public Integer getViewsWeek() {
+		ContentCount count = getContentCount();
+		if (count != null) {
+			return count.getViewsWeek();
+		} else {
+			return null;
+		}
+	}
+	public Integer getViewDay() {
+		ContentCount count = getContentCount();
+		if (count != null) {
+			return count.getViewsDay();
+		} else {
+			return null;
+		}
+	}
 
 	public Integer getCommentsCount() {
 		ContentCount count = getContentCount();
@@ -751,6 +825,21 @@ public class Content extends BaseContent implements ContentInterface {
 			return 0;
 		}
 	}
+	
+	public boolean hasCommentUser(CmsUser user){
+		Set<CmsComment>comments=getComments();
+		if(comments==null){
+			return false;
+		}
+		Iterator<CmsComment>it=comments.iterator();
+		while(it.hasNext()){
+			CmsComment comment=it.next();
+			if(comment.getCommentUser()!=null&&comment.getCommentUser().equals(user)){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Integer getUps() {
 		ContentCount count = getContentCount();
@@ -769,7 +858,7 @@ public class Content extends BaseContent implements ContentInterface {
 			return null;
 		}
 	}
-
+	
 	public Byte getCheckStep() {
 		ContentCheck check = getContentCheck();
 		if (check != null) {
@@ -814,7 +903,7 @@ public class Content extends BaseContent implements ContentInterface {
 			return null;
 		}
 	}
-
+	
 	public String getDesc() {
 		return getDescription();
 	}
@@ -852,6 +941,10 @@ public class Content extends BaseContent implements ContentInterface {
 		return getTitleColor();
 	}
 
+	public Integer getSiteId() {
+		return getSite().getId();
+	}
+	
 	public String getSiteName() {
 		return getSite().getName();
 	}
@@ -887,6 +980,113 @@ public class Content extends BaseContent implements ContentInterface {
 	public String getCompanyContact(){
 		return getSite().getSiteCompany().getContact();
 	}
+	
+	public Integer[]getChannelIds(){
+		Set<Channel>channels=getChannels();
+		return Channel.fetchIds(channels);
+	}
+	
+	public Integer[]getChannelIdsWithoutChannel(){
+		Set<Channel>channels=getChannels();
+		channels.remove(getChannel());
+		return Channel.fetchIds(channels);
+	}
+	
+	public Integer[]getTopicIds(){
+		Set<CmsTopic>topics=getTopics();
+		return CmsTopic.fetchIds(topics);
+	}
+	
+	public Integer[]getViewGroupIds(){
+		Set<CmsGroup>groups =getViewGroups();
+		return CmsGroup.fetchIds(groups);
+	}
+	
+	public String[]getAttachmentPaths(){
+		List<ContentAttachment>attList=getAttachments();
+		if(attList==null||attList.size()<=0){
+			return null;
+		}
+		String[]attachmentPaths=new String[attList.size()];
+		for(int i=0;i<attachmentPaths.length;i++){
+			attachmentPaths[i]=attList.get(i).getPath();
+		}
+		return attachmentPaths;
+	}
+	
+	public String[]getAttachmentNames(){
+		List<ContentAttachment>attList=getAttachments();
+		if(attList==null||attList.size()<=0){
+			return null;
+		}
+		String[]attachmentNames=new String[attList.size()];
+		for(int i=0;i<attachmentNames.length;i++){
+			attachmentNames[i]=attList.get(i).getName();
+		}
+		return attachmentNames;
+	}
+	
+	public String[]getAttachmentFileNames(){
+		List<ContentAttachment>attList=getAttachments();
+		if(attList==null||attList.size()<=0){
+			return null;
+		}
+		String[]attachmentFileNames=new String[attList.size()];
+		for(int i=0;i<attachmentFileNames.length;i++){
+			attachmentFileNames[i]=attList.get(i).getFilename();
+		}
+		return attachmentFileNames;
+	}
+	
+	public String[]getPicPaths(){
+		List<ContentPicture>pics=getPictures();
+		if(pics==null||pics.size()<=0){
+			return null;
+		}
+		String[]picPaths=new String[pics.size()];
+		for(int i=0;i<picPaths.length;i++){
+			picPaths[i]=pics.get(i).getImgPath();
+		}
+		return picPaths;
+	}
+	
+	public String[]getPicDescs(){
+		List<ContentPicture>pics=getPictures();
+		if(pics==null||pics.size()<=0){
+			return null;
+		}
+		String[]picDescs=new String[pics.size()];
+		for(int i=0;i<picDescs.length;i++){
+			picDescs[i]=pics.get(i).getDescription();
+		}
+		return picDescs;
+	}
+	
+	public String[]getTagArray(){
+		List<ContentTag>tags=getTags();
+		if(tags==null||tags.size()<=0){
+			return null;
+		}
+		String[]tagArrar=new String[tags.size()];
+		for(int i=0;i<tagArrar.length;i++){
+			tagArrar[i]=tags.get(i).getName();
+		}
+		return tagArrar;
+	}
+	
+	public Double getScoreAvg() {
+		Integer scoreTotal=0;
+		if(getScoreRecordSet()!=null){
+			for(CmsScoreRecord r:getScoreRecordSet()){
+				scoreTotal+=r.getCount();
+			}
+		}
+		if(scoreTotal==0){
+			return 0.0;
+		}else{
+			return getScore()*1.0/scoreTotal;
+		}
+	}
 
 	public boolean isTitBold() {
 		return getBold();
@@ -899,6 +1099,50 @@ public class Content extends BaseContent implements ContentInterface {
 	public Boolean getTarget() {
 		return null;
 	}
+	
+	public boolean getNew(){
+		Date releaseDate=getReleaseDate();
+		Date today=Calendar.getInstance().getTime();
+		int between=DateUtils.getDaysBetweenDate(releaseDate, today);
+		Integer dayNew=getSite().getConfig().getConfigAttr().getDayNew();
+		if(dayNew==0){
+			return false;
+		}else{
+			return dayNew-between>0?true:false;
+		}
+	}
+	
+	public Content cloneWithoutSet() {  
+        Content content = new Content();  
+        content.setSortDate(getSortDate());
+        content.setTopLevel(getTopLevel());
+        content.setHasTitleImg(getHasTitleImg());
+        content.setRecommend(getRecommend());
+        content.setStatus(getStatus());
+        content.setViewsDay(getViewDay());
+        content.setCommentsDay(getCommentsDay());
+        content.setDownloadsDay(getDownloadsDay());
+        content.setUpsDay(getUpsDay());
+        content.setType(getType());
+        content.setSite(getSite());
+        content.setUser(getUser());
+        content.setChannel(getChannel());
+        content.setModel(getModel());
+        Map<String,String>attrs=getAttr();
+        if(attrs!=null&&!attrs.isEmpty()){
+        	Map<String,String>newAttrs=new HashMap<String, String>();
+        	String key;
+            Set<String>keyset=attrs.keySet();
+            Iterator<String>keyIt=keyset.iterator();
+            while(keyIt.hasNext()){
+            	key=keyIt.next();
+            	newAttrs.put(key, attrs.get(key));
+            }
+            content.setAttr(newAttrs);
+        }
+        content.setContentExt(getContentExt());
+        return content;  
+    }  
 	
 	public void clear(){
 		getCollectUsers().clear();
@@ -920,7 +1164,7 @@ public class Content extends BaseContent implements ContentInterface {
 	 * Constructor for required fields
 	 */
 	public Content(java.lang.Integer id,
-			com.jeecms.cms.entity.main.CmsSite site, java.util.Date sortDate,
+			com.jeecms.core.entity.CmsSite site, java.util.Date sortDate,
 			java.lang.Byte topLevel, java.lang.Boolean hasTitleImg,
 			java.lang.Boolean recommend, java.lang.Byte status,
 			java.lang.Integer viewsDay, java.lang.Short commentsDay,

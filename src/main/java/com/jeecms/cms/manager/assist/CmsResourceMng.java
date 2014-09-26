@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.common.file.FileWrap;
 import com.jeecms.common.util.Zipper.FileEntry;
+import com.jeecms.core.entity.CmsSite;
 
 /**
  * 模板资源管理接口
@@ -151,4 +151,20 @@ public interface CmsResourceMng {
 	 * @throws IOException
 	 */
 	public void imoport(File file, CmsSite site) throws IOException;
+	
+	/**
+	 * 解压文件（插件）
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public void unZipFile(File file) throws IOException;
+	
+	/**
+	 * 删除解压文件以及zip包本身
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public void deleteZipFile(File file) throws IOException;
 }

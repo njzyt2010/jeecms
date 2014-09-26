@@ -15,15 +15,16 @@ import com.jeecms.cms.entity.assist.CmsAcquisition.AcquisitionResultType;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.entity.main.ContentExt;
 import com.jeecms.cms.entity.main.ContentTxt;
+import com.jeecms.cms.manager.assist.CmsAcquisitionHistoryMng;
 import com.jeecms.cms.manager.assist.CmsAcquisitionMng;
 import com.jeecms.cms.manager.main.ChannelMng;
 import com.jeecms.cms.manager.main.CmsModelMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.manager.main.ContentMng;
 import com.jeecms.cms.manager.main.ContentTypeMng;
 import com.jeecms.cms.service.ChannelDeleteChecker;
 import com.jeecms.common.hibernate3.Updater;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
 
 @Service
 @Transactional
@@ -141,6 +142,8 @@ public class CmsAcquisitionMngImpl implements CmsAcquisitionMng,
 	}
 
 	public CmsAcquisition deleteById(Integer id) {
+		//删除采集记录
+		acquisitionHistoryMng.deleteByAcquisition(id);
 		CmsAcquisition bean = dao.deleteById(id);
 		return bean;
 	}
@@ -169,9 +172,9 @@ public class CmsAcquisitionMngImpl implements CmsAcquisitionMng,
 		cext.setTitle(title);
 		cext.setDescription(description);
 		ctxt.setTxt(txt);
-		Content content = contentMng.save(c, cext, ctxt, null, null, null,
+		Content content = contentMng.save(c, cext, ctxt,null, null, null,
 				null, null, null, null, null, null, acqu.getChannel().getId(),
-				acqu.getType().getId(), false, acqu.getUser(), false);
+				acqu.getType().getId(), false,false, acqu.getUser(), false);
 		history.setTitle(title);
 		history.setContent(content);
 		history.setDescription(resultType.name());
@@ -240,6 +243,8 @@ public class CmsAcquisitionMngImpl implements CmsAcquisitionMng,
 	private CmsAcquisitionDao dao;
 	@Autowired
 	private CmsModelMng modelMng;
+	@Autowired
+	private CmsAcquisitionHistoryMng acquisitionHistoryMng;
 
 	@Autowired
 	public void setChannelMng(ChannelMng channelMng) {

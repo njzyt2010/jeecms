@@ -21,5 +21,7 @@ public interface CmsAcquisitionHistoryMng {
 
 	public CmsAcquisitionHistory[] deleteByIds(Integer[] ids);
 	
+	public void deleteByAcquisition(Integer acquId);
+	
 	public Boolean checkExistByProperties(Boolean title, String value);
 }

@@ -74,7 +74,6 @@ public class CmsReceiverMessageDaoImpl extends
 		return find(finder, pageNo, pageSize);
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public List<CmsReceiverMessage> getList(Integer siteId, Integer sendUserId,
 			Integer receiverUserId, String title, Date sendBeginTime,

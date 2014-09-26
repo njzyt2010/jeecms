@@ -9,24 +9,24 @@ function createIndex() {
 	var button = $("#createButton");
 	var value = button.val();
 	button.val("<@s.m "cmsStatic.wait"/>").attr("disabled","disabled");
-	$.getJSON("o_index.do",function(data) {
-		button.val(value).removeAttr("disabled");		
+	$.post("o_index.do",function(data) {
+		button.val(value).removeAttr("disabled");	
 		if(data.success) {
-			alert("<@s.m "global.success"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'global.success'/>");
 		} else {
-			alert(data.msg);			
+			$.alert("<@s.m 'global.prompt'/>",data.msg);			
 		}
-	});
+	}, "json");
 }
 function deleteIndex() {
 	var button = $("#deleteButton");
-	$.getJSON("o_index_remove.do",function(data) {	
+	$.post("o_index_remove.do",function(data) {	
 		if(data.success) {
-			alert("<@s.m "global.success"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'global.success'/>");
 		} else {
-			alert("<@s.m "cmsStatic.fileNotExist"/>");			
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'cmsStatic.fileNotExist'/>");			
 		}
-	});
+	}, "json");
 }
 </script>
 </head>

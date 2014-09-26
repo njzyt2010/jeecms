@@ -24,7 +24,7 @@ public class CmsSiteFlow extends BaseCmsSiteFlow {
 	 */
 	public CmsSiteFlow (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String accessIp,
 		java.lang.String accessDate,
 		java.lang.String accessPage,

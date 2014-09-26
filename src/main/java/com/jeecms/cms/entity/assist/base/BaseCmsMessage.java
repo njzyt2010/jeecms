@@ -44,9 +44,9 @@ public abstract class BaseCmsMessage  implements Serializable {
 	 */
 	public BaseCmsMessage (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsUser msgReceiverUser,
-		com.jeecms.cms.entity.main.CmsUser msgSendUser,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsUser msgReceiverUser,
+		com.jeecms.core.entity.CmsUser msgSendUser,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String msgTitle,
 		java.lang.Boolean msgStatus,
 		java.lang.Integer msgBox) {
@@ -78,9 +78,9 @@ public abstract class BaseCmsMessage  implements Serializable {
 	private java.lang.Integer msgBox;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsUser msgReceiverUser;
-	private com.jeecms.cms.entity.main.CmsUser msgSendUser;
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsUser msgReceiverUser;
+	private com.jeecms.core.entity.CmsUser msgSendUser;
+	private com.jeecms.core.entity.CmsSite site;
 	
 	// collections
 	private java.util.Set<com.jeecms.cms.entity.assist.CmsReceiverMessage> receiverMsgs;
@@ -192,7 +192,7 @@ public abstract class BaseCmsMessage  implements Serializable {
 	/**
 	 * Return the value associated with the column: msg_receiver_user
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getMsgReceiverUser () {
+	public com.jeecms.core.entity.CmsUser getMsgReceiverUser () {
 		return msgReceiverUser;
 	}
 
@@ -200,7 +200,7 @@ public abstract class BaseCmsMessage  implements Serializable {
 	 * Set the value related to the column: msg_receiver_user
 	 * @param msgReceiverUser the msg_receiver_user value
 	 */
-	public void setMsgReceiverUser (com.jeecms.cms.entity.main.CmsUser msgReceiverUser) {
+	public void setMsgReceiverUser (com.jeecms.core.entity.CmsUser msgReceiverUser) {
 		this.msgReceiverUser = msgReceiverUser;
 	}
 
@@ -208,7 +208,7 @@ public abstract class BaseCmsMessage  implements Serializable {
 	/**
 	 * Return the value associated with the column: msg_send_user
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getMsgSendUser () {
+	public com.jeecms.core.entity.CmsUser getMsgSendUser () {
 		return msgSendUser;
 	}
 
@@ -216,7 +216,7 @@ public abstract class BaseCmsMessage  implements Serializable {
 	 * Set the value related to the column: msg_send_user
 	 * @param msgSendUser the msg_send_user value
 	 */
-	public void setMsgSendUser (com.jeecms.cms.entity.main.CmsUser msgSendUser) {
+	public void setMsgSendUser (com.jeecms.core.entity.CmsUser msgSendUser) {
 		this.msgSendUser = msgSendUser;
 	}
 
@@ -224,7 +224,7 @@ public abstract class BaseCmsMessage  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -232,7 +232,7 @@ public abstract class BaseCmsMessage  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 	

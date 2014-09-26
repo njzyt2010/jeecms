@@ -1,5 +1,6 @@
 package com.jeecms.cms.action.directive;
 
+import static com.jeecms.common.web.Constants.UTF8;
 import static com.jeecms.common.web.freemarker.DirectiveUtils.OUT_BEAN;
 import static freemarker.template.ObjectWrapper.DEFAULT_WRAPPER;
 
@@ -11,11 +12,10 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.freemarker.DirectiveUtils;
-import com.jeecms.common.web.freemarker.ParamsRequiredException;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.FrontUtils;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;
@@ -27,6 +27,7 @@ import freemarker.template.TemplateModel;
  * 栏目对象标签
  */
 public class ChannelDirective implements TemplateDirectiveModel {
+	
 	/**
 	 * 输入参数，栏目ID。
 	 */
@@ -39,6 +40,14 @@ public class ChannelDirective implements TemplateDirectiveModel {
 	 * 输入参数，站点ID。存在时，获取该站点栏目，不存在时获取当前站点栏目。
 	 */
 	public static final String PARAM_SITE_ID = "siteId";
+	/**
+	 * 没有栏目id参数 模板路径
+	 */
+	public static final String TPL_CHANNEL_PARAMREQUIRED = "/WEB-INF/t/cms_sys_defined/channel/ParamsRequiredException.html";
+	/**
+	 * 没有找到栏目 模板路径
+	 */
+	public static final String TPL_CHANNEL_NOT_FOUND = "/WEB-INF/t/cms_sys_defined/channel/NotFoundChannelException.html";
 
 	@SuppressWarnings("unchecked")
 	public void execute(Environment env, Map params, TemplateModel[] loopVars,
@@ -46,13 +55,15 @@ public class ChannelDirective implements TemplateDirectiveModel {
 		CmsSite site = FrontUtils.getSite(env);
 		Integer id = DirectiveUtils.getInt(PARAM_ID, params);
 		Channel channel;
+		boolean hasParam=true;
 		if (id != null) {
 			channel = channelMng.findById(id);
 		} else {
 			String path = DirectiveUtils.getString(PARAM_PATH, params);
 			if (StringUtils.isBlank(path)) {
 				// 如果path不存在，那么id必须存在。
-				throw new ParamsRequiredException(PARAM_ID);
+				hasParam=false;
+				//throw new ParamsRequiredException(PARAM_ID);
 			}
 			Integer siteId = DirectiveUtils.getInt(PARAM_SITE_ID, params);
 			if (siteId == null) {
@@ -60,13 +71,21 @@ public class ChannelDirective implements TemplateDirectiveModel {
 			}
 			channel = channelMng.findByPathForTag(path, siteId);
 		}
-
 		Map<String, TemplateModel> paramWrap = new HashMap<String, TemplateModel>(
 				params);
-		paramWrap.put(OUT_BEAN, DEFAULT_WRAPPER.wrap(channel));
-		Map<String, TemplateModel> origMap = DirectiveUtils
-				.addParamsToVariable(env, paramWrap);
-		body.render(env.getOut());
+		if(channel!=null){
+			paramWrap.put(OUT_BEAN, DEFAULT_WRAPPER.wrap(channel));
+		}else{
+			if(hasParam){
+				env.include(TPL_CHANNEL_NOT_FOUND, UTF8, true);
+			}else{
+				env.include(TPL_CHANNEL_PARAMREQUIRED, UTF8, true);
+			}
+		}
+		Map<String, TemplateModel> origMap = DirectiveUtils.addParamsToVariable(env, paramWrap);
+	    if (body != null) {  
+		    body.render(env.getOut());
+        }  
 		DirectiveUtils.removeParamsFromVariable(env, paramWrap, origMap);
 	}
 

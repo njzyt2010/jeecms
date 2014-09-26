@@ -106,11 +106,11 @@ $(function(){
 </div>
 <div class="body-box">
 
-<form id="queryForm" action="v_list.do" method="post" style="padding-top:5px;">
+<form id="queryForm" action="v_list.do" method="post">
 <input type="hidden" name="year"/>
 <input type="hidden" name="month"/>
 <input type="hidden" name="day"/>
-<div style="padding-top:5px">
+<div style="padding-top:5px;padding-bottom:5px; text-indent:10px; border-bottom:1px solid #fff; border-top:1px solid #fff;">
 	<select id="year"></select><@s.m "statistic.year"/>
 	<select id="month"></select><@s.m "statistic.month"/>
 	<select id="day"></select><@s.m "statistic.date"/>　
@@ -129,7 +129,7 @@ $(function(){
 	</select>
 	<input class="query" type="button" value="<@s.m "global.query"/>" onclick="querySubmit();"/>
 </div>
-<div style="padding-top:5px">
+<div style="padding-top:5px; line-height:28px; text-indent:10px;">
 <label><input type="radio" name="queryModel" value="year" <#if statisticModel=="year">checked="checked"</#if> onclick="chgModel(this.value);"/><@s.m "statistic.report.year"/></label>
 <label><input type="radio" name="queryModel" value="month" <#if statisticModel=="month">checked="checked"</#if> onclick="chgModel(this.value);"/><@s.m "statistic.report.month"/></label>
 <label><input type="radio" name="queryModel" value="week" <#if statisticModel=="week">checked="checked"</#if> onclick="chgModel(this.value);"/><@s.m "statistic.report.week"/></label>
@@ -141,20 +141,20 @@ $(function(){
 <@p.table value=list;cmsStatistic,i,has_next><#rt/>
 <#switch statisticModel>
 	<#case "year">
-		<@p.column code="statistic.month2">${cmsStatistic.description}<@s.m "statistic.month"/></@p.column><#t/>
+		<@p.column code="statistic.month2" align="center">${cmsStatistic.description}<@s.m "statistic.month"/></@p.column><#t/>
 	<#break>
 	<#case "month">
-		<@p.column code="statistic.date2">${cmsStatistic.description}<@s.m "statistic.date"/></@p.column><#t/>
+		<@p.column code="statistic.date2" align="center">${cmsStatistic.description}<@s.m "statistic.date"/></@p.column><#t/>
 	<#break>
 	<#case "week">
-		<@p.column code="statistic.week"><@s.m "statistic.week."+cmsStatistic.description/></@p.column><#t/>
+		<@p.column code="statistic.week" align="center"><@s.m "statistic.week."+cmsStatistic.description/></@p.column><#t/>
 	<#break>
 	<#case "day">
-		<@p.column code="statistic.hour">${cmsStatistic.description}</@p.column><#t/>
+		<@p.column code="statistic.hour" align="center">${cmsStatistic.description}</@p.column><#t/>
 	<#default>
 	<#break>
 </#switch>
-	<@p.column code="statistic.content.contents">${cmsStatistic.count}</@p.column><#t/>
+	<@p.column code="statistic.content.contents" align="center">${cmsStatistic.count}</@p.column><#t/>
 	<@p.column code="statistic.percent"><img src="${base}/res/jeecms/img/admin/vote_bar.gif" width="${cmsStatistic.barWidth}" height="10px" border="0"/>${cmsStatistic.percent}</@p.column><#t/>
 </@p.table>
 </form>

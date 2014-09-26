@@ -46,7 +46,7 @@ public abstract class BaseChannel  implements Serializable {
 	 */
 	public BaseChannel (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		com.jeecms.cms.entity.main.CmsModel model,
 		java.lang.Integer lft,
 		java.lang.Integer rgt,
@@ -84,17 +84,18 @@ public abstract class BaseChannel  implements Serializable {
 
 	// one to one
 	private com.jeecms.cms.entity.main.ChannelExt channelExt;
+	private com.jeecms.cms.entity.main.ChannelCount channelCount;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsSite site;
 	private com.jeecms.cms.entity.main.CmsModel model;
 	private com.jeecms.cms.entity.main.Channel parent;
 
 	// collections
 	private java.util.Set<com.jeecms.cms.entity.main.Channel> child;
-	private java.util.Set<com.jeecms.cms.entity.main.CmsGroup> viewGroups;
-	private java.util.Set<com.jeecms.cms.entity.main.CmsGroup> contriGroups;
-	private java.util.Set<com.jeecms.cms.entity.main.CmsUser> users;
+	private java.util.Set<com.jeecms.core.entity.CmsGroup> viewGroups;
+	private java.util.Set<com.jeecms.core.entity.CmsGroup> contriGroups;
+	private java.util.Set<com.jeecms.core.entity.CmsUser> users;
 	private java.util.Set<com.jeecms.cms.entity.main.ChannelTxt> channelTxtSet;
 	private java.util.List<com.jeecms.cms.entity.main.ChannelModel> channelModels;
 	private java.util.Map<java.lang.String, java.lang.String> attr;
@@ -233,12 +234,19 @@ public abstract class BaseChannel  implements Serializable {
 	public void setChannelExt (com.jeecms.cms.entity.main.ChannelExt channelExt) {
 		this.channelExt = channelExt;
 	}
+	
+	public com.jeecms.cms.entity.main.ChannelCount getChannelCount() {
+		return channelCount;
+	}
 
+	public void setChannelCount(com.jeecms.cms.entity.main.ChannelCount channelCount) {
+		this.channelCount = channelCount;
+	}
 
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -246,7 +254,7 @@ public abstract class BaseChannel  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 
@@ -282,7 +290,6 @@ public abstract class BaseChannel  implements Serializable {
 		this.parent = parent;
 	}
 
-
 	/**
 	 * Return the value associated with the column: child
 	 */
@@ -298,11 +305,10 @@ public abstract class BaseChannel  implements Serializable {
 		this.child = child;
 	}
 
-
 	/**
 	 * Return the value associated with the column: viewGroups
 	 */
-	public java.util.Set<com.jeecms.cms.entity.main.CmsGroup> getViewGroups () {
+	public java.util.Set<com.jeecms.core.entity.CmsGroup> getViewGroups () {
 		return viewGroups;
 	}
 
@@ -310,7 +316,7 @@ public abstract class BaseChannel  implements Serializable {
 	 * Set the value related to the column: viewGroups
 	 * @param viewGroups the viewGroups value
 	 */
-	public void setViewGroups (java.util.Set<com.jeecms.cms.entity.main.CmsGroup> viewGroups) {
+	public void setViewGroups (java.util.Set<com.jeecms.core.entity.CmsGroup> viewGroups) {
 		this.viewGroups = viewGroups;
 	}
 
@@ -318,7 +324,7 @@ public abstract class BaseChannel  implements Serializable {
 	/**
 	 * Return the value associated with the column: contriGroups
 	 */
-	public java.util.Set<com.jeecms.cms.entity.main.CmsGroup> getContriGroups () {
+	public java.util.Set<com.jeecms.core.entity.CmsGroup> getContriGroups () {
 		return contriGroups;
 	}
 
@@ -326,7 +332,7 @@ public abstract class BaseChannel  implements Serializable {
 	 * Set the value related to the column: contriGroups
 	 * @param contriGroups the contriGroups value
 	 */
-	public void setContriGroups (java.util.Set<com.jeecms.cms.entity.main.CmsGroup> contriGroups) {
+	public void setContriGroups (java.util.Set<com.jeecms.core.entity.CmsGroup> contriGroups) {
 		this.contriGroups = contriGroups;
 	}
 
@@ -334,7 +340,7 @@ public abstract class BaseChannel  implements Serializable {
 	/**
 	 * Return the value associated with the column: users
 	 */
-	public java.util.Set<com.jeecms.cms.entity.main.CmsUser> getUsers () {
+	public java.util.Set<com.jeecms.core.entity.CmsUser> getUsers () {
 		return users;
 	}
 
@@ -342,11 +348,9 @@ public abstract class BaseChannel  implements Serializable {
 	 * Set the value related to the column: users
 	 * @param users the users value
 	 */
-	public void setUsers (java.util.Set<com.jeecms.cms.entity.main.CmsUser> users) {
+	public void setUsers (java.util.Set<com.jeecms.core.entity.CmsUser> users) {
 		this.users = users;
 	}
-
-
 	/**
 	 * Return the value associated with the column: channelTxtSet
 	 */
@@ -385,8 +389,6 @@ public abstract class BaseChannel  implements Serializable {
 	public void setAttr (java.util.Map<java.lang.String, java.lang.String> attr) {
 		this.attr = attr;
 	}
-
-
 
 	public boolean equals (Object obj) {
 		if (null == obj) return false;

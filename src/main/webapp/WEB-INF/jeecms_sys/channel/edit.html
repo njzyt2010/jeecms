@@ -7,6 +7,7 @@
 <script type="text/javascript">
 $(function() {
 	$("#jvForm").validate();
+	$(document).tooltip();
 	<#if channel.titleImg??>
 	$("#preImg1").css("width","auto").css("height","auto").attr("src","${channel.titleImg}?d="+new Date()*1);
 	</#if>
@@ -88,7 +89,10 @@ function appendModelTpl(modelId,tpl){
 <@p.text value=channel.name required="true" class="required" maxlength="100" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="path">
-<@p.text value=channel.path required="true" class="required" maxlength="30" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+<#assign channelPathExist><@s.m "error.channelPathExist"/></#assign>
+<@p.text value=channel.path  required="true"  vld="{required:true,remote:'v_check_path.do?cid=${channel.id}',messages:{remote:'${channelPathExist}'}}" maxlength="30" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/>
+<span id="pathMsg"/>
+<#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="title">
 <@p.text value=channel.title maxlength="255" size="${item.size!35}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
@@ -104,7 +108,7 @@ function appendModelTpl(modelId,tpl){
 
 <#elseif item.field=="tplContent">
 <@p.td label=item.label colspan=item.single?string("2","1") width="${item.single?string(100,50)}">
-<@p.button id="openModelTplDialog" value="${item.label!}"  /><@s.m "channel.modelTpl.help"/>
+<@p.button id="openModelTplDialog" value="${item.label!}"  name=item.field  /><@s.m "channel.modelTpl.help"/>
 </@p.td><#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="channelStatic">
@@ -162,6 +166,12 @@ function appendModelTpl(modelId,tpl){
 <#elseif item.field=="allowUpdown">
 <@p.radio value=channel.allowUpdown list={"true":"global.allow","false":"global.notAllow"} help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
+<#elseif item.field=="allowShare">
+<@p.radio value=channel.allowShare list={"true":"global.allow","false":"global.notAllow"} help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+
+<#elseif item.field=="allowScore">
+<@p.radio value=channel.allowScore list={"true":"global.allow","false":"global.notAllow"} help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+
 <#elseif item.field=="viewGroupIds">
 <@p.checkboxlist valueList=viewGroupIds list=viewGroups listKey="id" listValue="name" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
@@ -173,7 +183,7 @@ function appendModelTpl(modelId,tpl){
 
 <#elseif item.field=="link">
 <#assign h><#if item.help??>${item.help}<#else><@s.m "content."+item.field+".help"/></#if></#assign>
-<@p.text value=channel.link maxlength="255" size="${item.size!35}" help="${h}" helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+<@p.text value=channel.link title="channelLink.tip.title" maxlength="255" size="${item.size!35}" help="${h}" helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="titleImg">
 <@p.td label=item.label colspan="1" width="50" noHeight="true">

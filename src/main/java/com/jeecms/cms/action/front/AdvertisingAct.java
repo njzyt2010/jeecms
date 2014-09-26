@@ -7,6 +7,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.util.ThreadContext;
+import org.apache.shiro.web.subject.WebSubject;
+import org.apache.shiro.web.subject.WebSubject.Builder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -14,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsAdvertising;
 import com.jeecms.cms.entity.assist.CmsAdvertisingSpace;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsAdvertisingMng;
 import com.jeecms.cms.manager.assist.CmsAdvertisingSpaceMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 /**
  * 广告Action
@@ -80,6 +85,19 @@ public class AdvertisingAct {
 		response.setHeader("Cache-Control", "no-cache");
 		response.setDateHeader("Expires", 0);
 	}
+	
+	@RequestMapping(value = "/login_pass.jspx")
+	public void login(String username, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
+		//@ToDo需要检测其他登录来源的有效性
+		PrincipalCollection principals = new SimplePrincipalCollection(username, "MobileRealm");  
+		Builder builder = new WebSubject.Builder( request,response);  
+		builder.principals(principals);  
+		builder.authenticated(true);  
+		WebSubject subject = builder.buildWebSubject();  
+		ThreadContext.bind(subject); 
+	}
+
 
 	@Autowired
 	private CmsAdvertisingMng cmsAdvertisingMng;

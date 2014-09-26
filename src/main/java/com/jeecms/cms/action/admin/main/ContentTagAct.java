@@ -3,8 +3,12 @@ package com.jeecms.cms.action.admin.main;
 import static com.jeecms.common.page.SimplePage.cpn;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,21 +16,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.ContentTag;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.ContentTagMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
+import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class ContentTagAct {
-	private static final Logger log = LoggerFactory
-			.getLogger(ContentTagAct.class);
+	private static final Logger log = LoggerFactory.getLogger(ContentTagAct.class);
 
+	@RequiresPermissions("tag:v_list")
 	@RequestMapping("/tag/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -40,11 +45,13 @@ public class ContentTagAct {
 		return "tag/list";
 	}
 
+	@RequiresPermissions("tag:v_add")
 	@RequestMapping("/tag/v_add.do")
 	public String add(ModelMap model) {
 		return "tag/add";
 	}
 
+	@RequiresPermissions("tag:v_edit")
 	@RequestMapping("/tag/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -58,7 +65,24 @@ public class ContentTagAct {
 		}
 		return "tag/edit";
 	}
+	
+	@RequiresPermissions("tag:v_ajax_edit")
+	@RequestMapping("/tag/v_ajax_edit.do")
+	public void ajaxEdit(Integer id, HttpServletRequest request,HttpServletResponse response, ModelMap model) throws JSONException {
+		JSONObject object = new JSONObject();
+		ContentTag tag=manager.findById(id);
+		String queryName = RequestUtils.getQueryParam(request, "queryName");
+		if (!StringUtils.isBlank(queryName)) {
+			model.addAttribute("queryName", queryName);
+		}
+		if(tag!=null){
+			object.put("id", tag.getId());
+			object.put("name", tag.getName());
+		}
+		ResponseUtils.renderJson(response, object.toString());
+	}
 
+	@RequiresPermissions("tag:o_save")
 	@RequestMapping("/tag/o_save.do")
 	public String save(ContentTag bean, HttpServletRequest request,
 			ModelMap model) {
@@ -73,6 +97,7 @@ public class ContentTagAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("tag:o_update")
 	@RequestMapping("/tag/o_update.do")
 	public String update(ContentTag bean, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
@@ -87,6 +112,7 @@ public class ContentTagAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("tag:o_delete")
 	@RequestMapping("/tag/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {

@@ -103,7 +103,7 @@ public class CmsGuestbook extends BaseCmsGuestbook {
 	 */
 	public CmsGuestbook (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		com.jeecms.cms.entity.assist.CmsGuestbookCtg ctg,
 		java.lang.String ip,
 		java.util.Date createTime,

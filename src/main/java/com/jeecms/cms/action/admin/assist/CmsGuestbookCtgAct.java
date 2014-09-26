@@ -3,7 +3,11 @@ package com.jeecms.cms.action.admin.assist;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +16,19 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsGuestbookCtg;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsGuestbookCtgMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsGuestbookCtgAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsGuestbookCtgAct.class);
 
+	@RequiresPermissions("guestbook_ctg:v_list")
 	@RequestMapping("/guestbook_ctg/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -32,11 +38,13 @@ public class CmsGuestbookCtgAct {
 		return "guestbook_ctg/list";
 	}
 
+	@RequiresPermissions("guestbook_ctg:v_add")
 	@RequestMapping("/guestbook_ctg/v_add.do")
 	public String add(ModelMap model) {
 		return "guestbook_ctg/add";
 	}
 
+	@RequiresPermissions("guestbook_ctg:v_edit")
 	@RequestMapping("/guestbook_ctg/v_edit.do")
 	public String edit(Integer id, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -48,7 +56,22 @@ public class CmsGuestbookCtgAct {
 		model.addAttribute("pageNo", pageNo);
 		return "guestbook_ctg/edit";
 	}
+	
+	@RequiresPermissions("guestbook_ctg:v_ajax_edit")
+	@RequestMapping("/guestbook_ctg/v_ajax_edit.do")
+	public void ajaxEdit(Integer id, HttpServletRequest request,HttpServletResponse response, ModelMap model) throws JSONException {
+		JSONObject object = new JSONObject();
+		CmsGuestbookCtg ctg=manager.findById(id);
+		if(ctg!=null){
+			object.put("id", ctg.getId());
+			object.put("name", ctg.getName());
+			object.put("description", ctg.getDescription());
+			object.put("priority", ctg.getPriority());
+		}
+		ResponseUtils.renderJson(response, object.toString());
+	}
 
+	@RequiresPermissions("guestbook_ctg:o_save")
 	@RequestMapping("/guestbook_ctg/o_save.do")
 	public String save(CmsGuestbookCtg bean, HttpServletRequest request,
 			ModelMap model) {
@@ -63,6 +86,7 @@ public class CmsGuestbookCtgAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("guestbook_ctg:o_update")
 	@RequestMapping("/guestbook_ctg/o_update.do")
 	public String update(CmsGuestbookCtg bean, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
@@ -77,6 +101,7 @@ public class CmsGuestbookCtgAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("guestbook_ctg:o_delete")
 	@RequestMapping("/guestbook_ctg/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {

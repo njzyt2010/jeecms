@@ -45,35 +45,35 @@ public class DateUtils {
 		return buffer.toString();
 	}
 
-	private static int getDateField(Date date,int field) {
+	private static int getDateField(Date date, int field) {
 		Calendar c = getCalendar();
 		c.setTime(date);
 		return c.get(field);
 	}
-	public static int getYearsBetweenDate(Date begin,Date end){
-		int bYear=getDateField(begin,Calendar.YEAR);
-		int eYear=getDateField(end,Calendar.YEAR);
-		return eYear-bYear;
+
+	public static int getYearsBetweenDate(Date begin, Date end) {
+		int bYear = getDateField(begin, Calendar.YEAR);
+		int eYear = getDateField(end, Calendar.YEAR);
+		return eYear - bYear;
 	}
-	
-	public static int getMonthsBetweenDate(Date begin,Date end){
-		int bMonth=getDateField(begin,Calendar.MONTH);
-		int eMonth=getDateField(end,Calendar.MONTH);
-		return eMonth-bMonth;
+
+	public static int getMonthsBetweenDate(Date begin, Date end) {
+		int bMonth = getDateField(begin, Calendar.MONTH);
+		int eMonth = getDateField(end, Calendar.MONTH);
+		return eMonth - bMonth;
 	}
-	public static int getWeeksBetweenDate(Date begin,Date end){
-		int bWeek=getDateField(begin,Calendar.WEEK_OF_YEAR);
-		int eWeek=getDateField(end,Calendar.WEEK_OF_YEAR);
-		return eWeek-bWeek;
+
+	public static int getWeeksBetweenDate(Date begin, Date end) {
+		int bWeek = getDateField(begin, Calendar.WEEK_OF_YEAR);
+		int eWeek = getDateField(end, Calendar.WEEK_OF_YEAR);
+		return eWeek - bWeek;
 	}
-	public static int getDaysBetweenDate(Date begin,Date end){
-		int bDay=getDateField(begin,Calendar.DAY_OF_YEAR);
-		int eDay=getDateField(end,Calendar.DAY_OF_YEAR);
-		return eDay-bDay;
+
+	public static int getDaysBetweenDate(Date begin, Date end) {
+		return (int) ((end.getTime()-begin.getTime())/(1000 * 60 * 60 * 24));
 	}
-	
-	
-	public static void main(String args[]){
+
+	public static void main(String args[]) {
 		System.out.println(getSpecficDateStart(new Date(), 288));
 	}
 
@@ -84,7 +84,7 @@ public class DateUtils {
 	 *            可正、可负
 	 * @return
 	 */
-	public static Date getSpecficYearStart(Date date,int amount) {
+	public static Date getSpecficYearStart(Date date, int amount) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(Calendar.YEAR, amount);
@@ -99,8 +99,8 @@ public class DateUtils {
 	 *            可正、可负
 	 * @return
 	 */
-	public static Date getSpecficYearEnd(Date date,int amount) {
-		Date temp = getStartDate(getSpecficYearStart(date,amount + 1));
+	public static Date getSpecficYearEnd(Date date, int amount) {
+		Date temp = getStartDate(getSpecficYearStart(date, amount + 1));
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(temp);
 		cal.add(Calendar.DAY_OF_YEAR, -1);
@@ -114,7 +114,7 @@ public class DateUtils {
 	 *            可正、可负
 	 * @return
 	 */
-	public static Date getSpecficMonthStart(Date date,int amount) {
+	public static Date getSpecficMonthStart(Date date, int amount) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(Calendar.MONTH, amount);
@@ -129,9 +129,9 @@ public class DateUtils {
 	 *            可正、可负
 	 * @return
 	 */
-	public static Date getSpecficMonthEnd(Date date,int amount) {
+	public static Date getSpecficMonthEnd(Date date, int amount) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(getSpecficMonthStart(date,amount + 1));
+		cal.setTime(getSpecficMonthStart(date, amount + 1));
 		cal.add(Calendar.DAY_OF_YEAR, -1);
 		return getFinallyDate(cal.getTime());
 	}
@@ -143,7 +143,7 @@ public class DateUtils {
 	 *            可正、可负
 	 * @return
 	 */
-	public static Date getSpecficWeekStart(Date date,int amount) {
+	public static Date getSpecficWeekStart(Date date, int amount) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.setFirstDayOfWeek(Calendar.MONDAY); /* 设置一周的第一天为星期一 */
@@ -159,15 +159,15 @@ public class DateUtils {
 	 *            可正、可负
 	 * @return
 	 */
-	public static Date getSpecficWeekEnd(Date date,int amount) {
+	public static Date getSpecficWeekEnd(Date date, int amount) {
 		Calendar cal = Calendar.getInstance();
 		cal.setFirstDayOfWeek(Calendar.MONDAY); /* 设置一周的第一天为星期一 */
 		cal.add(Calendar.WEEK_OF_MONTH, amount);
 		cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 		return getFinallyDate(cal.getTime());
 	}
-	
-	public static Date getSpecficDateStart(Date date,int amount){
+
+	public static Date getSpecficDateStart(Date date, int amount) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
 		cal.add(Calendar.DAY_OF_YEAR, amount);
@@ -207,19 +207,33 @@ public class DateUtils {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * 
-	 * @param date 指定比较日期
-	 * @param compareDate 
+	 * @param date
+	 *            指定比较日期
+	 * @param compareDate
 	 * @return
 	 */
-	public static boolean isInDate(Date date,Date compareDate){
-		if(compareDate.after(getStartDate(date))&&compareDate.before(getFinallyDate(date))){
+	public static boolean isInDate(Date date, Date compareDate) {
+		if (compareDate.after(getStartDate(date))
+				&& compareDate.before(getFinallyDate(date))) {
 			return true;
-		}else{
+		} else {
 			return false;
 		}
+
+	}
+	
+	/**
+	 * 获取两个时间的差值秒
+	 * @param d1
+	 * @param d2
+	 * @return
+	 */
+	public static Integer getSecondBetweenDate(Date d1,Date d2){
+		Long second=(d2.getTime()-d1.getTime())/1000;
+		return second.intValue();
 	}
 
 	private int getYear(Calendar calendar) {

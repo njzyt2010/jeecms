@@ -16,15 +16,15 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsComment;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.MemberConfig;
 import com.jeecms.cms.manager.assist.CmsCommentMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.MemberConfig;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 /**
  * 会员中心获取评论Action
@@ -160,6 +160,13 @@ public class CommentMemberAct {
 		// 删除单条评论
 		CmsComment bean;
 		if (commentId != null) {
+			CmsComment cmsComment=commentMng.findById(commentId);
+			if(cmsComment==null){
+				return FrontUtils.showMessage(request, model, "comment.notFound");
+			}
+			if(!canDeleteComment(cmsComment, user)){
+				return FrontUtils.showMessage(request, model, "comment.deleteError");
+			}
 			bean = commentMng.deleteById(commentId);
 			log.info("delete CmsComment id={}", bean.getId());
 		} else {
@@ -168,6 +175,9 @@ public class CommentMemberAct {
 					user.getId(), userId, ip);
 			for (int i = 0; i < comments.size(); i++) {
 				bean = comments.get(i);
+				if(!canDeleteComment(bean, user)){
+					return FrontUtils.showMessage(request, model, "comment.deleteError");
+				}
 				commentMng.deleteById(comments.get(i).getId());
 				log.info("delete CmsComment id={}", bean.getId());
 			}
@@ -180,6 +190,22 @@ public class CommentMemberAct {
 		 */
 		// 返回评论列表
 		return FrontUtils.showSuccess(request, model, nextUrl);
+	}
+	
+	private  boolean canDeleteComment(CmsComment comment,CmsUser user){
+		//匿名用户评论文章的所有者可以删除
+		if(comment.getCommentUser()==null&&!comment.getContent().getUser().equals(user)){
+			return false;
+		}else if(comment.getCommentUser()==null&&comment.getContent().getUser().equals(user)){
+			return true;
+		}else{
+			//非匿名用户评论 文章的所有者可以删除，评论者也可以删除
+			if(comment.getCommentUser().equals(user)||comment.getContent().getUser().equals(user)){
+				return true;
+			}else{
+				return false;
+			}
+		}
 	}
 
 	@Autowired

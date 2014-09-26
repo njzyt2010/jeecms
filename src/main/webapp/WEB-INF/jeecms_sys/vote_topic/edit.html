@@ -14,11 +14,29 @@ function up(subTopicId){
 	if(subTopicId!=0){
 		var subTopicHtml=$("#subTopic"+subTopicId).html().replace("up('"+subTopicId+"')","up('"+(subTopicId-1)+"')");
 		var subBeforeTopicHtml=$("#subTopic"+(subTopicId-1)).html().replace("up('"+(subTopicId-1)+"')","up('"+subTopicId+"')");
+	//	subTopicHtml=subTopicHtml.replaceAll("typeId"+subTopicId,"typeId"+(subTopicId-1));
+	//	subBeforeTopicHtml=subBeforeTopicHtml.replaceAll("typeId"+(subTopicId-1),"typeId"+subTopicId);
+	    
 		$("#subTopic"+subTopicId).html(subBeforeTopicHtml);
 		$("#subTopic"+(subTopicId-1)).html(subTopicHtml);
 		//交换排序
 		$("input[name='subPriority']").each(function(i){
 			$(this).val(i*1+1);
+		});
+		$("input[name^='subtitle']").each(function(i){
+			$(this).attr("id","subtitle"+i);
+		});
+		$("input[name='typeId"+subTopicId+"']").attr("name","typeId-1");
+		$("input[name='typeId"+(subTopicId-1)+"']").attr("name","typeId"+subTopicId);
+		$("input[name='typeId-1']").attr("name","typeId"+(subTopicId-1));
+		$("input[name='typeId"+subTopicId+"']").bind('click', function() {
+			changeAddItemButton(subTopicId,this.value);
+		});
+		$("input[name='typeId"+(subTopicId-1)+"']").bind('click', function() {
+			changeAddItemButton(subTopicId-1,this.value);
+		});
+		$("span[id^='voteItemMsg']").each(function(i){
+			$(this).attr("id","voteItemMsg"+i);
 		});
 		processButton();
 	}
@@ -27,11 +45,29 @@ function down(subTopicId){
 	if(subTopicId!=(subTopicSize-1)){
 		var subTopicHtml=$("#subTopic"+subTopicId).html().replace("down('"+subTopicId+"')","down('"+(subTopicId*1+1)+"')");
 		var subAfterTopicHtml=$("#subTopic"+(subTopicId*1+1)).html().replace("down('"+(subTopicId*1+1)+"')","down('"+subTopicId+"')");
+		//subTopicHtml=subTopicHtml.replace("typeId"+subTopicId,"typeId"+(subTopicId*1+1));
+		//subAfterTopicHtml=subAfterTopicHtml.replace("typeId"+(subTopicId*1+1),"typeId"+subTopicId);
 		$("#subTopic"+subTopicId).html(subAfterTopicHtml);
 		$("#subTopic"+(subTopicId*1+1)).html(subTopicHtml);
+		
 		//交换排序
 		$("input[name='subPriority']").each(function(i){
 			$(this).val(i*1+1);
+		});
+		$("input[name^='subtitle']").each(function(i){
+			$(this).attr("id","subtitle"+i);
+		});
+		$("input[name='typeId"+subTopicId+"']").attr("name","typeId+1");
+		$("input[name='typeId"+(subTopicId*1+1)+"']").attr("name","typeId"+subTopicId);
+		$("input[name='typeId+1']").attr("name","typeId"+(subTopicId*1+1));
+		$("input[name='typeId"+subTopicId+"']").bind('click', function() {
+			changeAddItemButton(subTopicId,this.value);
+		});
+		$("input[name='typeId"+(subTopicId*1+1)+"']").bind('click', function() {
+			changeAddItemButton(subTopicId*1+1,this.value);
+		});
+		$("span[id^='voteItemMsg']").each(function(i){
+			$(this).attr("id","voteItemMsg"+i);
 		});
 		processButton();
 	}
@@ -60,6 +96,12 @@ function processButton(){
 		$(this).bind('click', function() {
 			  down(i);
 		});	
+	});
+	$("input[name^='typeId']").bind('click', function() {
+		changeAddItemButton($(this).parent().attr("id").split("subTopic")[1],this.value);
+	});
+	$("input[name^='itemTitle']").each(function(i){
+		$(this).attr("id",$(this).parent().parent().attr("id").split("subTopic")[1]+"_"+i);
 	});
 }
 </script>
@@ -108,9 +150,9 @@ function processButton(){
 	<#assign total="${cmsVoteTopic.subtopics?size}"/>
 	<#list cmsVoteTopic.subtopics as subTopic>
 		<div class="items" id="subTopic${subTopic_index}">
-		<@s.m "cmsVoteItem.title"/>: <input type="text" name="subtitle${subTopic_index}" value="${subTopic.title!}" style="width:300px"/>
+		<@s.m "cmsVoteItem.title"/>: <input type="text" name="subtitle" id="subtitle${subTopic_index}" value="${subTopic.title!}" style="width:300px"/>
 		&nbsp; <@s.m "cmsVoteItem.priority"/>: <input type="text" id="subPriority${subTopic_index}" name="subPriority" value="${subTopic.priority!}" style="width:30px"/>
-		<@s.m "cmsVoteTopic.type"/>: <input type="radio" name="typeId${subTopic_index}" value="1" onclick="changeAddItemButton(${subTopic_index},this.value)" <#if subTopic.type==1>checked="checked"</#if>><@s.m "cmsVoteTopic.type.single"/></input><input type="radio" name="typeId${subTopic_index}" value="2" onclick="changeAddItemButton(${subTopic_index},this.value)" <#if subTopic.type==2>checked="checked"</#if>><@s.m "cmsVoteTopic.type.mul"/></input><input type="radio" name="typeId${subTopic_index}" value="3" onclick="changeAddItemButton(${subTopic_index},this.value)" <#if subTopic.type==3>checked="checked"</#if>><@s.m "cmsVoteTopic.type.text"/></input>
+		<@s.m "cmsVoteTopic.type"/>: <input type="radio" name="typeId${subTopic_index}" value="1"  <#if subTopic.type==1>checked="checked"</#if>><@s.m "cmsVoteTopic.type.single"/></input><input type="radio" name="typeId${subTopic_index}" value="2"  <#if subTopic.type==2>checked="checked"</#if>><@s.m "cmsVoteTopic.type.mul"/></input><input type="radio" name="typeId${subTopic_index}" value="3"  <#if subTopic.type==3>checked="checked"</#if>><@s.m "cmsVoteTopic.type.text"/></input>
 		<input type="hidden" name="subTopicId" value="${subTopic.id}"/>
 		&nbsp; <input class="del-button" type="button" value="<@s.m "global.delete"/>" onclick="$(this).parent().remove();"/>
 		<span id="voteItemMsg${subTopic_index}" style="color: red;"></span>
@@ -138,9 +180,9 @@ function processButton(){
 
 <textarea id="subTopicTpl" style="display:none;">
 <div class="items">
-<@s.m "cmsVoteItem.title"/>: <input type="text" name="subtitle{0}" style="width:300px"/>
+<@s.m "cmsVoteItem.title"/>: <input type="text" name="subtitle" id="subtitle{0}" style="width:300px"/>
 &nbsp; <@s.m "cmsVoteItem.priority"/>: <input type="text" name="subPriority" value="{0}" style="width:30px"/>
-<@s.m "cmsVoteTopic.type"/>: <input type="radio" name="typeId{0}" value="1" onclick="changeAddItemButton({0},this.value)" checked="checked"><@s.m "cmsVoteTopic.type.single"/></input><input type="radio" name="typeId{0}" value="2" onclick="changeAddItemButton({0},this.value)"><@s.m "cmsVoteTopic.type.mul"/></input><input type="radio" name="typeId{0}" value="3" onclick="changeAddItemButton({0},this.value)"><@s.m "cmsVoteTopic.type.text"/></input>
+<@s.m "cmsVoteTopic.type"/>: <input type="radio" name="typeId{0}" value="1"  checked="checked"><@s.m "cmsVoteTopic.type.single"/></input><input type="radio" name="typeId{0}" value="2" ><@s.m "cmsVoteTopic.type.mul"/></input><input type="radio" name="typeId{0}" value="3" ><@s.m "cmsVoteTopic.type.text"/></input>
 <input type="hidden" name="subTopicId" value=""/>
 &nbsp; <input class="del-button" type="button" value="<@s.m "global.delete"/>" onclick="$(this).parent().remove();"/>
 <span id="voteItemMsg{0}" style="color: red;"></span>
@@ -181,12 +223,12 @@ function changeAddItemButton(index,value){
 }
 function checkVoteItem(){
 	var subIndexId,subTypeName,subTypeObject,flag=true,voteItemMsgId;
-	$("input[name^='subtitle']").each(function(){
-			subIndexId=$(this).attr("name").split("subtitle")[1];
+	$("input[name='subtitle']").each(function(){
+			subIndexId=$(this).attr("id").split("subtitle")[1];
 			subTypeName="typeId"+subIndexId;
 			$("input[name='"+subTypeName+"']").each(function(i){
 				subTypeObject=$(this);
-				if(subTypeObject.attr("checked")&&subTypeObject.val()!=3){
+				if(subTypeObject.prop("checked")&&subTypeObject.val()!=3){
 					var i=0;
 					$("input[id^='"+subIndexId+"']").each(function(){
 							i++;

@@ -35,7 +35,7 @@ $(function() {
 <@p.textarea colspan="2" label="cmsTopic.description" name="description" value=cmsTopic.description rows="3" cols="70" maxlength="255"/><@p.tr/>
 <@p.radio colspan="1" width="50" label="cmsTopic.recommend" name="recommend" value=cmsTopic.recommend list={"true":"global.true","false":"global.false"}/>
 <@p.text colspan="1" width="50" label="cmsTopic.priority" name="priority" value=cmsTopic.priority required="true" class="required" style="width:70px" maxlength="5"/><@p.tr/>
-<@p.select colspan="2" label="cmsTopic.tplContent" name="tplContent" value=cmsTopic.tplContent list=tplList headerKey="" headerValue="global.default"/><@p.tr/>
+<@p.select colspan="2" label="cmsTopic.tplContent" name="tplContent" value=tplContent list=tplList headerKey="" headerValue="global.default"/><@p.tr/>
 <@p.td label="cmsTopic.titleImg" colspan="1" width="50" noHeight="true">
 <@p.text id="uploadImgPath1" name="titleImg" value=cmsTopic.titleImg style="width:220px"/> <input class="preview-button"  type="button" value="<@s.m "imageupload.preview"/>" onclick="previewImg(1);"/><br/>
 <span id="ufc1" style="position:relative">

@@ -20,13 +20,13 @@ function luceneSubmit() {
 				luceneSubmit();
 			} else {
 				$("#startId").val("");
-				alert("<@s.m "global.success"/>");
+				$.alert("<@s.m 'global.prompt'/>","<@s.m 'global.success'/>");
 				$("#submitButton").removeAttr("disabled");
 				$("#cancelButton").attr("disabled","disabled");
 				$("#stop").val("");
 			}
 		} else {
-			alert(data.msg);
+			$.alert("<@s.m 'global.prompt'/>",data.msg);
 			$("#submitButton").removeAttr("disabled");
 			$("#cancelButton").attr("disabled","disabled");
 			$("#stop").val("");

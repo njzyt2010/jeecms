@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jeecms.cms.dao.assist.CmsVoteRecordDao;
 import com.jeecms.cms.entity.assist.CmsVoteRecord;
 import com.jeecms.cms.entity.assist.CmsVoteTopic;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.assist.CmsVoteRecordMng;
+import com.jeecms.core.entity.CmsUser;
 
 @Service
 @Transactional

@@ -45,11 +45,19 @@ body{margin:0;padding:0;font-size:12px;background:url(${base}/res/jeecms/img/log
               <tr>
                 <td>
                 <div>
-<#if errors??>
-	<ul>
-	<#list errors as error><li>${error}</li></#list>
-	</ul>
-</#if>
+				<#if error??>
+					<ul>
+						<#if error=="org.apache.shiro.authc.IncorrectCredentialsException">
+						<li><@s.m "error.invalidPassword"/></li>
+						<#elseif error=="org.apache.shiro.authc.UnknownAccountException">
+						<li><@s.m "error.usernameNotExist"/></li>
+						<#elseif error=="com.jeecms.common.security.CaptchaErrorException">
+						<li><@s.m "error.invalidCaptcha"/></li>
+						<#elseif error=="com.jeecms.common.security.DisabledException">
+						<li><@s.m "error.userDisabled"/></li>
+ 						</#if>
+					</ul>
+				</#if>
                 </div>
                 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="5">
                     <tr>

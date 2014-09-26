@@ -11,12 +11,12 @@ function getTableForm() {
 }
 function optDelete() {
 	if(Pn.checkedCount('ids')<=0) {
-		alert("<@s.m 'error.checkRecord'/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
-	if(!confirm("<@s.m 'global.confirm.delete'/>")) {
-		return;
-	}
+	$.confirm(doDelete,"<@s.m 'global.confirm'/>","<@s.m 'global.confirm.delete'/>");
+}
+function doDelete(){
 	var f = getTableForm();
 	f.action="o_delete.do";
 	f.submit();
@@ -38,11 +38,11 @@ function toList(box) {
 <input type="hidden" name="pageNo" value="${pageNo!}"/>
 <input type="hidden" name="box" value="${box!}"/>
 <@p.table value=pagination;message,i,has_next><#rt/>
-	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"ids\",this.checked)'/>" width="20">
-		<input type='checkbox' name='ids' value='${message.id}' id="id_${message.id!}"/><#t/>
+	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"ids\",this.checked)'/>" width="25" align="center">
+		<input type='checkbox' name='ids' value='${message.id}' id="id_${message.id!}" onclick="Pn.selectCheckBox('${message.id}',this.checked)"/><#t/>
 	</@p.column><#t/>
-	<@p.column title="ID">${message.id}</@p.column><#t/>
-	<@p.column code="cmsMessage.title">
+	<@p.column title="ID" align="center">${message.id}</@p.column><#t/>
+	<@p.column code="cmsMessage.title" align="center">
 		<#if message.msgStatus>
 			<a href="v_read.do?id=${message.id!}&&box=0"><@text_cut s=message.titleHtml len='15' append='...'/></a>
 		<#else>
@@ -52,7 +52,9 @@ function toList(box) {
 	<@p.column code="cmsMessage.sendUser" align="center">${message.msgSendUser.username!}</@p.column><#t/>
 	<@p.column code="cmsMessage.sendTime" align="center">${message.sendTime?string('yyyy-MM-dd HH:mm:ss')}</@p.column><#t/>
 </@p.table>
-<div><input class="del-button" type="button" value="<@s.m "global.delete"/>" onclick="toTrash();"/><span id="msgDiv" style="color: red;"></span></div>
+<div style="background:url(${base}/res/common/img/theme/boxTitleBG.jpg) repeat-x; height:20px; overflow:hidden;">
+<input class="del-button" type="button" value="<@s.m "global.delete"/>" onclick="toTrash();"/ style="float:left; border-right:1px solid #ffffff;"><span id="msgDiv" style="color: red;"></span>
+</div>
 </form>
 </div>
 <#include "/common/alert_message.html"/>

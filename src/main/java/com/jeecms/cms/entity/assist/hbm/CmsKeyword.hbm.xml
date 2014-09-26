@@ -8,6 +8,6 @@
 		<property name="name" column="keyword_name" type="string" not-null="true" length="100"/>
 		<property name="url" column="url" type="string" not-null="true" length="255"/>
 		<property name="disabled" column="is_disabled" type="java.lang.Boolean" not-null="true"/>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="false"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="false"></many-to-one>
 	</class>
 </hibernate-mapping>

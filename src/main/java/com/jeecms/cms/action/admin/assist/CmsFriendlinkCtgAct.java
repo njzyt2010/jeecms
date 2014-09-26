@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,18 +13,19 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsFriendlinkCtg;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsFriendlinkCtgMng;
 import com.jeecms.cms.manager.assist.CmsFriendlinkMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsFriendlinkCtgAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsFriendlinkCtgAct.class);
 
+	@RequiresPermissions("friendlink_ctg:v_list")
 	@RequestMapping("/friendlink_ctg/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -32,6 +34,7 @@ public class CmsFriendlinkCtgAct {
 		return "friendlink_ctg/list";
 	}
 
+	@RequiresPermissions("friendlink_ctg:o_save")
 	@RequestMapping("/friendlink_ctg/o_save.do")
 	public String save(CmsFriendlinkCtg bean, HttpServletRequest request,
 			ModelMap model) {
@@ -46,6 +49,7 @@ public class CmsFriendlinkCtgAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("friendlink_ctg:o_update")
 	@RequestMapping("/friendlink_ctg/o_update.do")
 	public String update(Integer[] wids, String[] name, Integer[] priority,
 			HttpServletRequest request, ModelMap model) {
@@ -59,6 +63,7 @@ public class CmsFriendlinkCtgAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("friendlink_ctg:o_delete")
 	@RequestMapping("/friendlink_ctg/o_delete.do")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			ModelMap model) {

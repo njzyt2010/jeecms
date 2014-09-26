@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,25 +22,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsMessage;
 import com.jeecms.cms.entity.assist.CmsReceiverMessage;
-import com.jeecms.cms.entity.main.CmsGroup;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.assist.CmsMessageMng;
 import com.jeecms.cms.manager.assist.CmsReceiverMessageMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsMessageAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsMessageAct.class);
 
+	@RequiresPermissions("message:v_list")
 	@RequestMapping("/message/v_list.do")
 	public String list(Integer pageNo, String title, Date sendBeginTime,
 			Date sendEndTime, Boolean status, Integer box,
@@ -88,6 +90,7 @@ public class CmsMessageAct {
 		return returnPage;
 	}
 
+	@RequiresPermissions("message:v_add")
 	@RequestMapping("/message/v_add.do")
 	public String add(ModelMap model) {
 		List<CmsGroup> groups = groupMng.getList();
@@ -96,6 +99,7 @@ public class CmsMessageAct {
 	}
 
 	// 直接发送
+	@RequiresPermissions("message:v_send")
 	@RequestMapping("/message/v_send.do")
 	public String send(CmsMessage message, String username, Integer groupId,
 			Integer pageNo, String title, Date sendBeginTime, Date sendEndTime,
@@ -196,6 +200,7 @@ public class CmsMessageAct {
 	}
 
 	// 存草稿
+	@RequiresPermissions("message:v_save")
 	@RequestMapping("/message/v_save.do")
 	public String save(CmsMessage message, String username, Integer pageNo,
 			String title, Date sendBeginTime, Date sendEndTime, Boolean status,
@@ -225,6 +230,7 @@ public class CmsMessageAct {
 	}
 
 	// 发送
+	@RequiresPermissions("message:v_tosend")
 	@RequestMapping("/message/v_tosend.do")
 	public String message_tosend(Integer id, Integer pageNo, String title,
 			Date sendBeginTime, Date sendEndTime, Boolean status, Integer box,
@@ -253,6 +259,7 @@ public class CmsMessageAct {
 				request, response, model);
 	}
 
+	@RequiresPermissions("message:v_edit")
 	@RequestMapping("/message/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -263,7 +270,8 @@ public class CmsMessageAct {
 		model.addAttribute("message", message);
 		return "message/edit";
 	}
-
+	
+	@RequiresPermissions("message:o_update")
 	@RequestMapping("/message/o_update.do")
 	public String update(CmsMessage message, Integer pageNo, String title,
 			Date sendBeginTime, Date sendEndTime, Boolean status, Integer box,
@@ -291,6 +299,7 @@ public class CmsMessageAct {
 				request, response, model);
 	}
 
+	@RequiresPermissions("message:v_read")
 	@RequestMapping("/message/v_read.do")
 	public String read(Integer id, Integer box, HttpServletRequest request,
 			ModelMap model) {
@@ -314,6 +323,7 @@ public class CmsMessageAct {
 		return "message/read";
 	}
 
+	@RequiresPermissions("message:v_forward")
 	@RequestMapping("/message/v_forward.do")
 	public String forward(Integer id, HttpServletRequest request, ModelMap model) {
 		CmsReceiverMessage receiverMessage = receiverMessageMng.findById(id);
@@ -329,6 +339,7 @@ public class CmsMessageAct {
 		return "message/add";
 	}
 	
+	@RequiresPermissions("message:v_reply")
 	@RequestMapping("/message/v_reply.do")
 	public String reply(Integer id, HttpServletRequest request, ModelMap model) {
 		CmsReceiverMessage receiverMessage = receiverMessageMng.findById(id);
@@ -338,6 +349,7 @@ public class CmsMessageAct {
 		return "message/reply";
 	}
 
+	@RequiresPermissions("message:v_trash")
 	@RequestMapping("/message/v_trash.do")
 	public void trash(Integer[] ids, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) throws JSONException {
@@ -399,6 +411,7 @@ public class CmsMessageAct {
 		ResponseUtils.renderJson(response, object.toString());
 	}
 
+	@RequiresPermissions("message:v_revert")
 	@RequestMapping("/message/v_revert.do")
 	public void revert(Integer ids[], HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) throws JSONException {
@@ -426,6 +439,7 @@ public class CmsMessageAct {
 		ResponseUtils.renderJson(response, object.toString());
 	}
 
+	@RequiresPermissions("message:v_empty")
 	@RequestMapping("/message/v_empty.do")
 	public void empty(Integer ids[], HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) throws JSONException {
@@ -474,6 +488,7 @@ public class CmsMessageAct {
 		ResponseUtils.renderJson(response, object.toString());
 	}
 
+	@RequiresPermissions("message:v_findUser")
 	@RequestMapping("/message/v_findUser.do")
 	public void findUserByUserName(String username, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) throws JSONException {
@@ -490,6 +505,7 @@ public class CmsMessageAct {
 	}
 
 	// 查找未读信息条数
+	@RequiresPermissions("message:v_countUnreadMsg")
 	@RequestMapping(value = "/message/v_countUnreadMsg.do")
 	public void findUnreadMessagesByUser(HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) throws JSONException {

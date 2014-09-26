@@ -25,7 +25,7 @@ $(function() {
 <@p.text width="50" colspan="1" label="cmsConfig.emailSender.host" name="host" value=(emailSender.host)! required="required" class="required" maxlength="100"/>
 <@p.text width="50" colspan="1" label="cmsConfig.emailSender.port" name="port" value=(emailSender.port)! class="digits" maxlength="5" help="cmsConfig.emailSender.port.help"/><@p.tr/>
 <@p.text width="50" colspan="1" label="cmsConfig.emailSender.username" name="username" value=(emailSender.username)! required="required" maxlength="100" class="required"/>
-<@p.text width="50" colspan="1" label="cmsConfig.emailSender.password" name="password" maxlength="100" help="cmsConfig.emailSender.password.help"/><@p.tr/>
+<@p.text width="50" colspan="1" label="cmsConfig.emailSender.password" name="password" required="required" class="required" maxlength="100"/><@p.tr/>
 <@p.text width="50" colspan="1" label="cmsConfig.emailSender.encoding" name="encoding" value=(emailSender.encoding)! maxlength="20"/>
 <@p.text width="50" colspan="1" label="cmsConfig.emailSender.personal" name="personal" value=(emailSender.personal)! maxlength="100"/><@p.tr/>
 

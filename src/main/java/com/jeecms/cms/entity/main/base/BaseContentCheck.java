@@ -64,7 +64,7 @@ public abstract class BaseContentCheck  implements Serializable {
 	private java.lang.Boolean rejected;
 	private java.util.Date checkDate;
 	
-	private com.jeecms.cms.entity.main.CmsUser reviewer;
+	private com.jeecms.core.entity.CmsUser reviewer;
 
 	// one to one
 	private com.jeecms.cms.entity.main.Content content;
@@ -149,11 +149,11 @@ public abstract class BaseContentCheck  implements Serializable {
 		this.checkDate = checkDate;
 	}
 
-	public com.jeecms.cms.entity.main.CmsUser getReviewer() {
+	public com.jeecms.core.entity.CmsUser getReviewer() {
 		return reviewer;
 	}
 
-	public void setReviewer(com.jeecms.cms.entity.main.CmsUser reviewer) {
+	public void setReviewer(com.jeecms.core.entity.CmsUser reviewer) {
 		this.reviewer = reviewer;
 	}
 

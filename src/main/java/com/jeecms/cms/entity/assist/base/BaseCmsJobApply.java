@@ -40,7 +40,7 @@ public abstract class BaseCmsJobApply  implements Serializable {
 	public BaseCmsJobApply (
 		java.lang.Integer id,
 		com.jeecms.cms.entity.main.Content content,
-		com.jeecms.cms.entity.main.CmsUser user,
+		com.jeecms.core.entity.CmsUser user,
 		java.util.Date applyTime) {
 
 		this.setId(id);
@@ -64,7 +64,7 @@ public abstract class BaseCmsJobApply  implements Serializable {
 
 	// many to one
 	private com.jeecms.cms.entity.main.Content content;
-	private com.jeecms.cms.entity.main.CmsUser user;
+	private com.jeecms.core.entity.CmsUser user;
 
 
 
@@ -125,7 +125,7 @@ public abstract class BaseCmsJobApply  implements Serializable {
 	/**
 	 * Return the value associated with the column: user_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getUser () {
+	public com.jeecms.core.entity.CmsUser getUser () {
 		return user;
 	}
 
@@ -133,7 +133,7 @@ public abstract class BaseCmsJobApply  implements Serializable {
 	 * Set the value related to the column: user_id
 	 * @param user the user_id value
 	 */
-	public void setUser (com.jeecms.cms.entity.main.CmsUser user) {
+	public void setUser (com.jeecms.core.entity.CmsUser user) {
 		this.user = user;
 	}
 

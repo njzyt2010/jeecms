@@ -10,15 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.manager.main.CmsRoleMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsRoleMng;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
 
 public class CmsAdminAbstract {
 	protected String channelsAddJson(Integer siteId,

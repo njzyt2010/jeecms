@@ -12,19 +12,20 @@ import com.jeecms.cms.entity.assist.CmsCommentExt;
 import com.jeecms.cms.manager.assist.CmsCommentExtMng;
 import com.jeecms.cms.manager.assist.CmsCommentMng;
 import com.jeecms.cms.manager.assist.CmsSensitivityMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.manager.main.ContentCountMng;
 import com.jeecms.cms.manager.main.ContentMng;
 import com.jeecms.common.hibernate3.Updater;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
 
 @Service
 @Transactional
 public class CmsCommentMngImpl implements CmsCommentMng {
 	@Transactional(readOnly = true)
 	public Pagination getPage(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int pageNo, int pageSize) {
 		Pagination page = dao.getPage(siteId, contentId, greaterThen, checked,
 				recommend, desc, pageNo, pageSize, false);
@@ -33,7 +34,7 @@ public class CmsCommentMngImpl implements CmsCommentMng {
 
 	@Transactional(readOnly = true)
 	public Pagination getPageForTag(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int pageNo, int pageSize) {
 		Pagination page = dao.getPage(siteId, contentId, greaterThen, checked,
 				recommend, desc, pageNo, pageSize, true);
@@ -54,7 +55,7 @@ public class CmsCommentMngImpl implements CmsCommentMng {
 
 	@Transactional(readOnly = true)
 	public List<CmsComment> getListForTag(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int count) {
 		return dao.getList(siteId, contentId, greaterThen, checked, recommend,
 				desc, count, true);
@@ -66,7 +67,7 @@ public class CmsCommentMngImpl implements CmsCommentMng {
 		return entity;
 	}
 
-	public CmsComment comment(String text, String ip, Integer contentId,
+	public CmsComment comment(Integer score,String text, String ip, Integer contentId,
 			Integer siteId, Integer userId, boolean checked, boolean recommend) {
 		CmsComment comment = new CmsComment();
 		comment.setContent(contentMng.findById(contentId));
@@ -108,7 +109,24 @@ public class CmsCommentMngImpl implements CmsCommentMng {
 		}
 		return beans;
 	}
-
+	
+	public CmsComment[] checkByIds(Integer[] ids, CmsUser user, boolean checked) {
+		CmsComment[] beans = new CmsComment[ids.length];
+		for (int i = 0, len = ids.length; i < len; i++) {
+			beans[i] = checkById(ids[i],user,checked);
+		}
+		return beans;
+	}
+	
+	
+	private CmsComment checkById(Integer id,CmsUser checkUser,boolean checked){
+		CmsComment bean=findById(id);
+		Updater<CmsComment> updater = new Updater<CmsComment>(bean);
+		bean = dao.updateByUpdater(updater);
+		bean.setChecked(checked);
+		return bean;
+	}
+	
 	public void ups(Integer id) {
 		CmsComment comment = findById(id);
 		comment.setUps((short) (comment.getUps() + 1));

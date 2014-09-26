@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +13,18 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsKeyword;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsKeywordMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsKeywordAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsKeywordAct.class);
 
+	@RequiresPermissions("keyword:v_list")
 	@RequestMapping("/keyword/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -32,6 +34,7 @@ public class CmsKeywordAct {
 		return "keyword/list";
 	}
 
+	@RequiresPermissions("keyword:o_save")
 	@RequestMapping("/keyword/o_save.do")
 	public String save(CmsKeyword bean, HttpServletRequest request,
 			ModelMap model) {
@@ -47,6 +50,7 @@ public class CmsKeywordAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("keyword:o_update")
 	@RequestMapping("/keyword/o_update.do")
 	public String update(Integer[] id, String[] name, String[] url,
 			Boolean[] disabled, HttpServletRequest request, ModelMap model) {
@@ -63,6 +67,7 @@ public class CmsKeywordAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("keyword:o_delete")
 	@RequestMapping("/keyword/o_delete.do")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			ModelMap model) {

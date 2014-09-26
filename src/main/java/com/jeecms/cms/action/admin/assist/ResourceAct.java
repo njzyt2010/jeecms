@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +18,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsResourceMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.file.FileWrap;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * JEECMS资源的Action
+ * 
  */
 // TODO 验证path必须以TPL_BASE开头，不能有..后退关键字
 @Controller
@@ -36,11 +38,20 @@ public class ResourceAct {
 			.getLogger(ResourceAct.class);
 	private static final String INVALID_PARAM = "template.invalidParams";
 
+
+	@RequiresPermissions("resource:resource_main")
+	@RequestMapping("/resource/resource_main.do")
+	public String resourceMain(ModelMap model) {
+		return "resource/resource_main";
+	}
+	
+	@RequiresPermissions("resource:v_left")
 	@RequestMapping("/resource/v_left.do")
 	public String left(String path, HttpServletRequest request, ModelMap model) {
 		return "resource/left";
 	}
 
+	@RequiresPermissions("resource:v_tree")
 	@RequestMapping(value = "/resource/v_tree.do")
 	public String tree(HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -68,6 +79,7 @@ public class ResourceAct {
 	}
 
 	// 直接调用方法需要把root参数保存至model中
+	@RequiresPermissions("resource:v_list")
 	@RequestMapping(value = "/resource/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -93,6 +105,7 @@ public class ResourceAct {
 		return "resource/list";
 	}
 
+	@RequiresPermissions("resource:o_create_dir")
 	@RequestMapping(value = "/resource/o_create_dir.do")
 	public String createDir(String root, String dirName,
 			HttpServletRequest request, ModelMap model) {
@@ -102,6 +115,7 @@ public class ResourceAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("resource:v_add")
 	@RequestMapping(value = "/resource/v_add.do")
 	public String add(HttpServletRequest request, ModelMap model) {
 		String root = RequestUtils.getQueryParam(request, "root");
@@ -109,6 +123,7 @@ public class ResourceAct {
 		return "resource/add";
 	}
 
+	@RequiresPermissions("resource:v_edit")
 	@RequestMapping("/resource/v_edit.do")
 	public String edit(HttpServletRequest request, ModelMap model)
 			throws IOException {
@@ -127,6 +142,7 @@ public class ResourceAct {
 		return "resource/edit";
 	}
 
+	@RequiresPermissions("resource:o_save")
 	@RequestMapping("/resource/o_save.do")
 	public String save(String root, String filename, String source,
 			HttpServletRequest request, ModelMap model) throws IOException {
@@ -143,6 +159,7 @@ public class ResourceAct {
 	}
 
 	// AJAX请求，不返回页面
+	@RequiresPermissions("resource:o_update")
 	@RequestMapping("/resource/o_update.do")
 	public void update(String root, String name, String source,
 			HttpServletRequest request, HttpServletResponse response,
@@ -150,16 +167,17 @@ public class ResourceAct {
 		CmsSite site = CmsUtils.getSite(request);
 		WebErrors errors = validateUpdate(root, name,site.getResPath(), source, request);
 		if (errors.hasErrors()) {
-			ResponseUtils.renderJson(response, "{success:false,msg:'"
+			ResponseUtils.renderJson(response, "{\"success\":false,\"msg\":'"
 					+ errors.getErrors().get(0) + "'}");
 		}
 		resourceMng.updateFile(name, source);
 		log.info("update Resource name={}.", name);
 		cmsLogMng.operating(request, "resource.log.update", "filename=" + name);
 		model.addAttribute("root", root);
-		ResponseUtils.renderJson(response, "{success:true}");
+		ResponseUtils.renderJson(response, "{\"success\":true}");
 	}
 
+	@RequiresPermissions("resource:o_delete")
 	@RequestMapping("/resource/o_delete.do")
 	public String delete(String root, String[] names,
 			HttpServletRequest request, ModelMap model) {
@@ -179,6 +197,7 @@ public class ResourceAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("resource:o_delete_single")
 	@RequestMapping("/resource/o_delete_single.do")
 	public String deleteSingle(HttpServletRequest request, ModelMap model) {
 		// TODO 输入验证
@@ -191,6 +210,7 @@ public class ResourceAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("resource:v_rename")
 	@RequestMapping(value = "/resource/v_rename.do")
 	public String renameInput(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -202,6 +222,7 @@ public class ResourceAct {
 		return "resource/rename";
 	}
 
+	@RequiresPermissions("resource:o_rename")
 	@RequestMapping(value = "/resource/o_rename.do", method = RequestMethod.POST)
 	public String renameSubmit(String root, String origName, String distName,
 			HttpServletRequest request, ModelMap model) {
@@ -214,6 +235,7 @@ public class ResourceAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("resource:v_upload")
 	@RequestMapping(value = "/resource/v_upload.do")
 	public String uploadInput(HttpServletRequest request, ModelMap model) {
 		String root = RequestUtils.getQueryParam(request, "root");
@@ -221,6 +243,7 @@ public class ResourceAct {
 		return "resource/upload";
 	}
 
+	@RequiresPermissions("resource:o_upload")
 	@RequestMapping(value = "/resource/o_upload.do", method = RequestMethod.POST)
 	public String uploadSubmit(String root, HttpServletRequest request,
 			ModelMap model) {
@@ -228,6 +251,7 @@ public class ResourceAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("resource:o_swfupload")
 	@RequestMapping(value = "/resource/o_swfupload.do", method = RequestMethod.POST)
 	public void swfUpload(
 			String root,

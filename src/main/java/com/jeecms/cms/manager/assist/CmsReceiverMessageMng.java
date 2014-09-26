@@ -3,7 +3,6 @@ package com.jeecms.cms.manager.assist;
 import java.util.Date;
 import java.util.List;
 
-import com.jeecms.cms.entity.assist.CmsMessage;
 import com.jeecms.cms.entity.assist.CmsReceiverMessage;
 import com.jeecms.common.page.Pagination;
 
@@ -16,7 +15,7 @@ public interface CmsReceiverMessageMng {
 			Date sendEndTime, Boolean status, Integer box, Boolean cacheable,
 			int pageNo, int pageSize);
 	
-	public List getList(Integer siteId, Integer sendUserId,
+	public List<CmsReceiverMessage> getList(Integer siteId, Integer sendUserId,
 			Integer receiverUserId, String title, Date sendBeginTime,
 			Date sendEndTime, Boolean status, Integer box, Boolean cacheable);
 

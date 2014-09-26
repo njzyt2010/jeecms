@@ -4,7 +4,7 @@ function upload(n) {
 	var of = $("#uploadFile"+n);
 	//检查是否选择了图片
 	if(of.val()=="") {
-		alert("<@s.m "imageupload.error.noFileToUpload"/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'imageupload.error.noFileToUpload'/>");
 		return;
 	}
 	//将file移动至上传表单
@@ -29,7 +29,7 @@ function upload(n) {
 //剪裁图片
 function imgCut(n) {
 	if($("#uploadImgPath"+n).val()=="") {
-		alert("<@s.m "imageupload.error.noFileToCut"/>");
+		$.alert("<@s.m "imageupload.error.noFileToCut"/>");
 		return;
 	}
 	var url = "../common/v_image_area_select.do?uploadNum="+n+"&imgSrcPath="

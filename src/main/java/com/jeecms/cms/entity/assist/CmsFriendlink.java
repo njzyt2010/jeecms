@@ -43,7 +43,7 @@ public class CmsFriendlink extends BaseCmsFriendlink {
 	 */
 	public CmsFriendlink(java.lang.Integer id,
 			com.jeecms.cms.entity.assist.CmsFriendlinkCtg category,
-			com.jeecms.cms.entity.main.CmsSite site, java.lang.String name,
+			com.jeecms.core.entity.CmsSite site, java.lang.String name,
 			java.lang.String domain, java.lang.Integer views,
 			java.lang.Integer priority, java.lang.Boolean enabled) {
 

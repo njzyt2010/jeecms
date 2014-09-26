@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -17,20 +18,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.assist.CmsDictionary;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.manager.assist.CmsDictionaryMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsDictionary;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsDictionaryMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsDictionaryAct {
 	private static final Logger log = LoggerFactory.getLogger(CmsDictionaryAct.class);
 
+	@RequiresPermissions("dictionary:v_list")
 	@RequestMapping("/dictionary/v_list.do")
 	public String list(String queryType,Integer pageNo, HttpServletRequest request, ModelMap model) {
 		Pagination pagination = manager.getPage(queryType,cpn(pageNo), CookieUtils
@@ -43,11 +45,13 @@ public class CmsDictionaryAct {
 		return "dictionary/list";
 	}
 
+	@RequiresPermissions("dictionary:v_add")
 	@RequestMapping("/dictionary/v_add.do")
 	public String add(ModelMap model) {
 		return "dictionary/add";
 	}
 
+	@RequiresPermissions("dictionary:v_edit")
 	@RequestMapping("/dictionary/v_edit.do")
 	public String edit(Integer id, Integer pageNo, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -58,7 +62,22 @@ public class CmsDictionaryAct {
 		model.addAttribute("pageNo",pageNo);
 		return "dictionary/edit";
 	}
+	
+	@RequiresPermissions("dictionary:v_ajax_edit")
+	@RequestMapping("/dictionary/v_ajax_edit.do")
+	public void ajaxEdit(Integer id, HttpServletRequest request,HttpServletResponse response, ModelMap model) throws JSONException {
+		JSONObject object = new JSONObject();
+		CmsDictionary dic=manager.findById(id);
+		if(dic!=null){
+			object.put("id", dic.getId());
+			object.put("name", dic.getName());
+			object.put("type", dic.getType());
+			object.put("value", dic.getValue());
+		}
+		ResponseUtils.renderJson(response, object.toString());
+	}
 
+	@RequiresPermissions("dictionary:o_save")
 	@RequestMapping("/dictionary/o_save.do")
 	public String save(CmsDictionary bean, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateSave(bean, request);
@@ -72,6 +91,7 @@ public class CmsDictionaryAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("dictionary:o_update")
 	@RequestMapping("/dictionary/o_update.do")
 	public String update(CmsDictionary bean,String queryType, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -86,6 +106,7 @@ public class CmsDictionaryAct {
 		return list(queryType,pageNo, request, model);
 	}
 
+	@RequiresPermissions("dictionary:o_delete")
 	@RequestMapping("/dictionary/o_delete.do")
 	public String delete(Integer[] ids, String queryType,Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -102,6 +123,7 @@ public class CmsDictionaryAct {
 		return list(queryType,pageNo, request, model);
 	}
 	
+	@RequiresPermissions("dictionary:v_check_value")
 	@RequestMapping(value = "/dictionary/v_check_value.do")
 	public void checkDateValue(String value, String type,HttpServletResponse response) throws JSONException {
 		JSONObject json=new JSONObject();

@@ -3,6 +3,7 @@ package com.jeecms.cms.dao.assist.impl;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
@@ -62,6 +63,12 @@ public class CmsAcquisitionHistoryDaoImpl extends
 			getSession().delete(entity);
 		}
 		return entity;
+	}
+	
+	public void deleteByAcquisition(Integer acquId){
+		String hql = "delete from CmsAcquisitionHistory bean where bean.acquisition.id=:acquId";
+		Query query = getSession().createQuery(hql).setParameter("acquId", acquId);
+		query.executeUpdate();
 	}
 
 	public Boolean checkExistByProperties(Boolean title, String value) {

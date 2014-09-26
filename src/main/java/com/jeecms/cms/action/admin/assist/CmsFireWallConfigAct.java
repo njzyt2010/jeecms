@@ -13,16 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.web.session.SessionProvider;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.web.util.CmsUtils;
 
 import com.jeecms.cms.Constants;
 
@@ -41,10 +42,13 @@ public class CmsFireWallConfigAct {
 	String property_firewall_week = "firewall.week";
 	String property_firewall_ips = "firewall.ips";
 	
+	@RequiresPermissions("config:v_login")
 	@RequestMapping("/config/v_login.do")
 	public String v_login(HttpServletRequest request, Model model) {
 		return "config/firewall_login";
 	}
+	
+	@RequiresPermissions("config:o_login")
 	@RequestMapping("/config/o_login.do")
 	public String o_login(String password,HttpServletRequest request,HttpServletResponse response,Model model)
 			throws IOException {
@@ -59,6 +63,8 @@ public class CmsFireWallConfigAct {
 			return "config/firewall_login_error";
 		}
 	}
+	
+	@RequiresPermissions("config:v_firewall")
 	@RequestMapping("/config/v_firewall.do")
 	public String edit(HttpServletRequest request, Model model)
 			throws IOException {
@@ -97,6 +103,7 @@ public class CmsFireWallConfigAct {
 		}
 	}
 
+	@RequiresPermissions("config:o_firewall")
 	@RequestMapping("/config/o_firewall.do")
 	public String update(HttpServletRequest request, Model model, String open,String oldPassword,
 			String password, String domain, String[] week,String[] hour, String ips)

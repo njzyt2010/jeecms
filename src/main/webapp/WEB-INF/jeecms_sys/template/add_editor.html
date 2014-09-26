@@ -31,7 +31,7 @@ $(function() {
 </div>
 <@p.form id="jvForm" action="o_save.do" labelWidth="15">
 <@p.text label="template.filename" name="filename" size="30" required="true" class="required" maxlength="100" help=".html"/>
-<@p.td colspan="2"><@p.editor name="source" height="500" fullPage="true"/></@p.td><@p.tr/>
+<@p.td colspan="2"><@p.editor  name="source" height="500" fullPage="true"/></@p.td><@p.tr/>
 <@p.td>
 	<input type="hidden" name="root" value="${root}"/>
 	<@p.submit code="global.save"/>

@@ -9,13 +9,6 @@ CKEDITOR.editorConfig = function( config ) {
 	    config.height = '300px'; // 高度  
 	    config.skin = 'kama';// 界面v2,kama,office2003  
 	    config.toolbar = 'MyToolbar';// 工具栏风格（基础'Basic'、全能'Full'、自定义）
-	    config.toolbarCanCollapse = true;// 工具栏是否可以被收缩  
-	    config.resize_enabled = false;// 取消 “拖拽以改变尺寸”功能  
-	    config.ignoreEmptyParagraph = true;//是否忽略空白符
-	    config.LinkUpload = true ;
-	    config.ImageUpload= true ;
-	    config.FlashUpload = true ;
-	    config.MediaUpload= true ;
 	    //自定义的工具栏      
 	    config.toolbar_MyToolbar =  
 	    [  

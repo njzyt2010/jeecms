@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.manager.CmsLogMng;
 import com.jeecms.core.manager.FtpMng;
+import com.jeecms.core.web.WebErrors;
 
 @Controller
 public class FtpAct {
 	private static final Logger log = LoggerFactory.getLogger(FtpAct.class);
 
+	@RequiresPermissions("ftp:v_list")
 	@RequestMapping("/ftp/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -29,11 +31,13 @@ public class FtpAct {
 		return "ftp/list";
 	}
 
+	@RequiresPermissions("ftp:v_add")
 	@RequestMapping("/ftp/v_add.do")
 	public String add(ModelMap model) {
 		return "ftp/add";
 	}
 
+	@RequiresPermissions("ftp:v_edit")
 	@RequestMapping("/ftp/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -44,6 +48,7 @@ public class FtpAct {
 		return "ftp/edit";
 	}
 
+	@RequiresPermissions("ftp:o_save")
 	@RequestMapping("/ftp/o_save.do")
 	public String save(Ftp bean, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateSave(bean, request);
@@ -57,6 +62,7 @@ public class FtpAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("ftp:o_update")
 	@RequestMapping("/ftp/o_update.do")
 	public String update(Ftp bean, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -65,7 +71,7 @@ public class FtpAct {
 			return errors.showErrorPage(model);
 		}
 		//留空不修改
-		if(StringUtils.isBlank(bean.getPassword())){
+		if(StringUtils.isBlank(bean.getPassword())){	
 			bean.setPassword(manager.findById(bean.getId()).getPassword());
 		}
 		bean = manager.update(bean);
@@ -75,6 +81,7 @@ public class FtpAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("ftp:o_delete")
 	@RequestMapping("/ftp/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {

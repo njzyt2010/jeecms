@@ -60,9 +60,9 @@ $(function() {
 
 <textarea id="subTopicTpl" style="display:none;">
 <div class="items">
-<@s.m "cmsVoteItem.title"/>: <input type="text" name="subtitle{0}" style="width:300px"/>
+<@s.m "cmsVoteItem.title"/>: <input type="text" name="subtitle" id="subtitle{0}" style="width:300px"/>
 &nbsp; <@s.m "cmsVoteItem.priority"/>: <input type="text" name="subPriority" value="{0}" style="width:30px"/>
-<@s.m "cmsVoteTopic.type"/>: <input type="radio" name="typeId{0}" value="1" onclick="changeAddItemButton({0},this.value)" checked="checked"><@s.m "cmsVoteTopic.type.single"/></input><input type="radio" name="typeId{0}" value="2" onclick="changeAddItemButton({0},this.value)"><@s.m "cmsVoteTopic.type.mul"/></input><input type="radio" name="typeId{0}" value="3" onclick="changeAddItemButton({0},this.value)"><@s.m "cmsVoteTopic.type.text"/></input>
+<@s.m "cmsVoteTopic.type"/>: <input type="radio" name="typeId{0}" id="typeId{0}_1" value="1" onclick="changeAddItemButton({0},this.value)" checked="checked"><@s.m "cmsVoteTopic.type.single"/></input><input type="radio" name="typeId{0}" id="typeId{0}_2" value="2" onclick="changeAddItemButton({0},this.value)"><@s.m "cmsVoteTopic.type.mul"/></input><input type="radio" name="typeId{0}" id="typeId{0}_3" value="3" onclick="changeAddItemButton({0},this.value)"><@s.m "cmsVoteTopic.type.text"/></input>
 &nbsp; <input class="del-button" type="button" value="<@s.m "global.delete"/>" onclick="$(this).parent().remove();"/>
 <span id="voteItemMsg{0}" style="color: red;"></span>
 <span><@s.m "cmsVoteTopic.items"/>&nbsp; <input id="addItem{0}" type="button" class="add_item" value="<@s.m "cmsVoteItem.addLines"/>" onclick="addLines({0});"/></span>
@@ -101,12 +101,11 @@ function changeAddItemButton(index,value){
 }
 function checkVoteItem(){
 	var subIndexId,subTypeName,subTypeObject,flag=true,voteItemMsgId;
-	$("input[name^='subtitle']").each(function(){
-			subIndexId=$(this).attr("name").split("subtitle")[1];
-			subTypeName="typeId"+subIndexId;
-			$("input[name='"+subTypeName+"']").each(function(i){
+	$("input[name='subtitle']").each(function(){
+			subIndexId=$(this).attr("id").split("subtitle")[1];
+			$("input[id^='typeId"+subIndexId+"']").each(function(i){
 				subTypeObject=$(this);
-				if(subTypeObject.attr("checked")&&subTypeObject.val()!=3){
+				if(subTypeObject.prop("checked")&&subTypeObject.val()!=3){
 					var i=0;
 					$("input[id^='"+subIndexId+"']").each(function(){
 							i++;

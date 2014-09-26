@@ -22,6 +22,7 @@ public abstract class BaseCmsField implements Serializable {
 	private java.lang.String comment;
 	private java.lang.String nullable;
 	private java.lang.String extra;
+	private java.lang.String length;
 
 	public java.lang.String getName() {
 		return name;
@@ -77,6 +78,14 @@ public abstract class BaseCmsField implements Serializable {
 
 	public void setExtra(java.lang.String extra) {
 		this.extra = extra;
+	}
+
+	public java.lang.String getLength() {
+		return length;
+	}
+
+	public void setLength(java.lang.String length) {
+		this.length = length;
 	}
 
 	public String toString() {

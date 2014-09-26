@@ -5,42 +5,22 @@
 <title></title>
 <#include "/jeecms_sys/head.html"/>
 <script type="text/javascript">
-/*
-function createIndex() {
+function createContents() {
 	var button = $("#createButton");
 	var value = button.val();
-	button.val("<@s.m "cmsStatic.wait"/>").attr("disabled","disabled");
-	
-	$.getJSON("o_content.do",function(data) {
+	button.val("<@s.m 'cmsStatic.wait'/>").attr("disabled","disabled");
+	$.post("o_content.do",{
+			channelId:$("#channelId option:selected").val(),
+			startDate:$("#startDate").val()
+		},function(data) {
 		button.val(value).removeAttr("disabled");
 		if(data.success) {
-			alert("<@s.m "cmsStatic.success"/>"+data.count);
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'cmsStatic.success'/>"+data.count);
 		} else {
-			alert(data.msg);
+			$.alert("<@s.m 'global.prompt'/>",data.msg);
 		}
 	});
 }
-*/
-$(function() {
-	$("#jvForm").validate( {
-		submitHandler : function(form) {
-			var button = $("#createButton");
-			var value = button.val();
-			button.val("<@s.m "cmsStatic.wait"/>").attr("disabled","disabled");
-			$(form).ajaxSubmit( {
-				"success" : function(data) {
-					button.val(value).removeAttr("disabled");
-					if(data.success) {
-						alert("<@s.m "cmsStatic.success"/>"+data.count);
-					} else {
-						alert(data.msg);
-					}
-				},
-				"dataType" : "json"
-			});
-		}
-	});
-});
 </script>
 </head>
 <body>
@@ -52,10 +32,10 @@ $(function() {
 </div>
 <div class="body-box">
 <@p.form id="jvForm" action="o_content.do">
-<@p.select label="cmsStatic.channel" name="channelId" list=channelList listKey="id" listValue="name" listDeep="deep" headerKey="" headerValue="cmsStatic.allChannel"/>
-<@p.text label="cmsStatic.startDate" name="startDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate"/>
+<@p.select label="cmsStatic.channel" name="channelId" id="channelId" list=channelList listKey="id" listValue="name" listDeep="deep" headerKey="" headerValue="cmsStatic.allChannel"/>
+<@p.text label="cmsStatic.startDate" name="startDate" id="startDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate"/>
 <@p.td>
-	<input class="generate-content-page" id="createButton" type="submit" value="<@s.m "cmsStatic.contentStatic"/>"/>
+	<input class="generate-content-page" id="createButton" type="button" value="<@s.m "cmsStatic.contentStatic"/>" onclick="createContents()"/>
 </@p.td>
 </@p.form>
 </div>

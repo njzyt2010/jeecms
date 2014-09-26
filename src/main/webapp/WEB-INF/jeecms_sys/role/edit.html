@@ -4,36 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <title></title>
 <#include "/jeecms_sys/head.html"/>
-<script type="text/javascript">
-var perms = [<#list cmsRole.perms as p>"${p}"<#if p_has_next>,</#if></#list>];
-function disablePerms() {
-	if($("input[name=super]:checked").val()=="true") {
-		$(".perm-container input[type=checkbox]").attr("disabled","disabeld");
-	} else {
-		$(".perm-container input[type=checkbox]").removeAttr("disabled");
-	}
-}
-$(function() {
-	disablePerms();
-	$("#jvForm").validate();
-	$(".perm-container input[type=checkbox]").each(function() {
-		var perm = $(this).val();
-		var index = perm.indexOf(",");		
-		if(index!=-1) {
-			perm = perm.substring(0,index);
-		}
-		for(var i=0,len=perms.length;i<len;i++) {
-			if(perms[i]==perm) {
-				$(this).attr("checked",true);
-				break;
-			}
-		}
-	});
-	$("input[name=super]").bind("click",function(){
-		disablePerms();
-	});
-});
-</script>
+<link rel="stylesheet" href="${base}/res/ztree/css/ztree.css" type="text/css">
+<script type="text/javascript" src="${base}/res/ztree/js/jquery.ztree.all-3.5.min.js"></script>
 <style type="text/css">
 .perm-container{}
 .perm-layout-1{padding:3px 0;}
@@ -52,10 +24,71 @@ $(function() {
 <@p.form id="jvForm" action="o_update.do" labelWidth="15">
 <@p.text colspan="1" width="50" label="cmsRole.name" name="name" value=cmsRole.name required="true" class="required" maxlength="100"/>
 <@p.text colspan="1" width="50" label="cmsRole.priority" name="priority" value=cmsRole.priority required="true" class="required digits" maxlength="5" style="width:70px"/><@p.tr/>
-<@p.radio colspan="2" label="cmsRole.super" name="super" value=cmsRole.super list={"true":"global.true","false":"global.false"}/><@p.tr/>
+<@p.radio colspan="2" label="cmsRole.super" name="all" value=cmsRole.all list={"true":"global.true","false":"global.false"}/><@p.tr/>
 <@p.td colspan="2" label="cmsRole.perms"><#assign perms=cmsRole.perms/><#include "perms.html"/></@p.td><@p.tr/>
-<@p.td colspan="2"><@p.hidden name="id" value=cmsRole.id/><@p.submit code="global.submit"/> &nbsp; <@p.reset code="global.reset"/></@p.td>
+<@p.td colspan="2"><@p.hidden name="id" value=cmsRole.id/><@p.submit code="global.submit" onclick="submitNodes()"/> &nbsp; <@p.reset code="global.reset"/></@p.td>
+<input type="hidden" id="perms" name="perms"/>
 </@p.form>
 </div>
+<script type="text/javascript">
+var perms = [<#list cmsRole.perms as p>"${p}"<#if p_has_next>,</#if></#list>];
+function disablePerms() {
+	var nodes = ztree.getNodes();
+	if($("input[name=all]:checked").val()=="true") {
+		ztree.checkAllNodes(false);
+		for(var i=0;i<nodes.length;i++){
+			  ztree.setChkDisabled(nodes[i], true,false,true);
+		}
+	} else {
+		for(var i=0;i<nodes.length;i++){
+			  ztree.setChkDisabled(nodes[i], false,false,true);
+		}
+	}
+}
+var isChecked = function(perm) {
+	return perms.indexOf(perm)!=-1;
+}
+function checkNodes(){
+	ztree.checkAllNodes(false);
+	var nodes = ztree.getCheckedNodes(false);
+	for(var i=0;i<nodes.length;i++){
+		if(nodes[i].perm!=null){
+			var nodePerms=nodes[i].perm.split(",");
+			if(perms.indexOf(nodes[i].perm)!=-1){
+				//单菜单权限节点
+				ztree.checkNode(nodes[i], true, true);
+			}else if((nodePerms.length>1&&perms.indexOf(nodePerms[0])!=-1)&&nodes[i].id!=1){
+			//	alert(nodes[i].perm);
+				//除根节点的带多个权限菜单的节点
+				ztree.checkNode(nodes[i], true, true);
+			}
+		}
+	}
+}
+$(function() {
+	disablePerms();
+	$("#jvForm").validate();
+	$("input[name=all]").bind("click",function(){
+		disablePerms();
+	});
+	//标识选中状态
+	checkNodes();
+});
+function submitNodes(){
+	var nodes = ztree.getCheckedNodes(true);
+	var str = "";
+	var perms = "";
+	for(var i=0;i<nodes.length;i++){
+		if(nodes[i].perm!=null){
+		    str += nodes[i].id+ ",";
+		    perms += nodes[i].perm+ ",";
+		}
+	}
+	if(perms.length>0) {
+		perms = perms.substring(0,perms.length-1);
+	}
+	$("#perms").val(perms);
+}
+</script>
 </body>
 </html>

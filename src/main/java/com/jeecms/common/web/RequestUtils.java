@@ -245,15 +245,13 @@ public class RequestUtils {
 			return sid;
 		} else {
 			// 手动从cookie获取
-			Cookie cookie = CookieUtils.getCookie(request,
-					Constants.JSESSION_COOKIE);
+			Cookie cookie = CookieUtils.getCookie(request,Constants.JSESSION_COOKIE);
 			if (cookie != null) {
 				return cookie.getValue();
 			} else {
 				return request.getSession().getId();
 			}
 		}
-
 	}
 
 	public static void main(String[] args) {

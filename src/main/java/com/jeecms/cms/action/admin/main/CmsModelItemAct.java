@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,15 @@ import com.jeecms.cms.entity.main.CmsModel;
 import com.jeecms.cms.entity.main.CmsModelItem;
 import com.jeecms.cms.manager.main.CmsModelItemMng;
 import com.jeecms.cms.manager.main.CmsModelMng;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.web.springmvc.MessageResolver;
+import com.jeecms.core.web.WebErrors;
 
 @Controller
 public class CmsModelItemAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsModelItemAct.class);
 
+	@RequiresPermissions("item:v_list")
 	@RequestMapping("/item/v_list.do")
 	public String list(Integer modelId, Boolean isChannel,
 			HttpServletRequest request, ModelMap model) {
@@ -44,6 +46,7 @@ public class CmsModelItemAct {
 		}
 	}
 
+	@RequiresPermissions("item:v_add")
 	@RequestMapping("/item/v_add.do")
 	public String add(Integer modelId, Boolean isChannel, ModelMap model) {
 		CmsModel m = cmsModelMng.findById(modelId);
@@ -53,6 +56,7 @@ public class CmsModelItemAct {
 		return "item/add";
 	}
 
+	@RequiresPermissions("item:v_edit")
 	@RequestMapping("/item/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -64,6 +68,7 @@ public class CmsModelItemAct {
 		return "item/edit";
 	}
 
+	@RequiresPermissions("item:o_priority")
 	@RequestMapping("/item/o_priority.do")
 	public String priority(Integer[] wids, Integer[] priority, String[] label,
 			Boolean[] single, Boolean[] display, Integer modelId,
@@ -75,6 +80,7 @@ public class CmsModelItemAct {
 		return list(modelId, isChannel, request, model);
 	}
 
+	@RequiresPermissions("item:o_save_list")
 	@RequestMapping("/item/o_save_list.do")
 	public String saveList(Integer modelId, Boolean isChannel, String[] fields,
 			String[] labels, Integer[] dataTypes, Integer[] prioritys,
@@ -90,6 +96,7 @@ public class CmsModelItemAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("item:o_save")
 	@RequestMapping("/item/o_save.do")
 	public String save(CmsModelItem bean, Integer modelId, Boolean isChannel,
 			HttpServletRequest request, ModelMap model) {
@@ -104,6 +111,7 @@ public class CmsModelItemAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("item:o_update")
 	@RequestMapping("/item/o_update.do")
 	public String update(CmsModelItem bean, HttpServletRequest request,
 			ModelMap model) {
@@ -118,6 +126,7 @@ public class CmsModelItemAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("item:o_delete")
 	@RequestMapping("/item/o_delete.do")
 	public String delete(Integer[] ids, Integer modelId, Boolean isChannel,
 			HttpServletRequest request, ModelMap model) {

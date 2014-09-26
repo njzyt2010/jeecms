@@ -23,18 +23,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.jeecms.cms.entity.assist.CmsVoteItem;
 import com.jeecms.cms.entity.assist.CmsVoteSubTopic;
 import com.jeecms.cms.entity.assist.CmsVoteTopic;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.assist.CmsVoteRecordMng;
 import com.jeecms.cms.manager.assist.CmsVoteReplyMng;
 import com.jeecms.cms.manager.assist.CmsVoteSubTopicMng;
 import com.jeecms.cms.manager.assist.CmsVoteTopicMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
+
 import static com.jeecms.common.page.SimplePage.cpn;
 
 @Controller

@@ -47,9 +47,9 @@
 		<property name="contentPrefix" column="content_prefix" type="string" not-null="false" length="255"/>
 		<property name="imgPrefix" column="img_prefix" type="string" not-null="false" length="255"/>
 		<property name="queue" type="integer" not-null="true" length="11"/>
-		<many-to-one name="user" column="user_id" class="com.jeecms.cms.entity.main.CmsUser" not-null="true"></many-to-one>
 		<many-to-one name="type" column="type_id" class="com.jeecms.cms.entity.main.ContentType" not-null="true"></many-to-one>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"></many-to-one>
 		<many-to-one name="channel" column="channel_id" class="com.jeecms.cms.entity.main.Channel" not-null="true"></many-to-one>
+		<many-to-one name="user" column="user_id" class="com.jeecms.core.entity.CmsUser" not-null="true"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"></many-to-one>
 	</class>
 </hibernate-mapping>

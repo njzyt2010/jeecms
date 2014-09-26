@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -17,14 +18,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.MarkConfig;
-import com.jeecms.cms.web.CmsUtils;
+import com.jeecms.cms.action.CommonUpload;
+import com.jeecms.core.entity.CmsSite;
 import com.jeecms.core.entity.Ftp;
-import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.entity.MarkConfig;
+import com.jeecms.core.web.WebCoreErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
-public class ImageUploadAct extends AbstractUpload {
+public class ImageUploadAct extends CommonUpload {
 	private static final Logger log = LoggerFactory
 			.getLogger(ImageUploadAct.class);
 	/**
@@ -36,6 +38,7 @@ public class ImageUploadAct extends AbstractUpload {
 	 */
 	public static final String ERROR = "error";
 
+	@RequiresPermissions("common:o_upload_image")
 	@RequestMapping("/common/o_upload_image.do")
 	public String execute(
 			String filename,
@@ -43,7 +46,7 @@ public class ImageUploadAct extends AbstractUpload {
 			Boolean mark,
 			@RequestParam(value = "uploadFile", required = false) MultipartFile file,
 			HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validate(filename, file, request);
+		WebCoreErrors errors = validateImage(file, request);
 		if (errors.hasErrors()) {
 			model.addAttribute(ERROR, errors.getErrors().get(0));
 			return RESULT_PAGE;
@@ -53,7 +56,6 @@ public class ImageUploadAct extends AbstractUpload {
 		if (mark == null) {
 			mark = conf.getOn();
 		}
-
 		String origName = file.getOriginalFilename();
 		String ext = FilenameUtils.getExtension(origName).toLowerCase(
 				Locale.ENGLISH);
@@ -152,6 +154,7 @@ public class ImageUploadAct extends AbstractUpload {
 			model.addAttribute(ERROR, e.getMessage());
 			log.error("upload file error!", e);
 		}
+		cmsUserMng.updateUploadSize(CmsUtils.getUserId(request), Integer.parseInt(String.valueOf(file.getSize()/1024)));
 		return RESULT_PAGE;
 	}
 

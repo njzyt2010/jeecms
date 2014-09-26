@@ -3,7 +3,7 @@
 -->
 <#macro form
 	action="" method="post" target="" enctype="" acceptCharset=""
-	theme="jeesys" width="100%" tableClass="pn-ftable" labelWidth="20" required="false" colspan="1"
+	theme="jeesys" width="100%" tableClass="pn-ftable" labelWidth="20" required="false" colspan="1" cellspacing="1"
 	id="" name="" class="" style="" size="" title="" disabled="" tabindex="" accesskey=""
 	onsubmit=""
 	>
@@ -19,7 +19,7 @@
 >
 <#if theme!="simple">
 <#assign labelWidth=labelWidth/>
-<table width="${width}" class="${tableClass}" cellpadding="2" cellspacing="1" border="0">
+<table width="${width}" class="${tableClass}" cellpadding="2" cellspacing="${cellspacing}" border="0">
 <tr>
 </#if>
 <#nested/><#rt/>

@@ -21,16 +21,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeecms.cms.entity.assist.CmsComment;
 import com.jeecms.cms.entity.main.ChannelExt;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.manager.assist.CmsCommentMng;
 import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
 import com.jeecms.common.web.session.SessionProvider;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 import com.octo.captcha.service.CaptchaServiceException;
 import com.octo.captcha.service.image.ImageCaptchaService;
 
@@ -46,6 +46,10 @@ public class CommentAct {
 			HttpServletRequest request, HttpServletResponse response,
 			ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
+		if(contentId==null){
+			return FrontUtils.showMessage(request, model,
+			"comment.contentNotFound");
+		}
 		Content content = contentMng.findById(contentId);
 		if (content == null) {
 			return FrontUtils.showMessage(request, model,
@@ -71,16 +75,17 @@ public class CommentAct {
 		if (count == null || count <= 0 || count > 200) {
 			count = 200;
 		}
-		boolean desc, rec;
+		boolean desc;
 		if (orderBy == null || orderBy == 0) {
 			desc = true;
 		} else {
 			desc = false;
 		}
-		if (recommend == null || recommend == 0) {
-			rec = false;
+		Boolean rec;
+		if (recommend != null) {
+			rec = recommend != 0;
 		} else {
-			rec = true;
+			rec = null;
 		}
 		Boolean chk;
 		if (checked != null) {
@@ -100,7 +105,7 @@ public class CommentAct {
 	}
 
 	@RequestMapping(value = "/comment.jspx", method = RequestMethod.POST)
-	public void submit(Integer contentId, String text, String captcha,
+	public void submit(Integer contentId, Integer score,String text, String captcha,
 			HttpServletRequest request, HttpServletResponse response,
 			ModelMap model) throws JSONException {
 		CmsSite site = CmsUtils.getSite(request);
@@ -150,6 +155,10 @@ public class CommentAct {
 			// 需要登录才能评论
 			json.put("success", false);
 			json.put("status", 4);
+		}else if (hasCommented(user, content)) {
+			// 已经评论过，不能重复评论
+			json.put("success", false);
+			json.put("status", 5);
 		} else {
 			boolean checked = false;
 			Integer userId = null;
@@ -157,7 +166,7 @@ public class CommentAct {
 				checked = !user.getGroup().getNeedCheck();
 				userId = user.getId();
 			}
-			cmsCommentMng.comment(text, RequestUtils.getIpAddr(request),
+			cmsCommentMng.comment(score,text, RequestUtils.getIpAddr(request),
 					contentId, site.getId(), userId, checked, false);
 			json.put("success", true);
 			json.put("status", 0);
@@ -184,6 +193,14 @@ public class CommentAct {
 			ResponseUtils.renderJson(response, "true");
 		} else {
 			ResponseUtils.renderJson(response, "false");
+		}
+	}
+
+	private boolean hasCommented(CmsUser user, Content content) {
+		if (content.hasCommentUser(user)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 

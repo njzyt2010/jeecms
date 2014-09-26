@@ -19,7 +19,7 @@ import org.springframework.core.io.Resource;
 /**
  * 用于Web的EhCacheManagerFacotryBean。可以基于Web根目录指定diskStore地址。
  */
-public class WebEhCacheManagerFacotryBean implements FactoryBean<CacheManager>,
+public class WebEhCacheManagerFacotryBean  implements FactoryBean<CacheManager>,
 		InitializingBean, DisposableBean {
 
 	private final Logger log = LoggerFactory

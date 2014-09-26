@@ -45,7 +45,6 @@ public class Ftp extends BaseFtp {
 		String path = System.getProperty("java.io.tmpdir");
 		File file = new File(path, fileName);
 		file = UploadUtils.getUniqueFile(file);
-
 		FTPClient ftp = getClient();
 		OutputStream output = new FileOutputStream(file);
 		ftp.retrieveFile(getPath() + name, output);
@@ -60,7 +59,7 @@ public class Ftp extends BaseFtp {
 		file.deleteOnExit();
 		return true;
 	}
-	
+
 	public int storeByFloder(String folder,String rootPath){
 		String fileAbsolutePath;
 		String fileRelativePath;
@@ -109,7 +108,7 @@ public class Ftp extends BaseFtp {
 			return 4;
 		}
 	}
-
+	
 	private int store(String remote, InputStream in) {
 		try {
 			FTPClient ftp = getClient();

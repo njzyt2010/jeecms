@@ -40,7 +40,7 @@ public abstract class BaseCmsAdvertisingSpace  implements Serializable {
 	 */
 	public BaseCmsAdvertisingSpace (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String name,
 		java.lang.Boolean enabled) {
 
@@ -66,7 +66,7 @@ public abstract class BaseCmsAdvertisingSpace  implements Serializable {
 	private java.lang.Boolean enabled;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsSite site;
 
 
 
@@ -143,7 +143,7 @@ public abstract class BaseCmsAdvertisingSpace  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -151,7 +151,7 @@ public abstract class BaseCmsAdvertisingSpace  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

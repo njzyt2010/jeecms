@@ -62,6 +62,12 @@ public class ChannelExt extends BaseChannelExt {
 		if (getPageSize() == null) {
 			setPageSize(20);
 		}
+		if(getAllowScore()==null){
+			setAllowShare(false);
+		}
+		if(getAllowScore()==null){
+			setAllowScore(false);
+		}
 		blankToNull();
 	}
 

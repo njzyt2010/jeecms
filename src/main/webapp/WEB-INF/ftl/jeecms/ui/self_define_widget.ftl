@@ -19,17 +19,17 @@ width
 	<#elseif type="2"><#local vld="{digits:true,maxlength:20}"/>
 	<#elseif type="3"><#local vld="{number:true,maxlength:20}"/>
 	</#if>
-	<@p.text colspan=colspan width=width label=label name=name value=value size=size help=help helpPosition=helpPosition vld=vld/>
+	<@p.text colspan=colspan width=width label=label  name=name value=value size=size help=help helpPosition=helpPosition vld=vld/>
 <#elseif type=="4">
-<@p.textarea colspan=colspan width=width label=label name=name value=value help=help cols=cols?string rows=rows?string helpPosition=helpPosition maxlength="255"/>
+<@p.textarea colspan=colspan width=width label=label  name=name value=value help=help cols=cols?string rows=rows?string helpPosition=helpPosition maxlength="255"/>
 <#elseif type=="5">
-<@p.text colspan=colspan width=width label=label name=name value=value readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" size=size?string help=help helpPosition=helpPosition/>
+<@p.text colspan=colspan width=width label=label  name=name value=value readonly="readonly" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" size=size?string help=help helpPosition=helpPosition/>
 <#elseif type=="6">
-<@p.select colspan=colspan width=width label=label name=name value=value help=help list=list!?split(",") helpPosition=helpPosition/>
+<@p.select colspan=colspan width=width label=label  name=name value=value help=help list=list!?split(",") helpPosition=helpPosition/>
 <#elseif type=="7">
-<@p.checkboxlist colspan=colspan width=width label=label name=name valueList=value!?split(",") list=list!?split(",") help=help helpPosition=helpPosition/>
+<@p.checkboxlist colspan=colspan width=width label=label  name=name valueList=value!?split(",") list=list!?split(",") help=help helpPosition=helpPosition/>
 <#elseif type=="8">
-<@p.radio colspan=colspan width=width label=label name=name value=value list=list!?split(",") help=help helpPosition=helpPosition/>
+<@p.radio colspan=colspan width=width label=label  name=name value=value list=list!?split(",") help=help helpPosition=helpPosition/>
 <#else>
 not support type: "${type}"
 </#if>

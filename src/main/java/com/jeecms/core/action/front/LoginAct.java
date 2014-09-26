@@ -18,7 +18,7 @@ import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.session.SessionProvider;
 import com.jeecms.core.entity.Authentication;
 import com.jeecms.core.manager.AuthenticationMng;
-import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.WebCoreErrors;
 
 /**
  * 统一认证中心Action
@@ -98,7 +98,7 @@ public class LoginAct {
 	public String submit(String username, String password, String processUrl,
 			String returnUrl, String message, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
-		WebErrors errors = validateSubmit(username, password, request);
+		WebCoreErrors errors = validateSubmit(username, password, request);
 		if (!errors.hasErrors()) {
 			try {
 				Authentication auth = authMng.login(username, password,
@@ -178,9 +178,9 @@ public class LoginAct {
 		}
 	}
 
-	private WebErrors validateSubmit(String username, String password,
+	private WebCoreErrors validateSubmit(String username, String password,
 			HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
+		WebCoreErrors errors = WebCoreErrors.create(request);
 		if (errors.ifOutOfLength(username, "username", 3, 100)) {
 			return errors;
 		}

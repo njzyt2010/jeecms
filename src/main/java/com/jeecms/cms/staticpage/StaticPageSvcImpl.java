@@ -1,7 +1,5 @@
 package com.jeecms.cms.staticpage;
 
-import static com.jeecms.cms.Constants.TPLDIR_INDEX;
-import static com.jeecms.cms.action.front.DynamicPageAct.TPL_INDEX;
 import static com.jeecms.common.web.Constants.UTF8;
 
 import java.io.File;
@@ -25,11 +23,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.Content;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.Constants;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.FrontUtils;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -148,9 +146,12 @@ public class StaticPageSvcImpl implements StaticPageSvc, InitializingBean {
 	public void index(CmsSite site) throws IOException, TemplateException {
 		Map<String, Object> data = new HashMap<String, Object>();
 		FrontUtils.frontData(data, site, null, site.getUrlStatic(), null);
+		/*
 		String tpl = FrontUtils.getTplPath(tplMessageSource, site
 				.getLocaleAdmin(), site.getSolutionPath(), TPLDIR_INDEX,
 				TPL_INDEX);
+		*/
+		String tpl=site.getTplIndexOrDef();
 		index(site, tpl, data);
 	}
 

@@ -12,12 +12,15 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -27,34 +30,30 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsGroup;
 import com.jeecms.cms.entity.main.CmsModel;
 import com.jeecms.cms.entity.main.CmsModelItem;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.CmsTopic;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.entity.main.Content;
+import com.jeecms.cms.entity.main.ContentCheck;
 import com.jeecms.cms.entity.main.ContentExt;
 import com.jeecms.cms.entity.main.ContentTxt;
 import com.jeecms.cms.entity.main.ContentType;
 import com.jeecms.cms.entity.main.Content.ContentStatus;
 import com.jeecms.cms.manager.assist.CmsFileMng;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.CmsModelItemMng;
 import com.jeecms.cms.manager.main.CmsModelMng;
 import com.jeecms.cms.manager.main.CmsTopicMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.manager.main.ContentMng;
 import com.jeecms.cms.manager.main.ContentTypeMng;
+import com.jeecms.cms.service.ImageSvc;
+import com.jeecms.cms.service.WeiXinSvc;
 import com.jeecms.cms.staticpage.exception.ContentNotCheckedException;
 import com.jeecms.cms.staticpage.exception.GeneratedZeroStaticPageException;
 import com.jeecms.cms.staticpage.exception.StaticPageNotOpenException;
 import com.jeecms.cms.staticpage.exception.TemplateNotFoundException;
 import com.jeecms.cms.staticpage.exception.TemplateParseException;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.common.image.ImageUtils;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.upload.FileRepository;
 import com.jeecms.common.util.StrUtils;
@@ -62,17 +61,28 @@ import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
 import com.jeecms.common.web.springmvc.MessageResolver;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
 import com.jeecms.core.manager.DbFileMng;
 import com.jeecms.core.tpl.TplManager;
-import com.jeecms.core.web.CoreUtils;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.CoreUtils;
 
 @Controller
-public class ContentAct {
+public class ContentAct{
 	private static final Logger log = LoggerFactory.getLogger(ContentAct.class);
 
+	@RequiresPermissions("content:v_left")
 	@RequestMapping("/content/v_left.do")
-	public String left() {
+	public String left(String source, ModelMap model) {
+		model.addAttribute("source", source);
 		return "content/left";
 	}
 
@@ -85,6 +95,7 @@ public class ContentAct {
 	 * @param model
 	 * @return
 	 */
+	@RequiresPermissions("content:v_tree")
 	@RequestMapping(value = "/content/v_tree.do")
 	public String tree(String root, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -112,6 +123,7 @@ public class ContentAct {
 			list = channelMng.getChildListByRight(userId, siteId, Integer
 					.parseInt(root), true);
 		}
+		
 		model.addAttribute("list", list);
 		response.setHeader("Cache-Control", "no-cache");
 		response.setContentType("text/json;charset=UTF-8");
@@ -127,6 +139,7 @@ public class ContentAct {
 	 * @param model
 	 * @return
 	 */
+	@RequiresPermissions("content:v_tree_channels")
 	@RequestMapping(value = "/content/v_tree_channels.do")
 	public String treeChannels(String root, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -134,11 +147,13 @@ public class ContentAct {
 		return "content/tree_channels";
 	}
 
+	@RequiresPermissions("content:v_list")
 	@RequestMapping("/content/v_list.do")
 	public String list(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
 			Integer queryOrderBy, Integer cid, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
+		long time = System.currentTimeMillis();
 		String queryTitle = RequestUtils.getQueryParam(request, "queryTitle");
 		queryTitle = StringUtils.trim(queryTitle);
 		String queryInputUsername = RequestUtils.getQueryParam(request,
@@ -151,7 +166,7 @@ public class ContentAct {
 			queryRecommend = false;
 		}
 		if (queryOrderBy == null) {
-			queryOrderBy = 0;
+			queryOrderBy = 4;
 		}
 		ContentStatus status;
 		if (!StringUtils.isBlank(queryStatus)) {
@@ -174,7 +189,7 @@ public class ContentAct {
 		CmsUser user = CmsUtils.getUser(request);
 		Integer userId = user.getId();
 		byte currStep = user.getCheckStep(siteId);
-		Pagination p = manager.getPageByRight(queryTitle, queryTypeId,
+		Pagination p = manager.getPageByRight(queryTitle, queryTypeId,user.getId(),
 				queryInputUserId, queryTopLevel, queryRecommend, status, user
 						.getCheckStep(siteId), siteId, cid, userId,
 				queryOrderBy, cpn(pageNo), CookieUtils.getPageSize(request));
@@ -193,10 +208,11 @@ public class ContentAct {
 		addAttibuteForQuery(model, queryTitle, queryInputUsername, queryStatus,
 				queryTypeId, queryTopLevel, queryRecommend, queryOrderBy,
 				pageNo);
-
+		time = System.currentTimeMillis() - time;
 		return "content/list";
 	}
 
+	@RequiresPermissions("content:v_add")
 	@RequestMapping("/content/v_add.do")
 	public String add(Integer cid,Integer modelId, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateAdd(cid,modelId, request);
@@ -214,8 +230,8 @@ public class ContentAct {
 		} else {
 			c = null;
 		}
-		CmsModel m;
 		// 模型
+		CmsModel m;
 		if(modelId==null){
 			if (c != null) {
 				m = c.getModel();
@@ -244,8 +260,7 @@ public class ContentAct {
 		if (c != null) {
 			channelList = c.getListForSelect(rights, true);
 		} else {
-			List<Channel> topList = channelMng.getTopListByRigth(userId,
-					siteId, true);
+			List<Channel> topList = channelMng.getTopListByRigth(userId,siteId, true);
 			channelList = Channel.getListForSelect(topList, rights, true);
 		}
 
@@ -262,7 +277,7 @@ public class ContentAct {
 		List<CmsGroup> groupList = cmsGroupMng.getList();
 		// 内容类型
 		List<ContentType> typeList = contentTypeMng.getList(false);
-
+		model.addAttribute("site",CmsUtils.getSite(request));
 		model.addAttribute("model", m);
 		model.addAttribute("itemList", itemList);
 		model.addAttribute("channelList", channelList);
@@ -279,15 +294,12 @@ public class ContentAct {
 		return "content/add";
 	}
 
+	@RequiresPermissions("content:v_view")
 	@RequestMapping("/content/v_view.do")
 	public String view(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
 			Integer queryOrderBy, Integer pageNo, Integer cid, Integer id,
 			HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validateView(id, request);
-		if (errors.hasErrors()) {
-			return errors.showErrorPage(model);
-		}
 		CmsSite site = CmsUtils.getSite(request);
 		CmsUser user = CmsUtils.getUser(request);
 		byte currStep = user.getCheckStep(site.getId());
@@ -295,7 +307,7 @@ public class ContentAct {
 
 		model.addAttribute("content", content);
 		model.addAttribute("currStep", currStep);
-
+		model.addAttribute("site", site);
 		if (cid != null) {
 			model.addAttribute("cid", cid);
 		}
@@ -308,6 +320,7 @@ public class ContentAct {
 		return "content/view";
 	}
 
+	@RequiresPermissions("content:v_edit")
 	@RequestMapping("/content/v_edit.do")
 	public String edit(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -324,12 +337,8 @@ public class ContentAct {
 		Content content = manager.findById(id);
 		// 栏目
 		Channel channel = content.getChannel();
-		
-		CmsModel m=content.getModel();
-		/*
 		// 模型
-		CmsModel m = channel.getModel();
-		*/
+		CmsModel m=content.getModel();
 		// 模型项列表
 		List<CmsModelItem> itemList = cmsModelItemMng.getList(m.getId(), false,
 				false);
@@ -369,7 +378,7 @@ public class ContentAct {
 		if (!StringUtils.isBlank(tplContent)) {
 			tplContent = tplContent.substring(tplPathLength);
 		}
-
+		model.addAttribute("site",CmsUtils.getSite(request));
 		model.addAttribute("content", content);
 		model.addAttribute("channel", channel);
 		model.addAttribute("model", m);
@@ -396,13 +405,15 @@ public class ContentAct {
 		return "content/edit";
 	}
 
+	@RequiresPermissions("content:o_save")
 	@RequestMapping("/content/o_save.do")
 	public String save(Content bean, ContentExt ext, ContentTxt txt,
+			Boolean copyimg,Integer sendType,Integer selectImg,String weixinImg,
 			Integer[] channelIds, Integer[] topicIds, Integer[] viewGroupIds,
 			String[] attachmentPaths, String[] attachmentNames,
 			String[] attachmentFilenames, String[] picPaths, String[] picDescs,
 			Integer channelId, Integer typeId, String tagStr, Boolean draft,
-			Integer cid,Integer modelId, HttpServletRequest request, ModelMap model) {
+			Integer cid, Integer modelId,HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateSave(bean, channelId, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
@@ -417,9 +428,14 @@ public class ContentAct {
 		bean.setAttr(RequestUtils.getRequestMap(request, "attr_"));
 		String[] tagArr = StrUtils.splitAndTrim(tagStr, ",", MessageResolver
 				.getMessage(request, "content.tagStr.split"));
-		bean = manager.save(bean, ext, txt, channelIds, topicIds, viewGroupIds,
+		if(txt!=null&&copyimg!=null&&copyimg){
+			txt=copyContentTxtImg(txt, site);
+		}
+		bean = manager.save(bean, ext, txt,channelIds, topicIds, viewGroupIds,
 				tagArr, attachmentPaths, attachmentNames, attachmentFilenames,
-				picPaths, picDescs, channelId, typeId, draft, user, false);
+				picPaths, picDescs, channelId, typeId, draft,false, user, false);
+		//微信消息发送
+		weiXinSvc.sendMessage(sendType, selectImg, weixinImg, bean, ext, txt);
 		//处理附件
 		fileMng.updateFileByPaths(attachmentPaths,picPaths,ext.getMediaPath(),ext.getTitleImg(),ext.getTypeImg(),ext.getContentImg(),true,bean);
 		log.info("save Content id={}", bean.getId());
@@ -432,10 +448,12 @@ public class ContentAct {
 		return add(cid,modelId, request, model);
 	}
 
+	@RequiresPermissions("content:o_update")
 	@RequestMapping("/content/o_update.do")
 	public String update(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
 			Integer queryOrderBy, Content bean, ContentExt ext, ContentTxt txt,
+			Boolean copyimg,Integer sendType,Integer selectImg,String weixinImg,
 			Integer[] channelIds, Integer[] topicIds, Integer[] viewGroupIds,
 			String[] attachmentPaths, String[] attachmentNames,
 			String[] attachmentFilenames, String[] picPaths,String[] picDescs,
@@ -458,10 +476,15 @@ public class ContentAct {
 		String[] tagArr = StrUtils.splitAndTrim(tagStr, ",", MessageResolver
 				.getMessage(request, "content.tagStr.split"));
 		Map<String, String> attr = RequestUtils.getRequestMap(request, "attr_");
-		bean = manager.update(bean, ext, txt, tagArr, channelIds, topicIds,
+		if(txt!=null&&copyimg!=null&&copyimg){
+			txt=copyContentTxtImg(txt, site);
+		}
+		bean = manager.update(bean, ext, txt,tagArr, channelIds, topicIds,
 				viewGroupIds, attachmentPaths, attachmentNames,
 				attachmentFilenames, picPaths, picDescs, attr, channelId,
 				typeId, draft, user, false);
+		//微信消息发送
+		weiXinSvc.sendMessage(sendType, selectImg, weixinImg, bean, ext, txt);
 		//处理之前的附件有效性
 		fileMng.updateFileByPaths(oldattachmentPaths,oldpicPaths,null,oldTitleImg,oldTypeImg,oldContentImg,false,bean);
 		//处理更新后的附件有效性
@@ -473,6 +496,7 @@ public class ContentAct {
 				queryOrderBy, cid, pageNo, request, model);
 	}
 
+	@RequiresPermissions("content:o_delete")
 	@RequestMapping("/content/o_delete.do")
 	public String delete(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -506,7 +530,8 @@ public class ContentAct {
 		return list(queryStatus, queryTypeId, queryTopLevel, queryRecommend,
 				queryOrderBy, cid, pageNo, request, model);
 	}
-
+	
+	@RequiresPermissions("content:o_check")
 	@RequestMapping("/content/o_check.do")
 	public String check(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -524,7 +549,24 @@ public class ContentAct {
 		return list(queryStatus, queryTypeId, queryTopLevel, queryRecommend,
 				queryOrderBy, cid, pageNo, request, model);
 	}
+	
+	@RequiresPermissions("content:o_check")
+	@RequestMapping("/content/o_ajax_check.do")
+	public void ajaxCheck(Integer[] ids, HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws JSONException {
+		WebErrors errors = validateCheck(ids, request);
+		JSONObject json=new JSONObject();
+		if (errors.hasErrors()) {
+			json.put("error", errors.getErrors().get(0));
+			json.put("success", false);
+		}
+		CmsUser user = CmsUtils.getUser(request);
+		manager.check(ids, user);
+		json.put("success", true);
+		ResponseUtils.renderJson(response, json.toString());
+	}
 
+	@RequiresPermissions("content:o_static")
 	@RequestMapping("/content/o_static.do")
 	public String contentStatic(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -561,6 +603,7 @@ public class ContentAct {
 				queryOrderBy, cid, pageNo, request, model);
 	}
 
+	@RequiresPermissions("content:o_reject")
 	@RequestMapping("/content/o_reject.do")
 	public String reject(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -572,7 +615,7 @@ public class ContentAct {
 			return errors.showErrorPage(model);
 		}
 		CmsUser user = CmsUtils.getUser(request);
-		Content[] beans = manager.reject(ids, user, rejectStep, rejectOpinion);
+		Content[] beans = manager.reject(ids, user,rejectStep, rejectOpinion);
 		for (Content bean : beans) {
 			log.info("reject Content id={}", bean.getId());
 		}
@@ -580,42 +623,33 @@ public class ContentAct {
 				queryOrderBy, cid, pageNo, request, model);
 	}
 	
-	@RequestMapping(value = "/content/v_tree_move.do")
+	@RequiresPermissions("content:o_reject")
+	@RequestMapping("/content/o_ajax_reject.do")
+	public void ajaxReject(Integer[] ids,Byte rejectStep, String rejectOpinion, HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws JSONException {
+		WebErrors errors = validateReject(ids, request);
+		JSONObject json=new JSONObject();
+		if (errors.hasErrors()) {
+			json.put("error", errors.getErrors().get(0));
+			json.put("success", false);
+		}
+		CmsUser user = CmsUtils.getUser(request);
+		manager.reject(ids, user, rejectStep,rejectOpinion);
+		json.put("success", true);
+		ResponseUtils.renderJson(response, json.toString());
+	}
+	
+	@RequiresPermissions("content:v_tree_radio")
+	@RequestMapping(value = "/content/v_tree_radio.do")
 	public String move_tree(String root, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
-		log.debug("tree path={}", root);
-		boolean isRoot;
-		// jquery treeview的根请求为root=source
-		if (StringUtils.isBlank(root) || "source".equals(root)) {
-			isRoot = true;
-		} else {
-			isRoot = false;
-		}
-		model.addAttribute("isRoot", isRoot);
-		WebErrors errors = validateTree(root, request);
-		if (errors.hasErrors()) {
-			log.error(errors.getErrors().get(0));
-			ResponseUtils.renderJson(response, "[]");
-			return null;
-		}
-		Integer siteId = CmsUtils.getSiteId(request);
-		Integer userId = CmsUtils.getUserId(request);
-		List<Channel> list;
-		if (isRoot) {
-			list = channelMng.getTopListByRigth(userId, siteId, true);
-		} else {
-			list = channelMng.getChildListByRight(userId, siteId, Integer
-					.parseInt(root), true);
-		}
-		model.addAttribute("list", list);
-		response.setHeader("Cache-Control", "no-cache");
-		response.setContentType("text/json;charset=UTF-8");
+		tree(root, request, response, model);
 		return "content/tree_move";
 	}
 	
+	@RequiresPermissions("content:o_move")
 	@RequestMapping("/content/o_move.do")
-	public void move(Integer contentIds[], Integer channelId,
-			HttpServletResponse response) throws JSONException {
+		public void move(Integer contentIds[], Integer channelId,HttpServletResponse response) throws JSONException {
 		JSONObject json = new JSONObject();
 		Boolean pass = true;
 		if (contentIds != null && channelId != null) {
@@ -631,20 +665,122 @@ public class ContentAct {
 		json.put("pass", pass);
 		ResponseUtils.renderJson(response, json.toString());
 	}
+	
+	@RequiresPermissions("content:o_copy")
+	@RequestMapping("/content/o_copy.do")
+		public void copy(Integer contentIds[],Integer channelId,Integer siteId,HttpServletRequest request,HttpServletResponse response) throws JSONException {
+		JSONObject json = new JSONObject();
+		CmsUser user=CmsUtils.getUser(request);
+		Boolean pass = true;
+		if (contentIds != null) {
+			for(Integer contentId:contentIds){
+				Content bean=manager.findById(contentId);
+				Content beanCopy= new Content();
+				ContentExt extCopy=new ContentExt();
+				ContentTxt txtCopy=new ContentTxt();
+				beanCopy=bean.cloneWithoutSet();
+				beanCopy.setChannel(channelMng.findById(channelId));
+				//复制到别站
+				if(siteId!=null){
+					beanCopy.setSite(siteMng.findById(siteId));
+				}
+				boolean draft=false;
+				if(bean.getStatus().equals(ContentCheck.DRAFT)){
+					draft=true;
+				}
+				BeanUtils.copyProperties(bean.getContentExt(), extCopy);
+				if(bean.getContentTxt()!=null){
+					BeanUtils.copyProperties(bean.getContentTxt(), txtCopy);
+				}
+				manager.save(beanCopy, extCopy, txtCopy, bean.getChannelIdsWithoutChannel(),
+						bean.getTopicIds(), bean.getViewGroupIds(), bean.getTagArray(), bean.getAttachmentPaths(), bean.getAttachmentNames(),
+						bean.getAttachmentFileNames(), bean.getPicPaths(), bean.getPicDescs(), channelId, bean.getType().getId(), draft,false, user, false);
+			}
+		}
+		json.put("pass", pass);
+		ResponseUtils.renderJson(response, json.toString());
+	}
+	/**
+	 * 引用
+	 * @param contentIds
+	 * @param channelId
+	 */
+	@RequiresPermissions("content:o_refer")
+	@RequestMapping("/content/o_refer.do")
+		public void refer(Integer contentIds[],Integer channelId,HttpServletRequest request,HttpServletResponse response) throws JSONException {
+		JSONObject json = new JSONObject();
+		CmsUser user=CmsUtils.getUser(request);
+		Boolean pass = true;
+		if(user==null){
+			ResponseUtils.renderJson(response, "false");
+		}
+		if (contentIds != null) {
+			for(Integer contentId:contentIds){
+				manager.updateByChannelIds(contentId, new Integer[]{channelId});
+			}
+		}else{
+			ResponseUtils.renderJson(response, "false");
+		}
+		json.put("pass", pass);
+		ResponseUtils.renderJson(response, json.toString());
+	}
+	
+	@RequiresPermissions("content:o_priority")
+	@RequestMapping("/content/o_priority.do")
+	public String priority(Integer[] wids, Byte[] topLevel,
+			String queryStatus, Integer queryTypeId,
+			Boolean queryTopLevel, Boolean queryRecommend,
+			Integer queryOrderBy, Integer cid, Integer pageNo,
+			HttpServletRequest request, ModelMap model) {
+		for(int i=0;i<wids.length;i++){
+			Content c=manager.findById(wids[i]);
+			c.setTopLevel(topLevel[i]);
+			manager.update(c);
+		}
+		log.info("update CmsFriendlink priority.");
+		return list(queryStatus, queryTypeId, queryTopLevel, queryRecommend, queryOrderBy, cid, pageNo, request, model);
+	}
+	
+	/**
+	 * 推送至专题
+	 * @param contentIds
+	 * @param topicIds
+	 */
+	@RequiresPermissions("content:o_send_to_topic")
+	@RequestMapping("/content/o_send_to_topic.do")
+		public void refer(Integer contentIds[],Integer[] topicIds,HttpServletRequest request,HttpServletResponse response) throws JSONException {
+		JSONObject json = new JSONObject();
+		CmsUser user=CmsUtils.getUser(request);
+		Boolean pass = true;
+		if(user==null){
+			ResponseUtils.renderJson(response, "false");
+		}
+		if (contentIds != null) {
+			for(Integer contentId:contentIds){
+				manager.addContentToTopics(contentId,topicIds);
+			}
+		}else{
+			ResponseUtils.renderJson(response, "false");
+		}
+		json.put("pass", pass);
+		ResponseUtils.renderJson(response, json.toString());
+	}
 
+	@RequiresPermissions("content:o_upload_attachment")
 	@RequestMapping("/content/o_upload_attachment.do")
 	public String uploadAttachment(
 			@RequestParam(value = "attachmentFile", required = false) MultipartFile file,
 			String attachmentNum, HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validateUpload(file, request);
+		CmsSite site = CmsUtils.getSite(request);
+		CmsUser user= CmsUtils.getUser(request);
+		String origName = file.getOriginalFilename();
+		String ext = FilenameUtils.getExtension(origName).toLowerCase(
+				Locale.ENGLISH);
+		WebErrors errors = validateUpload(file,request);
 		if (errors.hasErrors()) {
 			model.addAttribute("error", errors.getErrors().get(0));
 			return "content/attachment_iframe";
 		}
-		CmsSite site = CmsUtils.getSite(request);
-		String origName = file.getOriginalFilename();
-		String ext = FilenameUtils.getExtension(origName).toLowerCase(
-				Locale.ENGLISH);
 		// TODO 检查允许上传的后缀
 		try {
 			String fileUrl;
@@ -668,6 +804,7 @@ public class ContentAct {
 				// 加上部署路径
 				fileUrl = ctx + fileUrl;
 			}
+			cmsUserMng.updateUploadSize(user.getId(), Integer.parseInt(String.valueOf(file.getSize()/1024)));
 			fileMng.saveFileByPath(fileUrl, origName, false);
 			model.addAttribute("attachmentPath", fileUrl);
 			model.addAttribute("attachmentName", origName);
@@ -682,19 +819,21 @@ public class ContentAct {
 		return "content/attachment_iframe";
 	}
 
+	@RequiresPermissions("content:o_upload_media")
 	@RequestMapping("/content/o_upload_media.do")
 	public String uploadMedia(
 			@RequestParam(value = "mediaFile", required = false) MultipartFile file,
 			String filename, HttpServletRequest request, ModelMap model) {
+		CmsSite site = CmsUtils.getSite(request);
+		CmsUser user = CmsUtils.getUser(request);
+		String origName = file.getOriginalFilename();
+		String ext = FilenameUtils.getExtension(origName).toLowerCase(
+				Locale.ENGLISH);
 		WebErrors errors = validateUpload(file, request);
 		if (errors.hasErrors()) {
 			model.addAttribute("error", errors.getErrors().get(0));
 			return "content/media_iframe";
 		}
-		CmsSite site = CmsUtils.getSite(request);
-		String origName = file.getOriginalFilename();
-		String ext = FilenameUtils.getExtension(origName).toLowerCase(
-				Locale.ENGLISH);
 		// TODO 检查允许上传的后缀
 		try {
 			String fileUrl;
@@ -738,6 +877,7 @@ public class ContentAct {
 					fileUrl = ctx + fileUrl;
 				}
 			}
+			cmsUserMng.updateUploadSize(user.getId(), Integer.parseInt(String.valueOf(file.getSize()/1024)));
 			fileMng.saveFileByPath(fileUrl, fileUrl, false);
 			model.addAttribute("mediaPath", fileUrl);
 			model.addAttribute("mediaExt", ext);
@@ -751,7 +891,7 @@ public class ContentAct {
 		return "content/media_iframe";
 	}
 	
-	
+	@RequiresPermissions("content_cycle:v_list")
 	@RequestMapping("/content_cycle/v_list.do")
 	public String cycleList(Integer queryTypeId, Boolean queryTopLevel,
 			Boolean queryRecommend, Integer queryOrderBy, Integer cid,
@@ -761,6 +901,7 @@ public class ContentAct {
 		return "content/cycle_list";
 	}
 
+	@RequiresPermissions("content_cycle:o_recycle")
 	@RequestMapping("/content_cycle/o_recycle.do")
 	public String cycleRecycle(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -778,6 +919,7 @@ public class ContentAct {
 				queryOrderBy, cid, pageNo, request, model);
 	}
 
+	@RequiresPermissions("content_cycle:o_delete")
 	@RequestMapping("/content_cycle/o_delete.do")
 	public String cycleDelete(String queryStatus, Integer queryTypeId,
 			Boolean queryTopLevel, Boolean queryRecommend,
@@ -799,7 +941,8 @@ public class ContentAct {
 		return cycleList(queryTypeId, queryTopLevel, queryRecommend,
 				queryOrderBy, cid, pageNo, request, model);
 	}
-	
+
+	@RequiresPermissions("content:o_generateTags")
 	@RequestMapping("/content/o_generateTags.do")
 	public void generateTags(String title,HttpServletResponse response) throws JSONException {
 		JSONObject json = new JSONObject();
@@ -810,7 +953,17 @@ public class ContentAct {
 		json.put("tags", tags);
 		ResponseUtils.renderJson(response, json.toString());
 	}
-
+	
+	@RequiresPermissions("content:rank_list")
+	@RequestMapping(value = "/content/rank_list.do")
+	public String contentRankList(Integer orderBy,Integer pageNo, HttpServletRequest request,
+			HttpServletResponse response, ModelMap model) {
+		model.addAttribute("orderBy", orderBy);
+		model.addAttribute("pageNo", cpn(pageNo));
+		model.addAttribute("pageSize", CookieUtils.getPageSize(request));
+		model.addAttribute("site", CmsUtils.getSite(request));
+		return "content/ranklist";
+	}
 
 	private void addAttibuteForQuery(ModelMap model, String queryTitle,
 			String queryInputUsername, String queryStatus, Integer queryTypeId,
@@ -850,8 +1003,6 @@ public class ContentAct {
 		tplList = CoreUtils.tplTrim(tplList, tplPath, tpl);
 		return tplList;
 	}
-	
-	
 	
 	private WebErrors validateTree(String path, HttpServletRequest request) {
 		WebErrors errors = WebErrors.create(request);
@@ -918,15 +1069,6 @@ public class ContentAct {
 		return errors;
 	}
 
-	private WebErrors validateView(Integer id, HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
-		CmsSite site = CmsUtils.getSite(request);
-		if (vldExist(id, site.getId(), errors)) {
-			return errors;
-		}
-		return errors;
-	}
-
 	private WebErrors validateEdit(Integer id, HttpServletRequest request) {
 		WebErrors errors = WebErrors.create(request);
 		CmsSite site = CmsUtils.getSite(request);
@@ -956,20 +1098,24 @@ public class ContentAct {
 
 	private WebErrors validateDelete(Integer[] ids, HttpServletRequest request) {
 		WebErrors errors = WebErrors.create(request);
-		CmsSite site = CmsUtils.getSite(request);
+//		CmsSite site = CmsUtils.getSite(request);
 		errors.ifEmpty(ids, "ids");
-		for (Integer id : ids) {
-			if (vldExist(id, site.getId(), errors)) {
-				return errors;
-			}
-			Content content = manager.findById(id);
-			// TODO 是否有编辑的数据权限。
-			// 是否有审核后删除权限。
-			if (!content.isHasDeleteRight()) {
-				errors.addErrorCode("content.error.afterCheckDelete");
-				return errors;
-			}
+		if(ids!=null&&ids.length>0){
+			for (Integer id : ids) {
+				/*
+				if (vldExist(id, site.getId(), errors)) {
+					return errors;
+				}
+				*/
+				Content content = manager.findById(id);
+				// TODO 是否有编辑的数据权限。
+				// 是否有审核后删除权限。
+				if (!content.isHasDeleteRight()) {
+					errors.addErrorCode("content.error.afterCheckDelete");
+					return errors;
+				}
 
+			}
 		}
 		return errors;
 	}
@@ -1006,9 +1152,31 @@ public class ContentAct {
 
 	private WebErrors validateUpload(MultipartFile file,
 			HttpServletRequest request) {
+		String origName = file.getOriginalFilename();
+		CmsUser user= CmsUtils.getUser(request);
+		String ext = FilenameUtils.getExtension(origName).toLowerCase(Locale.ENGLISH);
+		int fileSize = (int) (file.getSize() / 1024);
 		WebErrors errors = WebErrors.create(request);
 		if (errors.ifNull(file, "file")) {
 			return errors;
+		}
+		//非允许的后缀
+		if(!user.isAllowSuffix(ext)){
+			errors.addErrorCode("upload.error.invalidsuffix", ext);
+			return errors;
+		}
+		//超过附件大小限制
+		if(!user.isAllowMaxFile((int)(file.getSize()/1024))){
+			errors.addErrorCode("upload.error.toolarge",origName,user.getGroup().getAllowMaxFile());
+			return errors;
+		}
+		//超过每日上传限制
+		if (!user.isAllowPerDay(fileSize)) {
+			long laveSize=user.getGroup().getAllowPerDay()-user.getUploadSize();
+			if(laveSize<0){
+				laveSize=0;
+			}
+			errors.addErrorCode("upload.error.dailylimit", laveSize);
 		}
 		return errors;
 	}
@@ -1026,6 +1194,30 @@ public class ContentAct {
 			return true;
 		}
 		return false;
+	}
+	
+	private ContentTxt copyContentTxtImg(ContentTxt txt,CmsSite site){
+		if(StringUtils.isNotBlank(txt.getTxt())){
+			txt.setTxt(copyTxtHmtlImg(txt.getTxt(), site));
+		}
+		if(StringUtils.isNotBlank(txt.getTxt1())){
+			txt.setTxt1(copyTxtHmtlImg(txt.getTxt1(), site));
+		}	
+		if(StringUtils.isNotBlank(txt.getTxt2())){
+			txt.setTxt2(copyTxtHmtlImg(txt.getTxt2(), site));
+		}
+		if(StringUtils.isNotBlank(txt.getTxt3())){
+			txt.setTxt3(copyTxtHmtlImg(txt.getTxt3(), site));
+		}
+		return txt;
+	}
+	
+	private String copyTxtHmtlImg(String txtHtml,CmsSite  site){
+		List<String>imgUrls=ImageUtils.getImageSrc(txtHtml);
+		for(String img:imgUrls){
+			txtHtml=txtHtml.replace(img, imageSvc.crawlImg(img,site));
+		}
+		return txtHtml;
 	}
 
 	@Autowired
@@ -1054,4 +1246,10 @@ public class ContentAct {
 	private ContentMng manager;
 	@Autowired
 	private CmsFileMng fileMng;
+	@Autowired
+	private CmsSiteMng siteMng;
+	@Autowired
+	private ImageSvc imageSvc;
+	@Autowired
+	private WeiXinSvc weiXinSvc;
 }

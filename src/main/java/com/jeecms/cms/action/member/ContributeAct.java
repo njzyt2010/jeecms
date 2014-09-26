@@ -1,55 +1,43 @@
 package com.jeecms.cms.action.member;
-
 import static com.jeecms.cms.Constants.TPLDIR_MEMBER;
-import static com.jeecms.common.page.SimplePage.cpn;
 
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsModel;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.Content;
-import com.jeecms.cms.entity.main.ContentExt;
-import com.jeecms.cms.entity.main.ContentTxt;
-import com.jeecms.cms.entity.main.ContentType;
-import com.jeecms.cms.entity.main.MemberConfig;
-import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsModelMng;
-import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.manager.main.ContentTypeMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
-import com.jeecms.cms.web.WebErrors;
-import com.jeecms.common.page.Pagination;
-import com.jeecms.common.util.StrUtils;
-import com.jeecms.common.web.session.SessionProvider;
-import com.octo.captcha.service.CaptchaServiceException;
-import com.octo.captcha.service.image.ImageCaptchaService;
+import com.jeecms.cms.manager.assist.CmsFileMng;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.manager.DbFileMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 /**
  * 会员投稿Action
+ * 
  */
 @Controller
-public class ContributeAct {
-	private static final Logger log = LoggerFactory
-			.getLogger(ContributeAct.class);
+public class ContributeAct extends AbstractContentMemberAct {
 
 	public static final String CONTRIBUTE_LIST = "tpl.contributeList";
 	public static final String CONTRIBUTE_ADD = "tpl.contributeAdd";
 	public static final String CONTRIBUTE_EDIT = "tpl.contributeEdit";
+	public static final String CONTRIBUTE_UPLOADMIDIA = "tpl.uploadMedia";
+	public static final String CONTRIBUTE_UPLOADATTACHMENT = "tpl.uploadAttachment";
 
 	/**
 	 * 会员投稿列表
@@ -65,30 +53,11 @@ public class ContributeAct {
 	 * @return
 	 */
 	@RequestMapping(value = "/member/contribute_list.jspx")
-	public String list(String queryTitle, Integer queryChannelId,
-			Integer pageNo, HttpServletRequest request, ModelMap model) {
-		CmsSite site = CmsUtils.getSite(request);
-		CmsUser user = CmsUtils.getUser(request);
-		FrontUtils.frontData(request, model, site);
-		MemberConfig mcfg = site.getConfig().getMemberConfig();
-		// 没有开启会员功能
-		if (!mcfg.isMemberOn()) {
-			return FrontUtils.showMessage(request, model, "member.memberClose");
-		}
-		if (user == null) {
-			return FrontUtils.showLogin(request, model, site);
-		}
-		Pagination p = contentMng.getPageForMember(queryTitle, queryChannelId,
-				site.getId(), user.getId(), cpn(pageNo), 20);
-		model.addAttribute("pagination", p);
-		if (!StringUtils.isBlank(queryTitle)) {
-			model.addAttribute("queryTitle", queryTitle);
-		}
-		if (queryChannelId != null) {
-			model.addAttribute("queryChannelId", queryChannelId);
-		}
-		return FrontUtils.getTplPath(request, site.getSolutionPath(),
-				TPLDIR_MEMBER, CONTRIBUTE_LIST);
+	public String list(String queryTitle, Integer modelId,
+			Integer queryChannelId, Integer pageNo, HttpServletRequest request,
+			ModelMap model) {
+		return super.list(queryTitle, modelId, queryChannelId, CONTRIBUTE_LIST,
+				pageNo, request, model);
 	}
 
 	/**
@@ -99,26 +68,9 @@ public class ContributeAct {
 	 * @return
 	 */
 	@RequestMapping(value = "/member/contribute_add.jspx")
-	public String add(HttpServletRequest request, ModelMap model) {
-		CmsSite site = CmsUtils.getSite(request);
-		CmsUser user = CmsUtils.getUser(request);
-		FrontUtils.frontData(request, model, site);
-		MemberConfig mcfg = site.getConfig().getMemberConfig();
-		// 没有开启会员功能
-		if (!mcfg.isMemberOn()) {
-			return FrontUtils.showMessage(request, model, "member.memberClose");
-		}
-		if (user == null) {
-			return FrontUtils.showLogin(request, model, site);
-		}
-		// 获得本站栏目列表
-		Set<Channel> rights = user.getGroup().getContriChannels();
-		List<Channel> topList = channelMng.getTopList(site.getId(), true);
-		List<Channel> channelList = Channel.getListForSelect(topList, rights,
-				true);
-		model.addAttribute("channelList", channelList);
-		return FrontUtils.getTplPath(request, site.getSolutionPath(),
-				TPLDIR_MEMBER, CONTRIBUTE_ADD);
+	public String add(HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) {
+		return super.add( CONTRIBUTE_ADD, request, response, model);
 	}
 
 	/**
@@ -148,54 +100,14 @@ public class ContributeAct {
 	@RequestMapping(value = "/member/contribute_save.jspx")
 	public String save(String title, String author, String description,
 			String txt, String tagStr, Integer channelId,Integer modelId, String captcha,
+			String mediaPath,String mediaType,
+			String[] attachmentPaths, String[] attachmentNames,
+			String[] attachmentFilenames, String[] picPaths, String[] picDescs,
 			String nextUrl, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
-		CmsSite site = CmsUtils.getSite(request);
-		CmsUser user = CmsUtils.getUser(request);
-		FrontUtils.frontData(request, model, site);
-		MemberConfig mcfg = site.getConfig().getMemberConfig();
-		// 没有开启会员功能
-		if (!mcfg.isMemberOn()) {
-			return FrontUtils.showMessage(request, model, "member.memberClose");
-		}
-		if (user == null) {
-			return FrontUtils.showLogin(request, model, site);
-		}
-		WebErrors errors = validateSave(title, author, description, txt,
-				tagStr, channelId, site, user, captcha, request, response);
-		if (errors.hasErrors()) {
-			return FrontUtils.showError(request, response, model, errors);
-		}
-
-		Content c = new Content();
-		c.setSite(site);
-		CmsModel defaultModel=cmsModelMng.getDefModel();
-		if(modelId!=null){
-			CmsModel m=cmsModelMng.findById(modelId);
-			if(m!=null){
-				c.setModel(m);
-			}else{
-				c.setModel(defaultModel);
-			}
-		}else{
-			c.setModel(defaultModel);
-		}
-		ContentExt ext = new ContentExt();
-		ext.setTitle(title);
-		ext.setAuthor(author);
-		ext.setDescription(description);
-		ContentTxt t = new ContentTxt();
-		t.setTxt(txt);
-		ContentType type = contentTypeMng.getDef();
-		if (type == null) {
-			throw new RuntimeException("Default ContentType not found.");
-		}
-		Integer typeId = type.getId();
-		String[] tagArr = StrUtils.splitAndTrim(tagStr, ",", null);
-		c = contentMng.save(c, ext, t, null, null, null, tagArr, null, null,
-				null, null, null, channelId, typeId, null, user, true);
-		log.info("member contribute save Content success. id={}", c.getId());
-		return FrontUtils.showSuccess(request, model, nextUrl);
+		return super.save(title, author, description, txt, tagStr, channelId,modelId,
+				 captcha,mediaPath,mediaType,attachmentPaths,attachmentNames, attachmentFilenames
+				,picPaths,picDescs,nextUrl, request, response, model);
 	}
 
 	/**
@@ -211,31 +123,7 @@ public class ContributeAct {
 	@RequestMapping(value = "/member/contribute_edit.jspx")
 	public String edit(Integer id, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
-		CmsSite site = CmsUtils.getSite(request);
-		CmsUser user = CmsUtils.getUser(request);
-		FrontUtils.frontData(request, model, site);
-		MemberConfig mcfg = site.getConfig().getMemberConfig();
-		// 没有开启会员功能
-		if (!mcfg.isMemberOn()) {
-			return FrontUtils.showMessage(request, model, "member.memberClose");
-		}
-		if (user == null) {
-			return FrontUtils.showLogin(request, model, site);
-		}
-		WebErrors errors = validateEdit(id, site, user, request);
-		if (errors.hasErrors()) {
-			return FrontUtils.showError(request, response, model, errors);
-		}
-		Content content = contentMng.findById(id);
-		// 获得本站栏目列表
-		Set<Channel> rights = user.getGroup().getContriChannels();
-		List<Channel> topList = channelMng.getTopList(site.getId(), true);
-		List<Channel> channelList = Channel.getListForSelect(topList, rights,
-				true);
-		model.addAttribute("content", content);
-		model.addAttribute("channelList", channelList);
-		return FrontUtils.getTplPath(request, site.getSolutionPath(),
-				TPLDIR_MEMBER, CONTRIBUTE_EDIT);
+		return super.edit(id, CONTRIBUTE_EDIT, request, response, model);
 	}
 
 	/**
@@ -265,38 +153,14 @@ public class ContributeAct {
 	@RequestMapping(value = "/member/contribute_update.jspx")
 	public String update(Integer id, String title, String author,
 			String description, String txt, String tagStr, Integer channelId,
+			String mediaPath,String mediaType,
+			String[] attachmentPaths, String[] attachmentNames,
+			String[] attachmentFilenames, String[] picPaths, String[] picDescs,
 			String nextUrl, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
-		CmsSite site = CmsUtils.getSite(request);
-		CmsUser user = CmsUtils.getUser(request);
-		FrontUtils.frontData(request, model, site);
-		MemberConfig mcfg = site.getConfig().getMemberConfig();
-		// 没有开启会员功能
-		if (!mcfg.isMemberOn()) {
-			return FrontUtils.showMessage(request, model, "member.memberClose");
-		}
-		if (user == null) {
-			return FrontUtils.showLogin(request, model, site);
-		}
-		WebErrors errors = validateUpdate(id, channelId, site, user, request);
-		if (errors.hasErrors()) {
-			return FrontUtils.showError(request, response, model, errors);
-		}
-		Content c = new Content();
-		c.setId(id);
-		c.setSite(site);
-		ContentExt ext = new ContentExt();
-		ext.setId(id);
-		ext.setTitle(title);
-		ext.setAuthor(author);
-		ext.setDescription(description);
-		ContentTxt t = new ContentTxt();
-		t.setId(id);
-		t.setTxt(txt);
-		String[] tagArr = StrUtils.splitAndTrim(tagStr, ",", null);
-		contentMng.update(c, ext, t, tagArr, null, null, null, null, null,
-				null, null, null, null, channelId, null, null, user, true);
-		return FrontUtils.showSuccess(request, model, nextUrl);
+		return super.update(id, title, author, description, txt, tagStr,
+				channelId, mediaPath,mediaType,attachmentPaths,attachmentNames, attachmentFilenames
+				,picPaths,picDescs, nextUrl, request, response, model);
 	}
 
 	/**
@@ -314,155 +178,166 @@ public class ContributeAct {
 	@RequestMapping(value = "/member/contribute_delete.jspx")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			String nextUrl, HttpServletResponse response, ModelMap model) {
+		return super.delete(ids, request, nextUrl, response, model);
+	}
+	
+	@RequestMapping("/member/o_upload_media.jspx")
+	public String uploadMedia(
+			@RequestParam(value = "mediaFile", required = false) MultipartFile file,
+			String filename, HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
 		CmsUser user = CmsUtils.getUser(request);
-		FrontUtils.frontData(request, model, site);
-		MemberConfig mcfg = site.getConfig().getMemberConfig();
-		// 没有开启会员功能
-		if (!mcfg.isMemberOn()) {
-			return FrontUtils.showMessage(request, model, "member.memberClose");
-		}
-		if (user == null) {
-			return FrontUtils.showLogin(request, model, site);
-		}
-		WebErrors errors = validateDelete(ids, site, user, request);
+		String origName = file.getOriginalFilename();
+		String ext = FilenameUtils.getExtension(origName).toLowerCase(
+				Locale.ENGLISH);
+		WebErrors errors = validateUpload(file, request);
 		if (errors.hasErrors()) {
-			return FrontUtils.showError(request, response, model, errors);
+			model.addAttribute("error", errors.getErrors().get(0));
+			return FrontUtils.getTplPath(request, site.getSolutionPath(),
+					TPLDIR_MEMBER, CONTRIBUTE_UPLOADMIDIA);
 		}
-		Content[] arr = contentMng.deleteByIds(ids);
-		log.info("member contribute delete Content success. ids={}",
-				StringUtils.join(arr, ","));
-		return FrontUtils.showSuccess(request, model, nextUrl);
-	}
-
-	private WebErrors validateSave(String title, String author,
-			String description, String txt, String tagStr, Integer channelId,
-			CmsSite site, CmsUser user, String captcha,
-			HttpServletRequest request, HttpServletResponse response) {
-		WebErrors errors = WebErrors.create(request);
+		// TODO 检查允许上传的后缀
 		try {
-			if (!imageCaptchaService.validateResponseForID(session
-					.getSessionId(request, response), captcha)) {
-				errors.addErrorCode("error.invalidCaptcha");
-				return errors;
+			String fileUrl;
+			if (site.getConfig().getUploadToDb()) {
+				String dbFilePath = site.getConfig().getDbFileUri();
+				if (!StringUtils.isBlank(filename)
+						&& FilenameUtils.getExtension(filename).equals(ext)) {
+					filename = filename.substring(dbFilePath.length());
+					fileUrl = dbFileMng.storeByFilename(filename, file
+							.getInputStream());
+				} else {
+					fileUrl = dbFileMng.storeByExt(site.getUploadPath(), ext,
+							file.getInputStream());
+					// 加上访问地址
+					fileUrl = request.getContextPath() + dbFilePath + fileUrl;
+				}
+			} else if (site.getUploadFtp() != null) {
+				Ftp ftp = site.getUploadFtp();
+				String ftpUrl = ftp.getUrl();
+				if (!StringUtils.isBlank(filename)
+						&& FilenameUtils.getExtension(filename).equals(ext)) {
+					filename = filename.substring(ftpUrl.length());
+					fileUrl = ftp.storeByFilename(filename, file
+							.getInputStream());
+				} else {
+					fileUrl = ftp.storeByExt(site.getUploadPath(), ext, file
+							.getInputStream());
+					// 加上url前缀
+					fileUrl = ftpUrl + fileUrl;
+				}
+			} else {
+				String ctx = request.getContextPath();
+				if (!StringUtils.isBlank(filename)
+						&& FilenameUtils.getExtension(filename).equals(ext)) {
+					filename = filename.substring(ctx.length());
+					fileUrl = fileRepository.storeByFilename(filename, file);
+				} else {
+					fileUrl = fileRepository.storeByExt(site.getUploadPath(),
+							ext, file);
+					// 加上部署路径
+					fileUrl = ctx + fileUrl;
+				}
 			}
-		} catch (CaptchaServiceException e) {
-			errors.addErrorCode("error.exceptionCaptcha");
-			log.warn("", e);
-			return errors;
+			cmsUserMng.updateUploadSize(user.getId(), Integer.parseInt(String.valueOf(file.getSize()/1024)));
+			fileMng.saveFileByPath(fileUrl, fileUrl, false);
+			model.addAttribute("mediaPath", fileUrl);
+			model.addAttribute("mediaExt", ext);
+		} catch (IllegalStateException e) {
+			model.addAttribute("error", e.getMessage());
+		} catch (IOException e) {
+			model.addAttribute("error", e.getMessage());
 		}
-		if (errors.ifBlank(title, "title", 150)) {
-			return errors;
-		}
-		if (errors.ifMaxLength(author, "author", 100)) {
-			return errors;
-		}
-		if (errors.ifMaxLength(description, "description", 255)) {
-			return errors;
-		}
-		// 内容不能大于1M
-		if (errors.ifBlank(txt, "txt", 1048575)) {
-			return errors;
-		}
-		if (errors.ifMaxLength(tagStr, "tagStr", 255)) {
-			return errors;
-		}
-		if (errors.ifNull(channelId, "channelId")) {
-			return errors;
-		}
-		if (vldChannel(errors, site, user, channelId)) {
-			return errors;
-		}
-		return errors;
+		return FrontUtils.getTplPath(request, site.getSolutionPath(),
+				TPLDIR_MEMBER, CONTRIBUTE_UPLOADMIDIA);
 	}
-
-	private WebErrors validateEdit(Integer id, CmsSite site, CmsUser user,
+	
+	@RequestMapping("/member/o_upload_attachment.jspx")
+	public String uploadAttachment(
+			@RequestParam(value = "attachmentFile", required = false) MultipartFile file,
+			String attachmentNum, HttpServletRequest request, ModelMap model) {
+		CmsSite site = CmsUtils.getSite(request);
+		CmsUser user= CmsUtils.getUser(request);
+		String origName = file.getOriginalFilename();
+		String ext = FilenameUtils.getExtension(origName).toLowerCase(
+				Locale.ENGLISH);
+		WebErrors errors = validateUpload(file,request);
+		if (errors.hasErrors()) {
+			model.addAttribute("error", errors.getErrors().get(0));
+			return FrontUtils.getTplPath(request, site.getSolutionPath(),
+					TPLDIR_MEMBER, CONTRIBUTE_UPLOADATTACHMENT);
+		}
+		// TODO 检查允许上传的后缀
+		try {
+			String fileUrl;
+			if (site.getConfig().getUploadToDb()) {
+				String dbFilePath = site.getConfig().getDbFileUri();
+				fileUrl = dbFileMng.storeByExt(site.getUploadPath(), ext, file
+						.getInputStream());
+				// 加上访问地址
+				fileUrl = request.getContextPath() + dbFilePath + fileUrl;
+			} else if (site.getUploadFtp() != null) {
+				Ftp ftp = site.getUploadFtp();
+				String ftpUrl = ftp.getUrl();
+				fileUrl = ftp.storeByExt(site.getUploadPath(), ext, file
+						.getInputStream());
+				// 加上url前缀
+				fileUrl = ftpUrl + fileUrl;
+			} else {
+				String ctx = request.getContextPath();
+				fileUrl = fileRepository.storeByExt(site.getUploadPath(), ext,
+						file);
+				// 加上部署路径
+				fileUrl = ctx + fileUrl;
+			}
+			cmsUserMng.updateUploadSize(user.getId(), Integer.parseInt(String.valueOf(file.getSize()/1024)));
+			fileMng.saveFileByPath(fileUrl, origName, false);
+			model.addAttribute("attachmentPath", fileUrl);
+			model.addAttribute("attachmentName", origName);
+			model.addAttribute("attachmentNum", attachmentNum);
+		} catch (IllegalStateException e) {
+			model.addAttribute("error", e.getMessage());
+		} catch (IOException e) {
+			model.addAttribute("error", e.getMessage());
+		}
+		return FrontUtils.getTplPath(request, site.getSolutionPath(),
+				TPLDIR_MEMBER, CONTRIBUTE_UPLOADATTACHMENT);
+	}
+	
+	private WebErrors validateUpload(MultipartFile file,
 			HttpServletRequest request) {
+		String origName = file.getOriginalFilename();
+		CmsUser user= CmsUtils.getUser(request);
+		String ext = FilenameUtils.getExtension(origName).toLowerCase(Locale.ENGLISH);
+		int fileSize = (int) (file.getSize() / 1024);
 		WebErrors errors = WebErrors.create(request);
-		if (vldOpt(errors, site, user, new Integer[] { id })) {
+		if (errors.ifNull(file, "file")) {
 			return errors;
+		}
+		//非允许的后缀
+		if(!user.isAllowSuffix(ext)){
+			errors.addErrorCode("upload.error.invalidsuffix", ext);
+			return errors;
+		}
+		//超过附件大小限制
+		if(!user.isAllowMaxFile((int)(file.getSize()/1024))){
+			errors.addErrorCode("upload.error.toolarge",origName,user.getGroup().getAllowMaxFile());
+			return errors;
+		}
+		//超过每日上传限制
+		if (!user.isAllowPerDay(fileSize)) {
+			long laveSize=user.getGroup().getAllowPerDay()-user.getUploadSize();
+			if(laveSize<0){
+				laveSize=0;
+			}
+			errors.addErrorCode("upload.error.dailylimit", laveSize);
 		}
 		return errors;
 	}
-
-	private WebErrors validateUpdate(Integer id, Integer channelId,
-			CmsSite site, CmsUser user, HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
-		if (vldOpt(errors, site, user, new Integer[] { id })) {
-			return errors;
-		}
-		if (vldChannel(errors, site, user, channelId)) {
-			return errors;
-		}
-		return errors;
-	}
-
-	private WebErrors validateDelete(Integer[] ids, CmsSite site, CmsUser user,
-			HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
-		if (vldOpt(errors, site, user, ids)) {
-			return errors;
-		}
-		return errors;
-	}
-
-	private boolean vldOpt(WebErrors errors, CmsSite site, CmsUser user,
-			Integer[] ids) {
-		for (Integer id : ids) {
-			if (errors.ifNull(id, "id")) {
-				return true;
-			}
-			Content c = contentMng.findById(id);
-			// 数据不存在
-			if (errors.ifNotExist(c, Content.class, id)) {
-				return true;
-			}
-			// 非本用户数据
-			if (!c.getUser().getId().equals(user.getId())) {
-				errors.noPermission(Content.class, id);
-				return true;
-			}
-			// 非本站点数据
-			if (!c.getSite().getId().equals(site.getId())) {
-				errors.notInSite(Content.class, id);
-				return true;
-			}
-			// 文章级别大于0，不允许修改
-			if (c.getCheckStep() > 0) {
-				errors.addErrorCode("member.contentChecked");
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean vldChannel(WebErrors errors, CmsSite site, CmsUser user,
-			Integer channelId) {
-		Channel channel = channelMng.findById(channelId);
-		if (errors.ifNotExist(channel, Channel.class, channelId)) {
-			return true;
-		}
-		if (!channel.getSite().getId().equals(site.getId())) {
-			errors.notInSite(Channel.class, channelId);
-			return true;
-		}
-		if (!channel.getContriGroups().contains(user.getGroup())) {
-			errors.noPermission(Channel.class, channelId);
-			return true;
-		}
-		return false;
-	}
-
 	@Autowired
-	private ContentMng contentMng;
+	private DbFileMng dbFileMng;
 	@Autowired
-	private ContentTypeMng contentTypeMng;
+	private CmsUserMng cmsUserMng;
 	@Autowired
-	private ChannelMng channelMng;
-	@Autowired
-	protected CmsModelMng cmsModelMng;
-	@Autowired
-	private SessionProvider session;
-	@Autowired
-	private ImageCaptchaService imageCaptchaService;
+	private CmsFileMng fileMng;
 }

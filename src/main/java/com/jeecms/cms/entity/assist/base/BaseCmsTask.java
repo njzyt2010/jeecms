@@ -54,8 +54,8 @@ public abstract class BaseCmsTask  implements Serializable {
 	 */
 	public BaseCmsTask (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsUser user,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsUser user,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.Integer type,
 		java.lang.String name,
 		java.lang.String jobClass,
@@ -101,8 +101,8 @@ public abstract class BaseCmsTask  implements Serializable {
 	private java.util.Date createTime;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsUser user;
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsUser user;
+	private com.jeecms.core.entity.CmsSite site;
 
 	// collections
 	private java.util.Map<java.lang.String, java.lang.String> attr;
@@ -390,7 +390,7 @@ public abstract class BaseCmsTask  implements Serializable {
 	/**
 	 * Return the value associated with the column: user_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getUser () {
+	public com.jeecms.core.entity.CmsUser getUser () {
 		return user;
 	}
 
@@ -398,7 +398,7 @@ public abstract class BaseCmsTask  implements Serializable {
 	 * Set the value related to the column: user_id
 	 * @param user the user_id value
 	 */
-	public void setUser (com.jeecms.cms.entity.main.CmsUser user) {
+	public void setUser (com.jeecms.core.entity.CmsUser user) {
 		this.user = user;
 	}
 
@@ -406,7 +406,7 @@ public abstract class BaseCmsTask  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -414,7 +414,7 @@ public abstract class BaseCmsTask  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

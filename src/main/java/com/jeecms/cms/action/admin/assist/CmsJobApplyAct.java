@@ -4,6 +4,7 @@ import static com.jeecms.common.page.SimplePage.cpn;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +13,23 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsJobApply;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.CmsUserResume;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.manager.assist.CmsJobApplyMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.CmsUserResume;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsJobApplyAct {
 	private static final Logger log = LoggerFactory.getLogger(CmsJobApplyAct.class);
 
+	@RequiresPermissions("jobapply:v_list")
 	@RequestMapping("/jobapply/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request, ModelMap model) {
 		Pagination pagination = manager.getPage(null,null,CmsUtils.getSiteId(request),true,cpn(pageNo), CookieUtils
@@ -37,6 +39,7 @@ public class CmsJobApplyAct {
 		return "jobapply/list";
 	}
 	
+	@RequiresPermissions("jobapply:o_delete")
 	@RequestMapping("/jobapply/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -52,6 +55,7 @@ public class CmsJobApplyAct {
 	}
 	
 	
+	@RequiresPermissions("jobapply:v_view")
 	@RequestMapping("/jobapply/v_view.do")
 	public String viewResume(Integer userId,Integer contentId, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {

@@ -14,16 +14,17 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.email.EmailSender;
 import com.jeecms.common.email.MessageTemplate;
+import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.session.SessionProvider;
+import com.jeecms.core.entity.CmsSite;
 import com.jeecms.core.entity.UnifiedUser;
 import com.jeecms.core.manager.ConfigMng;
 import com.jeecms.core.manager.UnifiedUserMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 import com.octo.captcha.service.CaptchaServiceException;
 import com.octo.captcha.service.image.ImageCaptchaService;
 
@@ -71,10 +72,11 @@ public class ForgotPasswordAct {
 	 * @return
 	 */
 	@RequestMapping(value = "/member/forgot_password.jspx", method = RequestMethod.POST)
-	public String forgotPasswordSubmit(String username, String email,
+	public String forgotPasswordSubmit(String email,
 			String captcha, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
+		String username=RequestUtils.getQueryParam(request,"username");
 		WebErrors errors = validateForgotPasswordSubmit(username, email,
 				captcha, request, response);
 		if (errors.hasErrors()) {

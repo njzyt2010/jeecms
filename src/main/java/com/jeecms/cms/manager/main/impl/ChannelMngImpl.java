@@ -9,22 +9,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jeecms.cms.dao.main.ChannelDao;
 import com.jeecms.cms.entity.main.Channel;
+import com.jeecms.cms.entity.main.ChannelCount;
 import com.jeecms.cms.entity.main.ChannelExt;
 import com.jeecms.cms.entity.main.ChannelTxt;
-import com.jeecms.cms.entity.main.CmsGroup;
 import com.jeecms.cms.entity.main.CmsModel;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.CmsUserSite;
+import com.jeecms.cms.manager.main.ChannelCountMng;
 import com.jeecms.cms.manager.main.ChannelExtMng;
 import com.jeecms.cms.manager.main.ChannelMng;
 import com.jeecms.cms.manager.main.ChannelTxtMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
 import com.jeecms.cms.manager.main.CmsModelMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.service.ChannelDeleteChecker;
 import com.jeecms.common.hibernate3.Updater;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.CmsUserSite;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
 
 @Service
 @Transactional
@@ -48,7 +50,7 @@ public class ChannelMngImpl implements ChannelMng {
 
 	@Transactional(readOnly = true)
 	public List<Channel> getTopListForTag(Integer siteId, boolean hasContentOnly) {
-		return dao.getTopList(siteId, hasContentOnly, true, true);
+		return dao.getTopList(siteId,hasContentOnly, true, true);
 	}
 
 	@Transactional(readOnly = true)
@@ -56,6 +58,17 @@ public class ChannelMngImpl implements ChannelMng {
 			int pageNo, int pageSize) {
 		return dao.getTopPage(siteId, hasContentOnly, false, false, pageNo,
 				pageSize);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Channel> getTopListForDepartId(Integer departId,Integer userId,Integer siteId,boolean hasContentOnly){
+		CmsUser user = cmsUserMng.findById(userId);
+		CmsUserSite us = user.getUserSite(siteId);
+		if (us.getAllChannel()) {
+			return getTopList(siteId, hasContentOnly);
+		}else{
+			return dao.getTopListForDepartId(departId,siteId,hasContentOnly);
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -80,12 +93,23 @@ public class ChannelMngImpl implements ChannelMng {
 			boolean hasContentOnly) {
 		return dao.getChildList(parentId, hasContentOnly, true, true);
 	}
+	
+	@Transactional(readOnly = true)
+	public List<Channel> getBottomList(Integer siteId,boolean hasContentOnly){
+		return dao.getBottomList(siteId,hasContentOnly);
+	}
 
 	@Transactional(readOnly = true)
 	public Pagination getChildPageForTag(Integer parentId,
 			boolean hasContentOnly, int pageNo, int pageSize) {
 		return dao.getChildPage(parentId, hasContentOnly, true, true, pageNo,
 				pageSize);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Channel> getChildListByDepartId(Integer departId,Integer siteId,
+			Integer parentId, boolean hasContentOnly){
+		return dao.getChildListByDepartId(departId,siteId,parentId,hasContentOnly);
 	}
 
 	@Transactional(readOnly = true)
@@ -106,7 +130,8 @@ public class ChannelMngImpl implements ChannelMng {
 
 	public Channel save(Channel bean, ChannelExt ext, ChannelTxt txt,
 			Integer[] viewGroupIds, Integer[] contriGroupIds,
-			Integer[] userIds, Integer siteId, Integer parentId, Integer modelId,Integer[]modelIds,String[] tpls) {
+			Integer[] userIds, Integer siteId, Integer parentId, Integer modelId,
+			Integer[]modelIds,String[] tpls) {
 		if (parentId != null) {
 			bean.setParent(findById(parentId));
 		}
@@ -118,6 +143,7 @@ public class ChannelMngImpl implements ChannelMng {
 		dao.save(bean);
 		channelExtMng.save(ext, bean);
 		channelTxtMng.save(txt, bean);
+		channelCountMng.save(new ChannelCount(), bean);
 		CmsGroup g;
 		if (viewGroupIds != null && viewGroupIds.length > 0) {
 			for (Integer gid : viewGroupIds) {
@@ -255,6 +281,10 @@ public class ChannelMngImpl implements ChannelMng {
 		}
 		return beans;
 	}
+	
+	public void initWorkFlow(Integer workflowId){
+		dao.initWorkFlow(workflowId);
+	}
 
 	private List<ChannelDeleteChecker> deleteCheckerList;
 
@@ -267,6 +297,7 @@ public class ChannelMngImpl implements ChannelMng {
 	private CmsModelMng cmsModelMng;
 	private ChannelExtMng channelExtMng;
 	private ChannelTxtMng channelTxtMng;
+	private ChannelCountMng channelCountMng;
 	private CmsUserMng cmsUserMng;
 	private CmsGroupMng cmsGroupMng;
 	private ChannelDao dao;
@@ -289,6 +320,11 @@ public class ChannelMngImpl implements ChannelMng {
 	@Autowired
 	public void setChannelTxtMng(ChannelTxtMng channelTxtMng) {
 		this.channelTxtMng = channelTxtMng;
+	}
+
+	@Autowired
+	public void setChannelCountMng(ChannelCountMng channelCountMng) {
+		this.channelCountMng = channelCountMng;
 	}
 
 	@Autowired

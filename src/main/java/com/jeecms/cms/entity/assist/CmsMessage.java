@@ -25,9 +25,9 @@ public class CmsMessage extends BaseCmsMessage {
 	 */
 	public CmsMessage (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsUser msgReceiverUser,
-		com.jeecms.cms.entity.main.CmsUser msgSendUser,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsUser msgReceiverUser,
+		com.jeecms.core.entity.CmsUser msgSendUser,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String msgTitle,
 		java.lang.Boolean msgStatus,
 		java.lang.Integer msgBox) {

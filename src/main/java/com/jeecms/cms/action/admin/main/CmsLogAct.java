@@ -4,6 +4,7 @@ import static com.jeecms.common.page.SimplePage.cpn;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,18 +12,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsLog;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
+import com.jeecms.core.entity.CmsLog;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsLogAct {
 	private static final Logger log = LoggerFactory.getLogger(CmsLogAct.class);
 
+	@RequiresPermissions("log:v_list_operating")
 	@RequestMapping("/log/v_list_operating.do")
 	public String listOperating(String queryUsername, String queryTitle,
 			String queryIp, Integer pageNo, HttpServletRequest request,
@@ -39,6 +41,7 @@ public class CmsLogAct {
 		return "log/list_operating";
 	}
 
+	@RequiresPermissions("log:v_list_login_success")
 	@RequestMapping("/log/v_list_login_success.do")
 	public String listLoginSuccess(String queryUsername, String queryTitle,
 			String queryIp, Integer pageNo, HttpServletRequest request,
@@ -54,6 +57,7 @@ public class CmsLogAct {
 		return "log/list_login_success";
 	}
 
+	@RequiresPermissions("log:v_list_login_failure")
 	@RequestMapping("/log/v_list_login_failure.do")
 	public String listLoginFailure(String queryTitle, String queryIp,
 			Integer pageNo, HttpServletRequest request, ModelMap model) {
@@ -67,6 +71,7 @@ public class CmsLogAct {
 		return "log/list_login_failure";
 	}
 
+	@RequiresPermissions("log:o_delete_operating")
 	@RequestMapping("/log/o_delete_operating.do")
 	public String deleteOperating(String queryUsername, String queryTitle,
 			String queryIp, Integer[] ids, Integer pageNo,
@@ -83,6 +88,7 @@ public class CmsLogAct {
 				request, model);
 	}
 
+	@RequiresPermissions("log:o_delete_operating_batch")
 	@RequestMapping("/log/o_delete_operating_batch.do")
 	public String deleteOperatingBatch(Integer days,
 			HttpServletRequest request, ModelMap model) {
@@ -92,6 +98,7 @@ public class CmsLogAct {
 		return listOperating(null, null, null, 1, request, model);
 	}
 
+	@RequiresPermissions("log:o_delete_login_success")
 	@RequestMapping("/log/o_delete_login_success.do")
 	public String deleteLoginSuccess(String queryUsername, String queryTitle,
 			String queryIp, Integer[] ids, Integer pageNo,
@@ -108,6 +115,7 @@ public class CmsLogAct {
 				request, model);
 	}
 
+	@RequiresPermissions("log:o_delete_login_success_batch")
 	@RequestMapping("/log/o_delete_login_success_batch.do")
 	public String deleteLoginSuccessBatch(Integer days,
 			HttpServletRequest request, ModelMap model) {
@@ -119,6 +127,7 @@ public class CmsLogAct {
 		return listLoginSuccess(null, null, null, 1, request, model);
 	}
 
+	@RequiresPermissions("log:o_delete_login_failure")
 	@RequestMapping("/log/o_delete_login_failure.do")
 	public String deleteLoginFailure(String queryTitle, String queryIp,
 			Integer[] ids, Integer pageNo, HttpServletRequest request,
@@ -134,6 +143,7 @@ public class CmsLogAct {
 		return listLoginFailure(queryTitle, queryIp, pageNo, request, model);
 	}
 
+	@RequiresPermissions("log:o_delete_login_failure_batch")
 	@RequestMapping("/log/o_delete_login_failure_batch.do")
 	public String deleteLoginFailureBatch(Integer days,
 			HttpServletRequest request, ModelMap model) {

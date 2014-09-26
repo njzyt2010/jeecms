@@ -21,19 +21,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.MarkConfig;
-import com.jeecms.cms.entity.main.MemberConfig;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.image.ImageScale;
 import com.jeecms.common.image.ImageUtils;
 import com.jeecms.common.upload.FileRepository;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.entity.MarkConfig;
+import com.jeecms.core.entity.MemberConfig;
 import com.jeecms.core.manager.DbFileMng;
-import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.WebCoreErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 
 @Controller
 public class ImageUploadAct {
@@ -59,7 +59,7 @@ public class ImageUploadAct {
 			Boolean mark,
 			@RequestParam(value = "uploadFile", required = false) MultipartFile file,
 			HttpServletRequest request, ModelMap model) {
-		WebErrors errors = validate(filename, file, request);
+		WebCoreErrors errors = validate(filename, file, request);
 		CmsSite site = CmsUtils.getSite(request);
 		CmsUser user = CmsUtils.getUser(request);
 		FrontUtils.frontData(request, model, site);
@@ -179,9 +179,9 @@ public class ImageUploadAct {
 				TPLDIR_MEMBER, RESULT_PAGE);
 	}
 
-	private WebErrors validate(String filename, MultipartFile file,
+	private WebCoreErrors validate(String filename, MultipartFile file,
 			HttpServletRequest request) {
-		WebErrors errors = WebErrors.create(request);
+		WebCoreErrors errors = WebCoreErrors.create(request);
 		if (file == null) {
 			errors.addErrorCode("imageupload.error.noFileToUpload");
 			return errors;

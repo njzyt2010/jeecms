@@ -21,22 +21,21 @@ public class UploadUtils {
 	
 	public static final DateFormat YEAR_MONTH_FORMAT = new SimpleDateFormat(
 	"yyyyMM");
-	
-	public static final DateFormat SHORT_FORMAT = new SimpleDateFormat(
-	"ddHHmmss");
-	
-	public static String generateMonthname() {
-		return YEAR_MONTH_FORMAT.format(new Date());
-	}
+
 
 	public static String generateFilename(String path, String ext) {
 		return path + MONTH_FORMAT.format(new Date())
 				+ RandomStringUtils.random(4, Num62.N36_CHARS) + "." + ext;
 	}
 	
+	public static String generateMonthname() {
+		return YEAR_MONTH_FORMAT.format(new Date());
+	}
+	
 	public static String generateByFilename(String path,String fileName, String ext) {
 		return path + fileName + "." + ext;
 	}
+
 
 	protected static final Pattern ILLEGAL_CURRENT_FOLDER_PATTERN = Pattern
 			.compile("^[^/]|[^/]$|/\\.{1,2}|\\\\|\\||:|\\?|\\*|\"|<|>|\\p{Cntrl}");

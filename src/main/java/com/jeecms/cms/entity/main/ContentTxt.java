@@ -3,11 +3,16 @@ package com.jeecms.cms.entity.main;
 import org.apache.commons.lang.StringUtils;
 
 import com.jeecms.cms.entity.main.base.BaseContentTxt;
+
 public class ContentTxt extends BaseContentTxt {
 	private static final long serialVersionUID = 1L;
-	public static String PAGE_START = "<p>[NextPage]";
-	public static String PAGE_END = "[/NextPage]</p>";
+	//ueditor采用分页
+	public static String PAGE_START = "[NextPage]";
+	public static String PAGE_END = "[/NextPage]";
+	//public static String PAGE_START = "<p>[NextPage]";
+	//public static String PAGE_END = "[/NextPage]</p>";
 	
+
 	public int getTxtCount() {
 		String txt = getTxt();
 		if (StringUtils.isBlank(txt)) {
@@ -89,6 +94,7 @@ public class ContentTxt extends BaseContentTxt {
 			setTxt3(null);
 		}
 	}
+	
 
 	/**
 	 * 是否所有属性都为空
@@ -100,6 +106,7 @@ public class ContentTxt extends BaseContentTxt {
 				&& StringUtils.isBlank(getTxt2())
 				&& StringUtils.isBlank(getTxt3());
 	}
+
 
 	/* [CONSTRUCTOR MARKER BEGIN] */
 	public ContentTxt () {

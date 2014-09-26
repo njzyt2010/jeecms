@@ -10,12 +10,12 @@ function getTableForm() {
 }
 function optDelete() {
 	if(Pn.checkedCount('ids')<=0) {
-		alert("<@s.m 'error.checkRecord'/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
-	if(!confirm("<@s.m 'global.confirm.delete'/>")) {
-		return;
-	}
+	$.confirm(doDelete,"<@s.m 'global.confirm'/>","<@s.m 'global.confirm.delete'/>");
+}
+function doDelete(){
 	var f = getTableForm();
 	f.action="o_delete.do";
 	f.submit();
@@ -59,10 +59,10 @@ function disInput(o) {
 <form id="tableForm" method="post">
 <input type="hidden" name="modelId" value="${modelId}"/>
 <input type="hidden" name="isChannel" value="${isChannel?string('true','false')}"/>
-<table class="pn-ltable" width="100%" cellspacing="1" cellpadding="0" border="0">
+<table class="pn-ltable" width="100%" cellspacing="0" cellpadding="0" border="0">
 <thead class="pn-lthead">
 <tr>
-	<th width="20"><input type='checkbox' onclick='Pn.checkbox("ids",this.checked)'/></th>
+	<th width="25"><input type='checkbox' onclick='Pn.checkbox("ids",this.checked)'/></th>
 	<th><@s.m "cmsModelItem.field"/></th>
 	<th><@s.m "cmsModelItem.dataType"/></th>
 	<th><@s.m "cmsModelItem.label"/></th>
@@ -75,7 +75,7 @@ function disInput(o) {
 <tbody class="pn-ltbody">
 <#list list as item>
 <tr>
-	<td><input type="checkbox" name="ids" value="${item.id}"/></td>
+	<td align="center"><input type="checkbox" name="ids" value="${item.id}"/></td>
 	<td align="center">${item.field}</td>
 	<td align="center"><@s.m "cmsModelItem.type${item.dataType}"/></td>
 	<td align="center"><input type="text" name="label" value="${item.label}" style="width:100px"/></td>
@@ -93,7 +93,7 @@ function disInput(o) {
 	</td>
 	<td align="center">
 		<a href="v_edit.do?id=${item.id}" class="pn-opt"><@s.m "global.edit"/></a> |
-		<a href="o_delete.do?ids=${item.id}&modelId=${modelId}&isChannel=${isChannel?string('true','false')}" class="pn-opt" onclick="if(!confirm('<@s.m "global.confirm.delete"/>')) {return false;}"><@s.m "global.delete"/></a>
+		<a href="o_delete.do?ids=${item.id}&modelId=${modelId}&isChannel=${isChannel?string('true','false')}" class="pn-opt" onclick="if(!$.confirmToUrl(this.href)) {return false;}"><@s.m "global.delete"/></a>
  	</td>
 </tr>
 </#list>
@@ -102,7 +102,7 @@ function disInput(o) {
 <tr id="sysDefModel" style="display:none;"><td colspan="8"><@s.m "cmsModelItem.sysDefModel"/>:</td></tr>
 <#if !fieldList?seq_contains('channelId')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">channelId</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type6"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.channelId"/>" style="width:100px"/></td>
@@ -124,7 +124,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('title')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">title</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.title"/>" style="width:100px"/></td>
@@ -146,7 +146,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('shortTitle')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">shortTitle</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.shortTitle"/>" style="width:100px"/></td>
@@ -168,7 +168,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('titleColor')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">titleColor</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type6"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.titleColor"/>" style="width:100px"/></td>
@@ -190,7 +190,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('tagStr')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">tagStr</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.tagStr"/>" style="width:100px"/></td>
@@ -212,7 +212,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('description')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">origin</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.description"/>" style="width:100px"/></td>
@@ -234,7 +234,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('author')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">author</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.author"/>" style="width:100px"/></td>
@@ -256,7 +256,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('origin')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">origin</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.origin"/>" style="width:100px"/></td>
@@ -278,7 +278,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('viewGroupIds')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">viewGroupIds</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type7"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.viewGroupIds"/>" style="width:100px"/></td>
@@ -300,7 +300,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('topLevel')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">topLevel</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type6"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.topLevel"/>" style="width:100px"/></td>
@@ -322,7 +322,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('releaseDate')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">releaseDate</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type5"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.releaseDate"/>" style="width:100px"/></td>
@@ -344,7 +344,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('typeId')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">typeId</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type6"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.typeId"/>" style="width:100px"/></td>
@@ -366,7 +366,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('tplContent')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">tplContent</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type6"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.tplContent"/>" style="width:100px"/></td>
@@ -388,7 +388,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('typeImg')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">typeImg</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.typeImg"/>" style="width:100px"/></td>
@@ -410,7 +410,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('titleImg')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">titleImg</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.titleImg"/>" style="width:100px"/></td>
@@ -432,7 +432,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('contentImg')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">contentImg</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.contentImg"/>" style="width:100px"/></td>
@@ -454,7 +454,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('attachments')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">attachments</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.attachments"/>" style="width:100px"/></td>
@@ -476,7 +476,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('media')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">media</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type1"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.media"/>" style="width:100px"/></td>
@@ -498,7 +498,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('txt')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">txt</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.txt"/>" style="width:100px"/></td>
@@ -520,7 +520,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('txt1')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">txt1</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.txt1"/>" style="width:100px"/></td>
@@ -542,7 +542,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('txt2')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">txt2</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.txt2"/>" style="width:100px"/></td>
@@ -564,7 +564,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('txt3')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">txt3</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
 	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.txt3"/>" style="width:100px"/></td>
@@ -586,7 +586,7 @@ function disInput(o) {
 </#if>
 <#if !fieldList?seq_contains('pictures')>
 <tr>
-	<td><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
 	<td align="center" class="dis">pictures</td>
 	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
 	<td align="center" class="dis"><input class="dis" type="text" name="labels" value="<@s.m "content.pictures"/>" style="width:100px"/></td>
@@ -606,7 +606,72 @@ function disInput(o) {
 </tr>
 <#assign i=i+1/>
 </#if>
-
+<#if !fieldList?seq_contains('docPath')>
+<tr>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center" class="dis">docPath</td>
+	<td align="center" class="dis"><@s.m "cmsModelItem.type4"/></td>
+	<td align="center" class="dis"><input class="dis" type="text" name="labels" value="<@s.m "content.doc.docPath"/>" style="width:100px"/></td>
+	<td align="center"><input class="dis" type="text" name="prioritys" value="10" style="width:40px"/></td>
+	<td align="center">
+		<input class="dis" type="checkbox" checked="checked" onclick="$('#singles${i}').val(this.checked)"/>
+		<input class="dis" type="hidden" id="singles${i}" name="singles" value="true"/>
+	</td>
+	<td align="center">
+		<input class="dis" type="checkbox" checked="checked" onclick="$('#displays${i}').val(this.checked)"/>
+		<input class="dis" type="hidden" id="displays${i}" name="displays" value="true"/>
+	</td>
+	<td align="center">
+		<input class="dis" type="hidden" name="fields" value="docPath"/>
+		<input class="dis" type="hidden" name="dataTypes" value="4"/>
+	</td>
+</tr>
+<#assign i=i+1/>
+</#if>
+<#if !fieldList?seq_contains('downNeed')>
+<tr>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center" class="dis">downNeed</td>
+	<td align="center" class="dis"><@s.m "cmsModelItem.type2"/></td>
+	<td align="center" class="dis"><input class="dis" type="text" name="labels" value="<@s.m "content.doc.downNeed"/>" style="width:100px"/></td>
+	<td align="center"><input class="dis" type="text" name="prioritys" value="10" style="width:40px"/></td>
+	<td align="center">
+		<input class="dis" type="checkbox" checked="checked" onclick="$('#singles${i}').val(this.checked)"/>
+		<input class="dis" type="hidden" id="singles${i}" name="singles" value="true"/>
+	</td>
+	<td align="center">
+		<input class="dis" type="checkbox" checked="checked" onclick="$('#displays${i}').val(this.checked)"/>
+		<input class="dis" type="hidden" id="displays${i}" name="displays" value="true"/>
+	</td>
+	<td align="center">
+		<input class="dis" type="hidden" name="fields" value="downNeed"/>
+		<input class="dis" type="hidden" name="dataTypes" value="2"/>
+	</td>
+</tr>
+<#assign i=i+1/>
+</#if>
+<#if !fieldList?seq_contains('isOpen')>
+<tr>
+	<td align="center"><input type="checkbox" onclick="disInput(this);" checked="checked"/></td>
+	<td align="center" class="dis">isOpen</td>
+	<td align="center" class="dis"><@s.m "cmsModelItem.type7"/></td>
+	<td align="center"><input class="dis" type="text" name="labels" value="<@s.m "content.doc.isOpen"/>" style="width:100px"/></td>
+	<td align="center"><input class="dis" type="text" name="prioritys" value="10" style="width:40px"/></td>
+	<td align="center">
+		<input class="dis" type="checkbox" checked="checked" onclick="$('#singles${i}').val(this.checked)"/>
+		<input class="dis" type="hidden" id="singles${i}" name="singles" value="true"/>
+	</td>
+	<td align="center">
+		<input class="dis" type="checkbox" checked="checked" onclick="$('#displays${i}').val(this.checked)"/>
+		<input class="dis" type="hidden" id="displays${i}" name="displays" value="true"/>
+	</td>
+	<td align="center">
+		<input class="dis" type="hidden" name="fields" value="isOpen"/>
+		<input class="dis" type="hidden" name="dataTypes" value="7"/>
+	</td>
+</tr>
+<#assign i=i+1/>
+</#if>
 </tbody>
 </table>
 

@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.image.ImageScale;
 import com.jeecms.common.upload.FileRepository;
+import com.jeecms.core.entity.CmsSite;
 import com.jeecms.core.entity.Ftp;
 import com.jeecms.core.manager.DbFileMng;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class ImageCutAct {
@@ -35,6 +36,7 @@ public class ImageCutAct {
 	 */
 	public static final String ERROR = "error";
 
+	@RequiresPermissions("common:v_image_area_select")
 	@RequestMapping("/common/v_image_area_select.do")
 	public String imageAreaSelect(String uploadBase, String imgSrcPath,
 			Integer zoomWidth, Integer zoomHeight, Integer uploadNum,
@@ -47,6 +49,7 @@ public class ImageCutAct {
 		return IMAGE_SELECT_RESULT;
 	}
 
+	@RequiresPermissions("common:o_image_cut")
 	@RequestMapping("/common/o_image_cut.do")
 	public String imageCut(String imgSrcPath, Integer imgTop, Integer imgLeft,
 			Integer imgWidth, Integer imgHeight, Integer reMinWidth,

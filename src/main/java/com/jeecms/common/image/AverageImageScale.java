@@ -306,10 +306,15 @@ public class AverageImageScale {
 
 	public static void main(String[] args) throws Exception {
 		long time = System.currentTimeMillis();
+		/*
 		AverageImageScale.resizeFix(new File(
 				"test/com/jeecms/common/util/1.bmp"), new File(
 				"test/com/jeecms/common/util/1-n-2.bmp"), 310, 310, 50, 50,
 				320, 320);
+				*/
+		AverageImageScale.imageMark(new File(
+				"D:/ttt/mv1.jpg"), new File(
+				"D:/ttt/mv2.jpg"), 120, 120, 1, 30, 30, "jeecms", Color.red, 40, 100);
 		time = System.currentTimeMillis() - time;
 		System.out.println("resize2 img in " + time + "ms");
 	}

@@ -17,6 +17,9 @@ import com.jeecms.cms.staticpage.StaticPageUtils;
 import com.jeecms.common.hibernate3.HibernateTree;
 import com.jeecms.common.hibernate3.PriorityComparator;
 import com.jeecms.common.hibernate3.PriorityInterface;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 
 /**
  * 栏目实体类
@@ -55,7 +58,9 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 		if (getStaticChannel()) {
 			return getUrlStatic(false, 1);
 		} else {
-			return getUrlDynamic(null);
+//			return getUrlDynamic(null);
+			//此处共享了别站信息需要绝句路径，做了更改 于2012-7-26修改
+			return getUrlDynamic(true);
 		}
 	}
 
@@ -243,7 +248,68 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 		}
 		return deep;
 	}
-
+	/**
+	 * 获取栏目下总浏览量
+	 * @return
+	 */
+	public int getViewTotal() {
+		Integer totalView=0;
+		List<Channel> list = new ArrayList<Channel>();
+		addChildToList(list, this, true);
+		for(Channel c:list){
+			totalView+=c.getChannelCount().getViews();
+		}
+		return totalView;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getViewsDayTotal() {
+		Integer totalView=0;
+		List<Channel> list = new ArrayList<Channel>();
+		addChildToList(list, this, true);
+		for(Channel c:list){
+			totalView+=c.getChannelCount().getViewsDay();
+		}
+		return totalView;
+	}
+	
+	public int getViewsMonthTotal() {
+		Integer totalView=0;
+		List<Channel> list = new ArrayList<Channel>();
+		addChildToList(list, this, true);
+		for(Channel c:list){
+			totalView+=c.getChannelCount().getViewsMonth();
+		}
+		return totalView;
+	}
+	
+	public int getViewsWeekTotal() {
+		Integer totalView=0;
+		List<Channel> list = new ArrayList<Channel>();
+		addChildToList(list, this, true);
+		for(Channel c:list){
+			totalView+=c.getChannelCount().getViewsWeek();
+		}
+		return totalView;
+	}
+	
+	private static void addChildToList(List<Channel> list, Channel channel, boolean hasContentOnly) {
+		list.add(channel);
+		Set<Channel> child = channel.getChild();
+		for (Channel c : child) {
+			if (hasContentOnly) {
+				if (c.getHasContent()) {
+					addChildToList(list, c,  hasContentOnly);
+				}
+			} else {
+				addChildToList(list, c, hasContentOnly);
+			}
+		}
+	}
+	
 	/**
 	 * 获得栏目终审级别
 	 * 
@@ -379,7 +445,6 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 	}
 
 	public String getTplContentOrDef(CmsModel contentModel) {
-		//原 栏目配置内容模板
 		/*
 		String tpl = getTplContent();
 		if (!StringUtils.isBlank(tpl)) {
@@ -396,7 +461,6 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 			String sol = getSite().getSolutionPath();
 			return contentModel.getTplContent(sol, true);
 		}
-		
 	}
 
 	public Integer[] getUserIds() {
@@ -524,7 +588,7 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 		}
 		return null;
 	}
-	
+
 	public void init() {
 		if (getPriority() == null) {
 			setPriority(10);
@@ -758,6 +822,24 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 			return null;
 		}
 	}
+	
+	public Boolean getAllowShare() {
+		ChannelExt ext = getChannelExt();
+		if (ext != null) {
+			return ext.getAllowShare();
+		} else {
+			return null;
+		}
+	}
+	
+	public Boolean getAllowScore() {
+		ChannelExt ext = getChannelExt();
+		if (ext != null) {
+			return ext.getAllowScore();
+		} else {
+			return null;
+		}
+	}
 
 	public Boolean getBlank() {
 		ChannelExt ext = getChannelExt();
@@ -886,6 +968,17 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 		}
 		return ids;
 	}
+	
+	public  void removeViewGroup(CmsGroup group) {
+		Set<CmsGroup>viewGroups=getViewGroups();
+		viewGroups.remove(group);
+	}
+	
+	public  void removeContriGroup(CmsGroup group) {
+		Set<CmsGroup>contriGroups=getContriGroups();
+		contriGroups.remove(group);
+	}
+	
 
 	/* [CONSTRUCTOR MARKER BEGIN] */
 	public Channel() {
@@ -903,7 +996,7 @@ public class Channel extends BaseChannel implements HibernateTree<Integer>,
 	 * Constructor for required fields
 	 */
 	public Channel(java.lang.Integer id,
-			com.jeecms.cms.entity.main.CmsSite site,
+			com.jeecms.core.entity.CmsSite site,
 			com.jeecms.cms.entity.main.CmsModel model, java.lang.Integer lft,
 			java.lang.Integer rgt, java.lang.Integer priority,
 			java.lang.Boolean hasContent, java.lang.Boolean display) {

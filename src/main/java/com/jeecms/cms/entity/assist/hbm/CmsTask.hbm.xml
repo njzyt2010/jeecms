@@ -125,10 +125,10 @@
 			not-null="true"
 			length="19"
 		/>
-		<many-to-one name="user" column="user_id" class="com.jeecms.cms.entity.main.CmsUser" not-null="true"></many-to-one>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"></many-to-one>
+		<many-to-one name="user" column="user_id" class="com.jeecms.core.entity.CmsUser" not-null="true"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"></many-to-one>
 	
-		<map name="attr" table="jc_task_attr"  lazy="false">
+		<map name="attr" table="jc_task_attr" lazy="false">
 			<cache usage="read-write"/>
 			<key column="task_id" not-null="true"/>
 			<map-key column="param_name" type="string" length="30"/>

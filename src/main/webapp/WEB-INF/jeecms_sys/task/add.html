@@ -30,64 +30,64 @@ $(function() {
 		$(this).hide();
 	});
 	$("#attr_channel_id").parent().hide();
-	$("#attr_channel_id").attr("disabled","disabled");
+	$("#attr_channel_id").prop("disabled","disabled");
 	controlInput(1);
 });
 function selectTaskType(){
 	var type=$("#type").val();
 	$("#acqu").hide();
-	$("#attr_acqu_id").attr("disabled","disabled");
+	$("#attr_acqu_id").prop("disabled","disabled");
 	$("#floderTable").hide();
 	$("#ftp").hide();
-	$("#attr_ftp_id").attr("disabled","disabled");
+	$("#attr_ftp_id").prop("disabled","disabled");
 	$("#attr_channel_id").parent().hide();
-	$("#attr_channel_id").attr("disabled","disabled");
+	$("#attr_channel_id").prop("disabled","disabled");
 	if(type==1){
 		$("#jobClass").val("com.jeecms.cms.task.job.IndexStaticJob");
 	}else if(type==2){
 		$("#jobClass").val("com.jeecms.cms.task.job.ChannelStaticJob");
 		$("#attr_channel_id").parent().show();
-		$("#attr_channel_id").attr("disabled","");
+		$("#attr_channel_id").prop("disabled","");
 	}else if(type==3){
 		$("#jobClass").val("com.jeecms.cms.task.job.ContentStaticJob");
 		$("#attr_channel_id").parent().show();
-		$("#attr_channel_id").attr("disabled","");
+		$("#attr_channel_id").prop("disabled","");
 	}else if(type==4){
 		$("#jobClass").val("com.jeecms.cms.task.job.AcquisiteJob");
 		$("#acqu").show();
-		$("#attr_acqu_id").attr("disabled","");
+		$("#attr_acqu_id").prop("disabled","");
 	}else if(type==5){
 		$("#jobClass").val("com.jeecms.cms.task.job.DistributeJob");
 		$("#floderTable").show();
 		$("#ftp").show();
-		$("#attr_ftp_id").attr("disabled","");
+		$("#attr_ftp_id").prop("disabled","");
 	}
 }
 function execycleSelect(){
 	var execycleValue=1;
 	$("input[name='execycle']").each(function(){
-		if($(this).attr("checked")){
+		if($(this).prop("checked")){
 			execycleValue=$(this).val();
 		}
 	});
 	if(execycleValue==1){
-		$("#dayOfMonthInput").attr("disabled","");
-		$("#dayOfWeekInput").attr("disabled","");
-		$("#hourInput").attr("disabled","");
-		$("#minuteInput").attr("disabled","");
-		$("#intervalHourInput").attr("disabled","");
-		$("#intervalMinuteInput").attr("disabled","");
-		$("#intervalUnit").attr("disabled","");
-		$("#cronExpression").attr("disabled","disabled");
+		$("#dayOfMonthInput").prop("disabled","");
+		$("#dayOfWeekInput").prop("disabled","");
+		$("#hourInput").prop("disabled","");
+		$("#minuteInput").prop("disabled","");
+		$("#intervalHourInput").prop("disabled","");
+		$("#intervalMinuteInput").prop("disabled","");
+		$("#intervalUnit").prop("disabled","");
+		$("#cronExpression").prop("disabled","disabled");
 	}else{
-		$("#dayOfMonthInput").attr("disabled","disabled");
-		$("#dayOfWeekInput").attr("disabled","disabled");
-		$("#hourInput").attr("disabled","disabled");
-		$("#minuteInput").attr("disabled","disabled");
-		$("#intervalHourInput").attr("disabled","disabled");
-		$("#intervalMinuteInput").attr("disabled","disabled");
-		$("#intervalUnit").attr("disabled","disabled");
-		$("#cronExpression").attr("disabled","");
+		$("#dayOfMonthInput").prop("disabled","disabled");
+		$("#dayOfWeekInput").prop("disabled","disabled");
+		$("#hourInput").prop("disabled","disabled");
+		$("#minuteInput").prop("disabled","disabled");
+		$("#intervalHourInput").prop("disabled","disabled");
+		$("#intervalMinuteInput").prop("disabled","disabled");
+		$("#intervalUnit").prop("disabled","disabled");
+		$("#cronExpression").prop("disabled","");
 	}
 }
 function selectUnit(){
@@ -99,33 +99,33 @@ function controlInput(intervalUnitValue){
 		$(this).hide();
 	});
 	$("input[id$='Input']").each(function(){
-		$(this).attr("disabled","disabled");
+		$(this).prop("disabled","disabled");
 	});
 	if(intervalUnitValue==1){
 		$("#intervalMinuteSpan").show();
-		$("#intervalMinuteInput").attr("disabled","");
+		$("#intervalMinuteInput").prop("disabled","");
 	}else if(intervalUnitValue==2){
 		$("#intervalHourSpan").show();
-		$("#intervalHourInput").attr("disabled","");
+		$("#intervalHourInput").prop("disabled","");
 	}else if(intervalUnitValue==3){
 		$("#hourSpan").show();
 		$("#minuteSpan").show();
-		$("#hourInput").attr("disabled","");
-		$("#minuteInput").attr("disabled","");
+		$("#hourInput").prop("disabled","");
+		$("#minuteInput").prop("disabled","");
 	}else if(intervalUnitValue==4){
 		$("#dayOfWeekSpan").show();
 		$("#hourSpan").show();
 		$("#minuteSpan").show();
-		$("#dayOfWeekInput").attr("disabled","");
-		$("#hourInput").attr("disabled","");
-		$("#minuteInput").attr("disabled","");
+		$("#dayOfWeekInput").prop("disabled","");
+		$("#hourInput").prop("disabled","");
+		$("#minuteInput").prop("disabled","");
 	}else if(intervalUnitValue==5){
 		$("#dayOfMonthSpan").show();
 		$("#hourSpan").show();
 		$("#minuteSpan").show();
-		$("#dayOfMonthInput").attr("disabled","");
-		$("#hourInput").attr("disabled","");
-		$("#minuteInput").attr("disabled","");
+		$("#dayOfMonthInput").prop("disabled","");
+		$("#hourInput").prop("disabled","");
+		$("#minuteInput").prop("disabled","");
 	}
 }
 </script>

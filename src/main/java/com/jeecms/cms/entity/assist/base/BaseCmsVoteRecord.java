@@ -69,7 +69,7 @@ public abstract class BaseCmsVoteRecord  implements Serializable {
 	private java.lang.String cookie;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsUser user;
+	private com.jeecms.core.entity.CmsUser user;
 	private com.jeecms.cms.entity.assist.CmsVoteTopic topic;
 
 
@@ -147,7 +147,7 @@ public abstract class BaseCmsVoteRecord  implements Serializable {
 	/**
 	 * Return the value associated with the column: user_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getUser () {
+	public com.jeecms.core.entity.CmsUser getUser () {
 		return user;
 	}
 
@@ -155,7 +155,7 @@ public abstract class BaseCmsVoteRecord  implements Serializable {
 	 * Set the value related to the column: user_id
 	 * @param user the user_id value
 	 */
-	public void setUser (com.jeecms.cms.entity.main.CmsUser user) {
+	public void setUser (com.jeecms.core.entity.CmsUser user) {
 		this.user = user;
 	}
 

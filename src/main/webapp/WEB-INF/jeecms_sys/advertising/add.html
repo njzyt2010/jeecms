@@ -93,8 +93,13 @@ function showAttr(value) {
 	<textarea name="code" rows="7" cols="60" maxlength="655350"></textarea>
 </div>
 </@p.td><@p.tr/>
-<@p.text colspan="1" width="50" label="cmsAdvertising.startTime" name="startTime" style="width:120px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate"/>
-<@p.text colspan="1" width="50" label="cmsAdvertising.endTime" name="endTime" style="width:120px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate"/><@p.tr/>
+<@p.td colspan="1" width="50" label="cmsAdvertising.startTime">
+<input  name="startTime" id="startTime" style="width:120px"  onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endTime\')}'})" class="Wdate"/>
+</@p.td>
+<@p.td colspan="1" width="50" label="cmsAdvertising.endTime">
+<input name="endTime" id="endTime" style="width:120px"   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startTime\')}'})" class="Wdate"/>
+</@p.td>
+<@p.tr/>
 <@p.text colspan="1" width="50" label="cmsAdvertising.clickCount" name="clickCount" value="0" required="true" class="required digits" style="width:70px"/>
 <@p.text colspan="1" width="50" label="cmsAdvertising.displayCount" name="displayCount" value="0" required="true" class="required digits" style="width:70px"/><@p.tr/>
 <@p.text colspan="1" width="50" label="cmsAdvertising.weight" name="weight" value="1" required="true" class="required digits" style="width:70px"/>

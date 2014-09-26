@@ -51,7 +51,7 @@ public abstract class BaseContent  implements Serializable {
 	 */
 	public BaseContent (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.util.Date sortDate,
 		java.lang.Byte topLevel,
 		java.lang.Boolean hasTitleImg,
@@ -95,6 +95,7 @@ public abstract class BaseContent  implements Serializable {
 	private java.lang.Short commentsDay;
 	private java.lang.Short downloadsDay;
 	private java.lang.Short upsDay;
+	private java.lang.Integer score;
 
 	// one to one
 	private com.jeecms.cms.entity.main.ContentExt contentExt;
@@ -102,25 +103,27 @@ public abstract class BaseContent  implements Serializable {
 
 	// many to one
 	private com.jeecms.cms.entity.main.ContentType type;
-	private com.jeecms.cms.entity.main.CmsSite site;
-	private com.jeecms.cms.entity.main.CmsUser user;
+	private com.jeecms.core.entity.CmsSite site;
+	private com.jeecms.core.entity.CmsUser user;
 	private com.jeecms.cms.entity.main.Channel channel;
 	private com.jeecms.cms.entity.main.CmsModel model;
 
 	// collections
 	private java.util.Set<com.jeecms.cms.entity.main.Channel> channels;
 	private java.util.Set<com.jeecms.cms.entity.main.CmsTopic> topics;
-	private java.util.Set<com.jeecms.cms.entity.main.CmsGroup> viewGroups;
+	private java.util.Set<com.jeecms.core.entity.CmsGroup> viewGroups;
 	private java.util.List<com.jeecms.cms.entity.main.ContentTag> tags;
 	private java.util.List<com.jeecms.cms.entity.main.ContentPicture> pictures;
 	private java.util.List<com.jeecms.cms.entity.main.ContentAttachment> attachments;
 	private java.util.Set<com.jeecms.cms.entity.main.ContentTxt> contentTxtSet;
 	private java.util.Set<com.jeecms.cms.entity.main.ContentCheck> contentCheckSet;
 	private java.util.Map<java.lang.String, java.lang.String> attr;
-	private java.util.Set<com.jeecms.cms.entity.main.CmsUser> collectUsers;
+	private java.util.Set<com.jeecms.core.entity.CmsUser> collectUsers;
 	private java.util.Set<com.jeecms.cms.entity.assist.CmsComment> comments;
 	private java.util.Set<com.jeecms.cms.entity.assist.CmsFile> files;
 	private java.util.Set<com.jeecms.cms.entity.assist.CmsJobApply> jobApplys;
+	private java.util.Set<com.jeecms.cms.entity.assist.CmsScoreRecord> scoreRecordSet;
+	
 
 
 
@@ -266,14 +269,26 @@ public abstract class BaseContent  implements Serializable {
 	public void setFiles(java.util.Set<com.jeecms.cms.entity.assist.CmsFile> files) {
 		this.files = files;
 	}
-
+	
 	public java.util.Set<com.jeecms.cms.entity.assist.CmsJobApply> getJobApplys() {
-		return jobApplys;
+			return jobApplys;
+	}
+	
+	public void setJobApplys(
+				java.util.Set<com.jeecms.cms.entity.assist.CmsJobApply> jobApplys) {
+			this.jobApplys = jobApplys;
+	}
+	
+
+	
+
+	public java.util.Set<com.jeecms.cms.entity.assist.CmsScoreRecord> getScoreRecordSet() {
+		return scoreRecordSet;
 	}
 
-	public void setJobApplys(
-			java.util.Set<com.jeecms.cms.entity.assist.CmsJobApply> jobApplys) {
-		this.jobApplys = jobApplys;
+	public void setScoreRecordSet(
+			java.util.Set<com.jeecms.cms.entity.assist.CmsScoreRecord> scoreRecordSet) {
+		this.scoreRecordSet = scoreRecordSet;
 	}
 
 	/**
@@ -306,7 +321,15 @@ public abstract class BaseContent  implements Serializable {
 	public void setUpsDay (java.lang.Short upsDay) {
 		this.upsDay = upsDay;
 	}
+	
 
+	public java.lang.Integer getScore() {
+		return score;
+	}
+
+	public void setScore(java.lang.Integer score) {
+		this.score = score;
+	}
 
 	/**
 	 * Return the value associated with the column: contentExt
@@ -359,7 +382,7 @@ public abstract class BaseContent  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -367,7 +390,7 @@ public abstract class BaseContent  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 
@@ -375,7 +398,7 @@ public abstract class BaseContent  implements Serializable {
 	/**
 	 * Return the value associated with the column: user_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getUser () {
+	public com.jeecms.core.entity.CmsUser getUser () {
 		return user;
 	}
 
@@ -383,7 +406,7 @@ public abstract class BaseContent  implements Serializable {
 	 * Set the value related to the column: user_id
 	 * @param user the user_id value
 	 */
-	public void setUser (com.jeecms.cms.entity.main.CmsUser user) {
+	public void setUser (com.jeecms.core.entity.CmsUser user) {
 		this.user = user;
 	}
 
@@ -411,6 +434,7 @@ public abstract class BaseContent  implements Serializable {
 		this.model = model;
 	}
 
+
 	/**
 	 * Return the value associated with the column: channels
 	 */
@@ -425,7 +449,6 @@ public abstract class BaseContent  implements Serializable {
 	public void setChannels (java.util.Set<com.jeecms.cms.entity.main.Channel> channels) {
 		this.channels = channels;
 	}
-
 
 	/**
 	 * Return the value associated with the column: topics
@@ -446,7 +469,7 @@ public abstract class BaseContent  implements Serializable {
 	/**
 	 * Return the value associated with the column: viewGroups
 	 */
-	public java.util.Set<com.jeecms.cms.entity.main.CmsGroup> getViewGroups () {
+	public java.util.Set<com.jeecms.core.entity.CmsGroup> getViewGroups () {
 		return viewGroups;
 	}
 
@@ -454,7 +477,7 @@ public abstract class BaseContent  implements Serializable {
 	 * Set the value related to the column: viewGroups
 	 * @param viewGroups the viewGroups value
 	 */
-	public void setViewGroups (java.util.Set<com.jeecms.cms.entity.main.CmsGroup> viewGroups) {
+	public void setViewGroups (java.util.Set<com.jeecms.core.entity.CmsGroup> viewGroups) {
 		this.viewGroups = viewGroups;
 	}
 
@@ -537,8 +560,6 @@ public abstract class BaseContent  implements Serializable {
 	public void setContentCheckSet (java.util.Set<com.jeecms.cms.entity.main.ContentCheck> contentCheckSet) {
 		this.contentCheckSet = contentCheckSet;
 	}
-
-
 	/**
 	 * Return the value associated with the column: attr
 	 */
@@ -547,12 +568,12 @@ public abstract class BaseContent  implements Serializable {
 	}
 	
 
-	public java.util.Set<com.jeecms.cms.entity.main.CmsUser> getCollectUsers() {
+	public java.util.Set<com.jeecms.core.entity.CmsUser> getCollectUsers() {
 		return collectUsers;
 	}
 
 	public void setCollectUsers(
-			java.util.Set<com.jeecms.cms.entity.main.CmsUser> collectUsers) {
+			java.util.Set<com.jeecms.core.entity.CmsUser> collectUsers) {
 		this.collectUsers = collectUsers;
 	}
 	

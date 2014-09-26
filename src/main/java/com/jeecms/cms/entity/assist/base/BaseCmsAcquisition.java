@@ -13,7 +13,6 @@ import java.io.Serializable;
  */
 
 public abstract class BaseCmsAcquisition  implements Serializable {
-
 	public static String REF = "CmsAcquisition";
 	public static String PROP_USER = "user";
 	public static String PROP_LINK_START = "linkStart";
@@ -68,9 +67,9 @@ public abstract class BaseCmsAcquisition  implements Serializable {
 	 */
 	public BaseCmsAcquisition (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsUser user,
+		com.jeecms.core.entity.CmsUser user,
 		com.jeecms.cms.entity.main.ContentType type,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		com.jeecms.cms.entity.main.Channel channel,
 		java.lang.String name,
 		java.lang.Integer status,
@@ -152,9 +151,9 @@ public abstract class BaseCmsAcquisition  implements Serializable {
 	private java.lang.Integer queue;
 
 	// many to one
-	private com.jeecms.cms.entity.main.CmsUser user;
+	private com.jeecms.core.entity.CmsUser user;
 	private com.jeecms.cms.entity.main.ContentType type;
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsSite site;
 	private com.jeecms.cms.entity.main.Channel channel;
 
 
@@ -755,7 +754,7 @@ public abstract class BaseCmsAcquisition  implements Serializable {
 	/**
 	 * Return the value associated with the column: user_id
 	 */
-	public com.jeecms.cms.entity.main.CmsUser getUser () {
+	public com.jeecms.core.entity.CmsUser getUser () {
 		return user;
 	}
 
@@ -763,7 +762,7 @@ public abstract class BaseCmsAcquisition  implements Serializable {
 	 * Set the value related to the column: user_id
 	 * @param user the user_id value
 	 */
-	public void setUser (com.jeecms.cms.entity.main.CmsUser user) {
+	public void setUser (com.jeecms.core.entity.CmsUser user) {
 		this.user = user;
 	}
 
@@ -787,7 +786,7 @@ public abstract class BaseCmsAcquisition  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -795,7 +794,7 @@ public abstract class BaseCmsAcquisition  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

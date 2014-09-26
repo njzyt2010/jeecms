@@ -5,8 +5,8 @@ import java.util.Set;
 
 import com.jeecms.cms.entity.assist.CmsVoteSubTopic;
 import com.jeecms.cms.entity.assist.CmsVoteTopic;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsUser;
 
 public interface CmsVoteTopicMng {
 	public Pagination getPage(Integer siteId, int pageNo, int pageSize);

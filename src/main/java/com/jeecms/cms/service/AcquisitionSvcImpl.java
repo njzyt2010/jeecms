@@ -1,19 +1,13 @@
 package com.jeecms.cms.service;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,18 +28,16 @@ import com.jeecms.cms.entity.assist.CmsAcquisition;
 import com.jeecms.cms.entity.assist.CmsAcquisitionHistory;
 import com.jeecms.cms.entity.assist.CmsAcquisitionTemp;
 import com.jeecms.cms.entity.assist.CmsAcquisition.AcquisitionResultType;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.entity.main.ContentCount;
 import com.jeecms.cms.manager.assist.CmsAcquisitionHistoryMng;
 import com.jeecms.cms.manager.assist.CmsAcquisitionMng;
 import com.jeecms.cms.manager.assist.CmsAcquisitionTempMng;
-import com.jeecms.cms.manager.main.CmsConfigMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
 import com.jeecms.cms.manager.main.ContentCountMng;
-import com.jeecms.common.file.FileNameUtils;
-import com.jeecms.common.upload.UploadUtils;
-import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.common.image.ImageUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsConfigMng;
+import com.jeecms.core.manager.CmsSiteMng;
 
 @Service
 public class AcquisitionSvcImpl implements AcquisitionSvc {
@@ -79,7 +71,7 @@ public class AcquisitionSvcImpl implements AcquisitionSvc {
 	@Autowired
 	private CmsConfigMng cmsConfigMng;
 	@Autowired
-	private RealPathResolver realPathResolver;
+	private ImageSvc imgSvc;
 	@Autowired
 	private ContentCountMng contentCountMng;
 
@@ -268,12 +260,15 @@ public class AcquisitionSvcImpl implements AcquisitionSvc {
 				String txt = html.substring(start, end);
 
 				if(acqu.getImgAcqu()){
-					List<String>imgUrls=getImageSrc(txt);
+					List<String>imgUrls=ImageUtils.getImageSrc(txt);
 					for(String img:imgUrls){
+						String imgRealUrl;
 						if(StringUtils.isNotBlank(acqu.getImgPrefix())){
-							img=acqu.getImgPrefix()+img;
+							imgRealUrl=acqu.getImgPrefix()+img;
+						}else{
+							imgRealUrl=img;
 						}
-						txt=txt.replace(img, saveImg(img,contextPath,uploadPath));
+						txt=txt.replace(img, imgSvc.crawlImg(imgRealUrl,acqu.getSite()));
 					}
 				}
 				
@@ -399,40 +394,7 @@ public class AcquisitionSvcImpl implements AcquisitionSvc {
 			}
 		}
 
-		private   List<String> getImageSrc(String htmlCode) {  
-	        List<String> imageSrcList = new ArrayList<String>();  
-	        String regular="<img(.*?)src=\"(.*?)\"";  
-	        String img_pre="(?i)<img(.*?)src=\"";
-	        String img_sub="\"";
-	        Pattern p=Pattern.compile(regular,Pattern.CASE_INSENSITIVE);
-	        Matcher m = p.matcher(htmlCode);  
-	        String src = null;  
-	        while (m.find()) {  
-	        	src=m.group();
-	        	src=src.replaceAll(img_pre, "").replaceAll(img_sub, "").trim();
-	            imageSrcList.add(src);  
-	        }  
-	        return imageSrcList;  
-	    }
 		
-		private String saveImg(String imgUrl,String contextPath,String uploadPath) {
-			HttpClient client = new DefaultHttpClient();
-			String outFileName="";
-			try{
-				HttpGet httpget = new HttpGet(new URI(imgUrl));
-				HttpResponse response = client.execute(httpget);
-				InputStream is = null;
-				OutputStream os = null;
-				HttpEntity entity = null;
-				entity = response.getEntity();
-				is = entity.getContent();
-				outFileName=UploadUtils.generateFilename(uploadPath, FileNameUtils.getFileSufix(imgUrl));
-				os = new FileOutputStream(realPathResolver.get(outFileName));
-				IOUtils.copy(is, os);
-			}catch (Exception e) {
-			}
-			return contextPath+outFileName;
-		}
 		
 		private Content handerResult(CmsAcquisitionTemp temp,
 				CmsAcquisitionHistory history, String title,

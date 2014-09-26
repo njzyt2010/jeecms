@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsSensitivity;
 import com.jeecms.cms.manager.assist.CmsSensitivityMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
 
 @Controller
 public class CmsSensitivityAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsSensitivityAct.class);
 
+	@RequiresPermissions("sensitivity:v_list")
 	@RequestMapping("/sensitivity/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		List<CmsSensitivity> list = manager.getList(false);
@@ -28,6 +30,7 @@ public class CmsSensitivityAct {
 		return "sensitivity/list";
 	}
 
+	@RequiresPermissions("sensitivity:o_save")
 	@RequestMapping("/sensitivity/o_save.do")
 	public String save(CmsSensitivity bean, HttpServletRequest request,
 			ModelMap model) {
@@ -43,6 +46,7 @@ public class CmsSensitivityAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("sensitivity:o_update")
 	@RequestMapping("/sensitivity/o_update.do")
 	public String update(Integer[] id, String[] search, String[] replacement,
 			HttpServletRequest request, ModelMap model) {
@@ -57,6 +61,7 @@ public class CmsSensitivityAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("sensitivity:o_delete")
 	@RequestMapping("/sensitivity/o_delete.do")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			ModelMap model) {

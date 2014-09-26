@@ -7,6 +7,7 @@
 <script type="text/javascript">
 $(function() {
 	$("#jvForm").validate();
+	$(document).tooltip();
 	//模型模板对话框
 	$("#modelTplDialog").dialog({
 		autoOpen: false,
@@ -68,12 +69,12 @@ function appendModelTpl(modelId,tpl){
 <#if !item.single><#assign count=count+1/></#if>
 <#if !item.custom>
 
-<#if item.field=="name" >
-<@p.text value="${item.defValue!}" required="true" class="required" maxlength="100" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label  name=item.field  colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/>
-<#if count%2==0><@p.tr/></#if>
+<#if item.field=="name">
+<@p.text value="${item.defValue!}" required="true" class="required" maxlength="100" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="path">
-<@p.text value="${item.defValue!}" required="true" class="required" maxlength="30" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+<#assign channelPathExist><@s.m "error.channelPathExist"/></#assign>
+<@p.text value="${item.defValue!}"  required="true"  vld="{required:true,path:true,remote:'v_check_path.do',messages:{remote:'${channelPathExist}'}}"  maxlength="30" size="${item.size!}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="title">
 <@p.text value="${item.defValue!}" maxlength="255" size="${item.size!35}" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
@@ -92,14 +93,13 @@ function appendModelTpl(modelId,tpl){
 <@p.button id="openModelTplDialog" value="${item.label!}"  name=item.field  /><@s.m "channel.modelTpl.help"/>
 </@p.td><#if count%2==0><@p.tr/></#if>
 
-
 <#elseif item.field=="channelStatic">
 <@p.td label=item.label colspan="2" width="100">
 <label><input type="checkbox" onclick="$('#staticChannel').val(this.checked)"/><@s.m "channel.staticOn"/><input type="hidden" id="staticChannel" name="staticChannel" value="false"/></label>
 <input type="text" name="channelRule" style="width:220px"/>
 <label><input type="checkbox" onclick="$('#accessByDir').val(this.checked)"/><@s.m "channel.accessByDir"/><input type="hidden" id="accessByDir" name="accessByDir" value="false"/></label>
 <label><input type="checkbox" onclick="$('#listChild').val(this.checked)"/><@s.m "channel.listChild"/><input type="hidden" id="listChild" name="listChild" value="false"/></label>
-&nbsp;<@s.m "channel.pageSize"/>:<input type="text" name="pageSize" value="20" style="width:40px" class="digits" maxlength="5"/>
+&nbsp;<@s.m "channel.pageSize"/>:<input type="text" name="pageSize" value="10" style="width:40px" class="digits" maxlength="5"/>
 </@p.td><@p.tr/>
 
 <#elseif item.field=="contentStatic">
@@ -148,6 +148,12 @@ function appendModelTpl(modelId,tpl){
 <#elseif item.field=="allowUpdown">
 <@p.radio value="true" list={"true":"global.allow","false":"global.notAllow"} help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
+<#elseif item.field=="allowShare">
+<@p.radio value="false" list={"true":"global.allow","false":"global.notAllow"} help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+
+<#elseif item.field=="allowScore">
+<@p.radio value="false" list={"true":"global.allow","false":"global.notAllow"} help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+
 <#elseif item.field=="viewGroupIds">
 <@p.checkboxlist valueList=viewGroupIds list=viewGroups listKey="id" listValue="name" help=item.help helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
@@ -159,7 +165,7 @@ function appendModelTpl(modelId,tpl){
 
 <#elseif item.field=="link">
 <#assign h><#if item.help??>${item.help}<#else><@s.m "content."+item.field+".help"/></#if></#assign>
-<@p.text value=item.defValue maxlength="255" size="${item.size!35}" help="${h}" helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
+<@p.text value=item.defValue title="channelLink.tip.title" maxlength="255" size="${item.size!35}" help="${h}" helpPosition="${item.helpPosition!2}" label=item.label name=item.field colspan=item.single?string("2","1") width="${item.single?string(100,50)}"/><#if count%2==0><@p.tr/></#if>
 
 <#elseif item.field=="titleImg">
 <@p.td label=item.label colspan="1" width="50" noHeight="true">
@@ -226,7 +232,6 @@ function appendModelTpl(modelId,tpl){
 </select><br/>
 </#list>
 </div>
-
 </div>
 </body>
 </html>

@@ -18,6 +18,8 @@ public interface CmsAcquisitionHistoryDao {
 	public CmsAcquisitionHistory updateByUpdater(Updater<CmsAcquisitionHistory> updater);
 
 	public CmsAcquisitionHistory deleteById(Integer id);
+	
+	public void deleteByAcquisition(Integer acquId);
 
 	public Boolean checkExistByProperties(Boolean title, String value);
 }

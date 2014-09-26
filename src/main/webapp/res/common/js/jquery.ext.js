@@ -1,5 +1,6 @@
 $.metadata.setType("attr", "vld");
-
+//允许传统传递数组参数
+jQuery.ajaxSettings.traditional = true;
 $.validator.AlertError = {
 	invalidHandler : function(form, validator) {
 		var errors = validator.numberOfInvalids();
@@ -44,6 +45,83 @@ $.extend($.validator.messages, {
 	min : $.format("该项不能小于 {0}"),
 	username : "只能输入字符、数字、中文、和 _ - @ 的组合",
 	path : "只能输入字符和数字的组合"
+});
+$.extend({
+	 confirm: function(callback,title,msg) {
+	 if(title==null){title="确认"};
+	 if(msg==null){msg="确认删除?"};
+	 $("BODY").append("<div id='dialog-message' title='"+title+"'><p>"+msg+"</p></div>");
+	 $("#dialog-message").dialog({
+				modal: true,
+				resizable:false,
+				position:'center',
+				buttons: {
+					确认: function() {
+						$(this).dialog( "close" );
+						$("#dialog-message").remove();
+						callback();
+					},
+					取消:function(){
+						$(this).dialog( "close" );
+						$("#dialog-message").remove();
+					}
+				}
+			});
+		$("#dialog-message").dialog('open');
+	},
+	confirmToUrl: function(url,title,msg) {
+		if(title==null){title="确认"};
+		if(msg==null){msg="确认删除?"};
+		 $("BODY").append("<div id='dialog-message' title='"+title+"'><p>"+msg+"</p></div>");
+		 $("#dialog-message").dialog({
+					modal: true,
+					resizable:false,
+					position:'center',
+					buttons: {
+						确认: function() {
+							$(this).dialog( "close" );
+							$("#dialog-message").remove();
+							window.location.href=url;
+						},
+						取消:function(){
+							$(this).dialog( "close" );
+							$("#dialog-message").remove();
+						}
+					}
+				});
+		$("#dialog-message").dialog('open');
+	},
+	alert: function(title,msg) {  
+		 if(title==null){title="提示"};
+		 $("body").append("<div id='dialog-message' title='"+title+"'><p>"+msg+"</p></div>");
+		 $("#dialog-message").dialog({
+					modal: true,
+					resizable:false,
+					position:'center',
+					buttons: {
+						确定: function() {
+							$(this).dialog( "close" );
+							$("#dialog-message").remove();
+						}
+					}
+				});
+			$("#dialog-message").dialog('open');
+	},
+	alertInParent:function(title,msg){    
+	    window.parent.jQuery("body").append("<div id='dialog-message' title='"+title+"'><p>"+msg+"</p></div>");     
+	    var dialog=window.parent.jQuery("#dialog-message");     
+	    dialog.dialog({
+			modal: true,
+			resizable:false,
+			position:'center',
+			buttons: {
+				确定: function() {
+	    			dialog.dialog( "close" );
+					dialog.remove();
+				}
+			}
+		});   
+	}
 });
 
 $.fn.extend( {

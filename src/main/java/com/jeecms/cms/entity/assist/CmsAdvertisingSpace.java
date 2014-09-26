@@ -24,7 +24,7 @@ public class CmsAdvertisingSpace extends BaseCmsAdvertisingSpace {
 	 */
 	public CmsAdvertisingSpace (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String name,
 		java.lang.Boolean enabled) {
 

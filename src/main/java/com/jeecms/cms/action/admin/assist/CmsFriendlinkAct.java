@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsFriendlink;
 import com.jeecms.cms.entity.assist.CmsFriendlinkCtg;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsFileMng;
 import com.jeecms.cms.manager.assist.CmsFriendlinkCtgMng;
 import com.jeecms.cms.manager.assist.CmsFriendlinkMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsFriendlinkAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsFriendlinkAct.class);
 
+	@RequiresPermissions("friendlink:v_list")
 	@RequestMapping("/friendlink/v_list.do")
 	public String list(Integer queryCtgId, HttpServletRequest request,
 			ModelMap model) {
@@ -42,6 +44,7 @@ public class CmsFriendlinkAct {
 		return "friendlink/list";
 	}
 
+	@RequiresPermissions("friendlink:v_add")
 	@RequestMapping("/friendlink/v_add.do")
 	public String add(ModelMap model, HttpServletRequest request) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -55,6 +58,7 @@ public class CmsFriendlinkAct {
 		return "friendlink/add";
 	}
 
+	@RequiresPermissions("friendlink:v_edit")
 	@RequestMapping("/friendlink/v_edit.do")
 	public String edit(Integer id, Integer queryCtgId,
 			HttpServletRequest request, ModelMap model) {
@@ -73,6 +77,7 @@ public class CmsFriendlinkAct {
 		return "friendlink/edit";
 	}
 
+	@RequiresPermissions("friendlink:o_save")
 	@RequestMapping("/friendlink/o_save.do")
 	public String save(CmsFriendlink bean, Integer ctgId,
 			HttpServletRequest request, ModelMap model) {
@@ -88,6 +93,7 @@ public class CmsFriendlinkAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("friendlink:o_update")
 	@RequestMapping("/friendlink/o_update.do")
 	public String update(CmsFriendlink bean, Integer ctgId, Integer queryCtgId,
 			String oldLog,
@@ -105,6 +111,7 @@ public class CmsFriendlinkAct {
 		return list(queryCtgId, request, model);
 	}
 
+	@RequiresPermissions("friendlink:o_priority")
 	@RequestMapping("/friendlink/o_priority.do")
 	public String priority(Integer[] wids, Integer[] priority,
 			Integer queryCtgId, HttpServletRequest request, ModelMap model) {
@@ -117,6 +124,7 @@ public class CmsFriendlinkAct {
 		return list(queryCtgId, request, model);
 	}
 
+	@RequiresPermissions("friendlink:o_delete")
 	@RequestMapping("/friendlink/o_delete.do")
 	public String delete(Integer[] ids, Integer queryCtgId,
 			HttpServletRequest request, ModelMap model) {

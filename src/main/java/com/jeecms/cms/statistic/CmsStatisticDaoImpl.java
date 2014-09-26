@@ -4,17 +4,13 @@ import static com.jeecms.cms.statistic.CmsStatistic.SITEID;
 import static com.jeecms.cms.statistic.CmsStatistic.ISREPLYED;
 import static com.jeecms.cms.statistic.CmsStatistic.USERID;
 import static com.jeecms.cms.statistic.CmsStatistic.CHANNELID;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
 import com.jeecms.cms.statistic.CmsStatistic.TimeRange;
 import com.jeecms.common.hibernate3.Finder;
 import com.jeecms.common.hibernate3.HibernateSimpleDao;
-import com.jeecms.common.page.Pagination;
 
 @Repository
 public class CmsStatisticDaoImpl extends HibernateSimpleDao implements
@@ -95,106 +91,6 @@ public class CmsStatisticDaoImpl extends HibernateSimpleDao implements
 			} else {
 				f.append(" and bean.replayTime is null");
 			}
-		}
-		return (Long) find(f).iterator().next();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getPvCountByGroup(Integer siteId) {
-		Finder f = createCacheableFinder("select count(*),bean.accessDate from CmsSiteFlow bean where bean.site.id=:siteId group by bean.accessDate");
-		f.setParam("siteId", siteId);
-		return find(f);
-	}
-
-	public long getPvCountByTimeRange(Integer siteId, TimeRange timeRange) {
-		Finder f = createCacheableFinder("select count(*) from CmsSiteFlow bean");
-		return byTimeRange(f, siteId, timeRange);
-	}
-	
-	public long getPvCount(Integer siteId) {
-		return getPvCountByTimeRange(siteId, null);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getUniqueIpCountByGroup(Integer siteId) {
-		Finder f = createCacheableFinder("select count(distinct bean.accessIp),bean.accessDate from CmsSiteFlow bean where bean.site.id=:siteId group by bean.accessDate");
-		f.setParam("siteId", siteId);
-		return find(f);
-	}
-
-	public long getUniqueIpCountByTimeRange(Integer siteId, TimeRange timeRange) {
-		Finder f = createCacheableFinder("select count(distinct bean.accessIp) from CmsSiteFlow bean");
-		return byTimeRange(f, siteId, timeRange);
-	}
-
-	public long getUniqueIpCount(Integer siteId) {
-		return getUniqueIpCountByTimeRange(siteId, null);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getUniqueVisitorCountByGroup(Integer siteId) {
-		Finder f = createCacheableFinder("select count(distinct bean.sessionId),bean.accessDate from CmsSiteFlow bean where bean.site.id=:siteId group by bean.accessDate");
-		f.setParam("siteId", siteId);
-		return find(f);
-	}
-
-	public long getUniqueVisitorCountByTimeRange(Integer siteId,
-			TimeRange timeRange) {
-		Finder f = createCacheableFinder("select count(distinct bean.sessionId) from CmsSiteFlow bean");
-		return byTimeRange(f, siteId, timeRange);
-	}
-
-	public long getUniqueVisitorCount(Integer siteId) {
-		return getUniqueVisitorCountByTimeRange(siteId, null);
-	}
-
-	public Pagination flowAnalysisPage(String groupCondition, Integer siteId,
-			Integer pageNo, Integer pageSize) {
-		Finder f = createCacheableFinder("select count(*),bean."
-				+ groupCondition
-				+ " from CmsSiteFlow bean where bean.site.id=:siteId group by bean."
-				+ groupCondition + " order by count(*) desc");
-		f.setParam("siteId", siteId);
-		f.setMaxResults(pageSize);
-		f.setFirstResult((pageNo - 1) * pageSize);
-		return new Pagination(pageNo, pageSize, getTotalCount(f.getOrigHql(),
-				siteId), find(f));
-	}
-
-	public void flowInit(Integer siteId, Date startDate, Date endDate) {
-		Finder f = Finder.create("delete from CmsSiteFlow bean where bean.site.id=:siteId");
-		f.setParam("siteId", siteId);
-		if (startDate != null) {
-			f.append(" and bean.accessTime >= :startDate");
-			f.setParam("startDate", startDate);
-		}
-		if (endDate != null) {
-			f.append(" and bean.accessTime <= :endDate");
-			f.setParam("endDate", endDate);
-		}
-		Query query = f.createQuery(getSession());
-		query.executeUpdate();
-	}
-
-	public long flowAnalysisTotal(Integer siteId) {
-		Finder f = createCacheableFinder("select count(*) from CmsSiteFlow bean where bean.site.id=:siteId");
-		f.setParam("siteId", siteId);
-		return (Long) find(f).iterator().next();
-	}
-
-	private int getTotalCount(String hql, Integer siteId) {
-		Finder f = createCacheableFinder(hql);
-		f.setParam("siteId", siteId);
-		return find(f).size();
-	}
-	
-	private long byTimeRange(Finder f, Integer siteId, TimeRange timeRange){
-		f.append(" where bean.site.id=:siteId").setParam("siteId", siteId);
-		if (timeRange != null) {
-			f.append(" and bean.accessTime >= :begin");
-			f.append(" and bean.accessTime < :end");
-			f.setParam("begin", timeRange.getBegin());
-			f.setParam("end", timeRange.getEnd());
 		}
 		return (Long) find(f).iterator().next();
 	}

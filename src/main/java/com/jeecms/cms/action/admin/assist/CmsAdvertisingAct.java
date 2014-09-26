@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,24 +26,25 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jeecms.cms.entity.assist.CmsAdvertising;
 import com.jeecms.cms.entity.assist.CmsAdvertisingSpace;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsAdvertisingMng;
 import com.jeecms.cms.manager.assist.CmsAdvertisingSpaceMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.upload.FileRepository;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
+import com.jeecms.core.entity.CmsSite;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.manager.CmsLogMng;
 import com.jeecms.core.manager.DbFileMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsAdvertisingAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsAdvertisingAct.class);
 
+	@RequiresPermissions("advertising:v_list")
 	@RequestMapping("/advertising/v_list.do")
 	public String list(Integer queryAdspaceId, Boolean queryEnabled,
 			Integer pageNo, HttpServletRequest request, ModelMap model) {
@@ -63,6 +65,7 @@ public class CmsAdvertisingAct {
 		return "advertising/list";
 	}
 
+	@RequiresPermissions("advertising:v_add")
 	@RequestMapping("/advertising/v_add.do")
 	public String add(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -72,6 +75,7 @@ public class CmsAdvertisingAct {
 		return "advertising/add";
 	}
 
+	@RequiresPermissions("advertising:v_edit")
 	@RequestMapping("/advertising/v_edit.do")
 	public String edit(Integer id, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -89,6 +93,7 @@ public class CmsAdvertisingAct {
 		return "advertising/edit";
 	}
 
+	@RequiresPermissions("advertising:o_save")
 	@RequestMapping("/advertising/o_save.do")
 	public String save(CmsAdvertising bean, Integer adspaceId,
 			HttpServletRequest request, ModelMap model) {
@@ -114,6 +119,7 @@ public class CmsAdvertisingAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("advertising:o_update")
 	@RequestMapping("/advertising/o_update.do")
 	public String update(Integer queryAdspaceId, Boolean queryEnabled,
 			CmsAdvertising bean, Integer adspaceId, Integer pageNo,
@@ -140,6 +146,7 @@ public class CmsAdvertisingAct {
 		return list(queryAdspaceId, queryEnabled, pageNo, request, model);
 	}
 
+	@RequiresPermissions("advertising:o_delete")
 	@RequestMapping("/advertising/o_delete.do")
 	public String delete(Integer[] ids, Integer queryAdspaceId,
 			Boolean queryEnabled, Integer pageNo, HttpServletRequest request,
@@ -157,6 +164,7 @@ public class CmsAdvertisingAct {
 		return list(queryAdspaceId, queryEnabled, pageNo, request, model);
 	}
 
+	@RequiresPermissions("advertising:o_upload_flash")
 	@RequestMapping("/advertising/o_upload_flash.do")
 	public String uploadFlash(
 			@RequestParam(value = "flashFile", required = false) MultipartFile file,

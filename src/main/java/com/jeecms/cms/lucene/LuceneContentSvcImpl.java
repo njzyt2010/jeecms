@@ -133,7 +133,7 @@ public class LuceneContentSvcImpl implements LuceneContentSvc {
 			int pageNo, int pageSize) throws CorruptIndexException,
 			IOException, ParseException {
 		Directory dir = new SimpleFSDirectory(new File(path));
-		return searchPage(dir, queryString, category,workplace,siteId, channelId, startDate,
+		return searchPage(dir, queryString,category,workplace, siteId, channelId, startDate,
 				endDate, pageNo, pageSize);
 	}
 
@@ -168,7 +168,7 @@ public class LuceneContentSvcImpl implements LuceneContentSvc {
 			int first, int max) throws CorruptIndexException, IOException,
 			ParseException {
 		Directory dir = new SimpleFSDirectory(new File(path));
-		return searchList(dir, queryString,category,workplace, siteId, channelId, startDate,
+		return searchList(dir, queryString, category,workplace,siteId, channelId, startDate,
 				endDate, first, max);
 	}
 

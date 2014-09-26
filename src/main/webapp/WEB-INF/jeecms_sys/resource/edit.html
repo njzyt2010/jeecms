@@ -15,9 +15,9 @@ function ajaxSubmit() {
 		"source" : $("#source").val()
 	}, function(data) {
 		if (data.success) {
-			alert("<@s.m "global.success.save"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'global.success.save'/>");
 		} else {
-			alert(data.msg);
+			$.alert("<@s.m 'global.prompt'/>",data.msg);
 		}
 	}, "json");
 }

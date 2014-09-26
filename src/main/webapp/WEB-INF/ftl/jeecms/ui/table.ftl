@@ -5,8 +5,8 @@
 	sytle：table的style样式。默认""。
 	width：表格的宽度。默认100%。
 -->
-<#macro table value listAction="v_list.do" class="pn-ltable" style="" theadClass="pn-lthead" tbodyClass="pn-ltbody" width="100%">
-<table class="${class}" style="${style}" width="${width}" cellspacing="1" cellpadding="0" border="0">
+<#macro table value listAction="v_list.do" class="pn-ltable" style="" theadClass="pn-lthead" tbodyClass="pn-ltbody" width="100%" cellspacing="1">
+<table class="${class}" style="${style}" width="${width}" cellspacing="${cellspacing}" cellpadding="0" border="0">
 <#if value?is_sequence><#local pageList=value/><#else><#local pageList=value.list/></#if>
 <#list pageList as row>
 <#if row_index==0>
@@ -14,7 +14,7 @@
 <thead class="${theadClass}"><tr><#nested row,i,true/></tr></thead>
 </#if>
 <#assign i=row_index has_next=row_has_next/>
-<#if row_index==0><tbody  class="${tbodyClass}"><tr onmouseover="this.bgColor='#eeeeee'" onmouseout="this.bgColor='#ffffff'"><#else><tr onmouseover="this.bgColor='#eeeeee'" onmouseout="this.bgColor='#ffffff'"></#if><#nested row,row_index,row_has_next/>
+<#if row_index==0><tbody  class="${tbodyClass}"><tr ><#else><tr ></#if><#nested row,row_index,row_has_next/>
 <#if !row_has_next>
 </tr></tbody>
 <#else>

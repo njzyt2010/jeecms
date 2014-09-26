@@ -2,38 +2,40 @@ package com.jeecms.cms.action.admin.main;
 
 import static com.jeecms.common.page.SimplePage.cpn;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsGroup;
-import com.jeecms.cms.entity.main.CmsRole;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.CmsUserExt;
-import com.jeecms.cms.entity.main.CmsUserSite;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsRole;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.CmsUserExt;
+import com.jeecms.core.entity.CmsUserSite;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * 本站管理员ACTION
- * 
  */
 @Controller
 public class CmsAdminLocalAct extends CmsAdminAbstract {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsAdminLocalAct.class);
 
+	@RequiresPermissions("admin_local:v_list")
 	@RequestMapping("/admin_local/v_list.do")
 	public String list(String queryUsername, String queryEmail,
 			Integer queryGroupId, Boolean queryDisabled, Integer pageNo,
@@ -54,6 +56,7 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 		return "admin/local/list";
 	}
 
+	@RequiresPermissions("admin_local:v_add")
 	@RequestMapping("/admin_local/v_add.do")
 	public String add(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -67,9 +70,10 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 		return "admin/local/add";
 	}
 
+	@RequiresPermissions("admin_local:v_edit")
 	@RequestMapping("/admin_local/v_edit.do")
 	public String edit(Integer id, Integer queryGroupId, Boolean queryDisabled,
-			HttpServletRequest request, ModelMap model) {
+			HttpServletRequest request,HttpServletResponse  response,ModelMap model) throws IOException {
 		CmsSite site = CmsUtils.getSite(request);
 		String queryUsername = RequestUtils.getQueryParam(request,
 				"queryUsername");
@@ -100,41 +104,44 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 		return "admin/local/edit";
 	}
 
+	@RequiresPermissions("admin_local:o_save")
 	@RequestMapping("/admin_local/o_save.do")
 	public String save(CmsUser bean, CmsUserExt ext, String username,
-			String email, String password, Boolean viewonlyAdmin,
-			Boolean selfAdmin, Integer rank, Integer groupId,
-			Integer[] roleIds, Integer[] channelIds, Byte[] steps,
-			Boolean[] allChannels, HttpServletRequest request, ModelMap model) {
+			String email, String password,Boolean selfAdmin, Integer rank, Integer groupId,
+			Integer[] roleIds, Integer[] channelIds,
+			Byte step, Boolean allChannel, HttpServletRequest request,
+			ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
 		WebErrors errors = validateSave(bean, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
 		Integer[] siteIds = new Integer[] { site.getId() };
+		Byte[] steps = new Byte[]{step};
+		Boolean[] allChannels = new Boolean[]{allChannel};
 		String ip = RequestUtils.getIpAddr(request);
-		bean = manager.saveAdmin(username, email, password, ip, viewonlyAdmin,
-				selfAdmin, rank, groupId, roleIds, channelIds, siteIds, steps,
-				allChannels, ext);
+		bean = manager.saveAdmin(username, email, password, ip, false,
+				selfAdmin, rank, groupId,roleIds, channelIds,
+				siteIds, steps, allChannels, ext);
 		log.info("save CmsAdmin id={}", bean.getId());
 		cmsLogMng.operating(request, "cmsUser.log.save", "id=" + bean.getId()
 				+ ";username=" + bean.getUsername());
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("admin_local:o_update")
 	@RequestMapping("/admin_local/o_update.do")
 	public String update(CmsUser bean, CmsUserExt ext, String password,
-			Integer groupId, Integer[] roleIds, Integer[] channelIds,
-			Byte step, Boolean allChannel, String queryUsername,
-			String queryEmail, Integer queryGroupId, Boolean queryDisabled,
-			Integer pageNo, HttpServletRequest request, ModelMap model) {
+			Integer groupId,Integer[] roleIds,Integer[] channelIds, Byte step, Boolean allChannel,
+			String queryUsername, String queryEmail, Integer queryGroupId,
+			Boolean queryDisabled, Integer pageNo, HttpServletRequest request,
+			ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
 		WebErrors errors = validateUpdate(bean.getId(),bean.getRank(), request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
-		bean = manager.updateAdmin(bean, ext, password, groupId, roleIds,
-				channelIds, site.getId(), step, allChannel);
+		bean = manager.updateAdmin(bean, ext, password, groupId,roleIds,channelIds, site.getId(), step, allChannel);
 		log.info("update CmsAdmin id={}.", bean.getId());
 		cmsLogMng.operating(request, "cmsUser.log.update", "id=" + bean.getId()
 				+ ";username=" + bean.getUsername());
@@ -142,6 +149,7 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 				pageNo, request, model);
 	}
 
+	@RequiresPermissions("admin_local:o_delete")
 	@RequestMapping("/admin_local/o_delete.do")
 	public String delete(Integer[] ids, Integer queryGroupId,
 			Boolean queryDisabled, Integer pageNo, HttpServletRequest request,
@@ -163,12 +171,14 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 				pageNo, request, model);
 	}
 
+	@RequiresPermissions("admin_local:v_channels_add")
 	@RequestMapping(value = "/admin_local/v_channels_add.do")
 	public String channelsAdd(Integer siteId, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
 		return channelsAddJson(siteId, request, response, model);
 	}
 
+	@RequiresPermissions("admin_local:v_channels_edit")
 	@RequestMapping(value = "/admin_local/v_channels_edit.do")
 	public String channelsEdit(Integer userId, Integer siteId,
 			HttpServletRequest request, HttpServletResponse response,
@@ -176,11 +186,13 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 		return channelsEditJson(userId, siteId, request, response, model);
 	}
 
+	@RequiresPermissions("admin_local:v_check_username")
 	@RequestMapping(value = "/admin_local/v_check_username.do")
 	public void checkUsername(HttpServletRequest request, HttpServletResponse response) {
-		checkUserJson(request,response);
+		checkUserJson(request, response);
 	}
 
+	@RequiresPermissions("admin_local:v_check_email")
 	@RequestMapping(value = "/admin_local/v_check_email.do")
 	public void checkEmail(String email, HttpServletResponse response) {
 		checkEmailJson(email, response);
@@ -229,7 +241,7 @@ public class CmsAdminLocalAct extends CmsAdminAbstract {
 		}
 		return false;
 	}
-	
+
 	private boolean vldParams(Integer id,Integer rank, HttpServletRequest request,
 			WebErrors errors) {
 		CmsUser user = CmsUtils.getUser(request);

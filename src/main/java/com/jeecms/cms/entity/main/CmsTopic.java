@@ -8,6 +8,16 @@ import com.jeecms.cms.entity.main.base.BaseCmsTopic;
 
 public class CmsTopic extends BaseCmsTopic {
 	private static final long serialVersionUID = 1L;
+	
+	public java.lang.String getTplContentShort (String tplBasePath) {
+		String tplContent=super.getTplContent();
+		// 当前模板，去除基本路径
+		int tplPathLength = tplBasePath.length();
+		if (!StringUtils.isBlank(tplContent)) {
+			tplContent = tplContent.substring(tplPathLength);
+		}
+		return tplContent;
+	}
 
 	/**
 	 * 获得简短名称，如果不存在则返回名称

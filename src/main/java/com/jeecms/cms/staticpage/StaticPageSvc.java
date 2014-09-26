@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.Map;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.Content;
+import com.jeecms.core.entity.CmsSite;
 
 import freemarker.template.TemplateException;
 

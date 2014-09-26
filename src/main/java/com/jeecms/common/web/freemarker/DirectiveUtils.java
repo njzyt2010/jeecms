@@ -4,6 +4,7 @@ import static org.springframework.web.servlet.view.AbstractTemplateView.SPRING_M
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -237,6 +238,20 @@ public abstract class DirectiveUtils {
 		} else {
 			throw new MustDateException(name);
 		}
+	}
+	
+	public static Set<String> getKeysByPrefix(String prefix,Map<String, TemplateModel> params) {
+		Set<String> keys = params.keySet();
+		Set<String> startWithPrefixKeys = new HashSet<String>();
+		if (keys == null) {
+			return null;
+		}
+		for(String key:keys){
+			if(key.startsWith(prefix)){
+				startWithPrefixKeys.add(key);
+			}
+		}
+		return startWithPrefixKeys;
 	}
 
 	/**

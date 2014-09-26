@@ -8,11 +8,11 @@ import com.jeecms.common.page.Pagination;
 
 public interface CmsCommentDao{
 	public Pagination getPage(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int pageNo, int pageSize, boolean cacheable);
 
 	public List<CmsComment> getList(Integer siteId, Integer contentId,
-			Integer greaterThen, Boolean checked, boolean recommend,
+			Integer greaterThen, Boolean checked, Boolean recommend,
 			boolean desc, int count, boolean cacheable);
 
 	public CmsComment findById(Integer id);

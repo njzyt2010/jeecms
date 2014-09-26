@@ -130,6 +130,8 @@ public abstract class BaseChannelExt  implements Serializable {
 	private java.lang.Integer contentImgHeight;
 	private java.lang.Integer commentControl;
 	private java.lang.Boolean allowUpdown;
+	private java.lang.Boolean allowShare;
+	private java.lang.Boolean allowScore;
 	private java.lang.Boolean blank;
 	private java.lang.String title;
 	private java.lang.String keywords;
@@ -529,6 +531,21 @@ public abstract class BaseChannelExt  implements Serializable {
 		this.allowUpdown = allowUpdown;
 	}
 
+	public java.lang.Boolean getAllowShare() {
+		return allowShare;
+	}
+
+	public void setAllowShare(java.lang.Boolean allowShare) {
+		this.allowShare = allowShare;
+	}
+
+	public java.lang.Boolean getAllowScore() {
+		return allowScore;
+	}
+
+	public void setAllowScore(java.lang.Boolean allowScore) {
+		this.allowScore = allowScore;
+	}
 
 	/**
 	 * Return the value associated with the column: is_blank

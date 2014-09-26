@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jeecms.cms.entity.assist.CmsFile;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsFileMng;
 import com.jeecms.cms.manager.assist.CmsResourceMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * JEECMS附件（包括文章图片多媒体）的Action
@@ -45,6 +46,7 @@ public class CmsFileAct {
 
 
 	// 直接调用方法需要把root参数保存至model中
+	@RequiresPermissions("file:v_list")
 	@RequestMapping(value = "/file/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -80,6 +82,7 @@ public class CmsFileAct {
 		return "file/list";
 	}
 	
+	@RequiresPermissions("file:o_delfreefiles")
 	@RequestMapping("/file/o_delfreefiles.do")
 	public String deleteUnValid(String root,
 			HttpServletRequest request, ModelMap model) {
@@ -127,6 +130,7 @@ public class CmsFileAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("file:o_delete")
 	@RequestMapping("/file/o_delete.do")
 	public String delete(String root, String[] names,
 			HttpServletRequest request, ModelMap model) {
@@ -147,6 +151,7 @@ public class CmsFileAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("file:o_delete_single")
 	@RequestMapping("/file/o_delete_single.do")
 	public String deleteSingle(HttpServletRequest request, ModelMap model) {
 		// TODO 输入验证
@@ -160,7 +165,7 @@ public class CmsFileAct {
 		return list(request, model);
 	}
 
-
+	@RequiresPermissions("file:v_upload")
 	@RequestMapping(value = "/file/v_upload.do")
 	public String uploadInput(HttpServletRequest request, ModelMap model) {
 		String root = RequestUtils.getQueryParam(request, "root");
@@ -168,6 +173,7 @@ public class CmsFileAct {
 		return "file/upload";
 	}
 
+	@RequiresPermissions("file:o_upload")
 	@RequestMapping(value = "/file/o_upload.do", method = RequestMethod.POST)
 	public String uploadSubmit(String root, HttpServletRequest request,
 			ModelMap model) {
@@ -175,6 +181,7 @@ public class CmsFileAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("file:o_swfupload")
 	@RequestMapping(value = "/file/o_swfupload.do", method = RequestMethod.POST)
 	public void swfUpload(
 			String root,
@@ -188,6 +195,8 @@ public class CmsFileAct {
 				.getOriginalFilename(), file.getSize());
 		ResponseUtils.renderText(response, "");
 	}
+	
+	@RequiresPermissions("file:o_flag_files")
 	@RequestMapping(value = "/file/o_flag_files.do")
 	public String flagOldFilesValid(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);

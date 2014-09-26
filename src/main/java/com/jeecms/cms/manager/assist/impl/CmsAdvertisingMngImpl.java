@@ -49,6 +49,8 @@ public class CmsAdvertisingMngImpl implements CmsAdvertisingMng {
 			Map<String, String> attr) {
 		Updater<CmsAdvertising> updater = new Updater<CmsAdvertising>(bean);
 		updater.include(CmsAdvertising.PROP_CODE);
+		updater.include(CmsAdvertising.PROP_START_TIME);
+		updater.include(CmsAdvertising.PROP_END_TIME);
 		bean = dao.updateByUpdater(updater);
 		bean.setAdspace(cmsAdvertisingSpaceMng.findById(adspaceId));
 		bean.getAttr().clear();

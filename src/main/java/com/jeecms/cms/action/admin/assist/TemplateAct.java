@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,38 +21,46 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jeecms.cms.Constants;
-import com.jeecms.cms.entity.main.CmsSite;
+import com.jeecms.cms.manager.assist.CmsDirectiveTplMng;
 import com.jeecms.cms.manager.assist.CmsResourceMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.util.Zipper;
 import com.jeecms.common.util.Zipper.FileEntry;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsSiteMng;
 import com.jeecms.core.tpl.Tpl;
 import com.jeecms.core.tpl.TplManager;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * JEECMS模板的Action
- * 
  */
-// TODO 验证path必须以TPL_BASE开头，不能有..后退关键字
 @Controller
 public class TemplateAct {
 	public static final String TEXT_AREA = "textarea";
 	public static final String EDITOR = "editor";
+	public static final String VISUAL = "visual";
 	private static final String INVALID_PARAM = "template.invalidParams";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(TemplateAct.class);
 
+	@RequiresPermissions("template:template_main")
+	@RequestMapping("/template/template_main.do")
+	public String templateMain(ModelMap model) {
+		return "template/template_main";
+	}
+
+	@RequiresPermissions("template:v_left")
 	@RequestMapping("/template/v_left.do")
 	public String left(String path, HttpServletRequest request, ModelMap model) {
 		return "template/left";
 	}
 
+	@RequiresPermissions("template:v_tree")
 	@RequestMapping(value = "/template/v_tree.do", method = RequestMethod.GET)
 	public String tree(HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -79,6 +88,7 @@ public class TemplateAct {
 	}
 
 	// 直接调用方法需要把root参数保存至model中
+	@RequiresPermissions("template:v_list")
 	@RequestMapping(value = "/template/v_list.do", method = RequestMethod.GET)
 	public String list(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -104,6 +114,7 @@ public class TemplateAct {
 		return "template/list";
 	}
 
+	@RequiresPermissions("template:o_create_dir")
 	@RequestMapping(value = "/template/o_create_dir.do")
 	public String createDir(String root, String dirName,
 			HttpServletRequest request, ModelMap model) {
@@ -113,6 +124,7 @@ public class TemplateAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("template:v_add")
 	@RequestMapping(value = "/template/v_add.do", method = RequestMethod.GET)
 	public String add(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -122,10 +134,12 @@ public class TemplateAct {
 			return errors.showErrorPage(model);
 		}
 		String style = handerStyle(RequestUtils.getQueryParam(request, "style"));
+		model.addAttribute("directives", directiveTplMng.getList(Integer.MAX_VALUE));
 		model.addAttribute("root", root);
 		return "template/add_" + style;
 	}
 
+	@RequiresPermissions("template:v_edit")
 	@RequestMapping("/template/v_edit.do")
 	public String edit(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -136,12 +150,14 @@ public class TemplateAct {
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
+		model.addAttribute("directives", directiveTplMng.getList(Integer.MAX_VALUE));
 		model.addAttribute("template", tplManager.get(name));
 		model.addAttribute("root", root);
 		model.addAttribute("name", name);
 		return "template/edit_" + style;
 	}
 
+	@RequiresPermissions("template:o_save")
 	@RequestMapping("/template/o_save.do")
 	public String save(String root, String filename, String source,
 			HttpServletRequest request, ModelMap model) {
@@ -159,6 +175,7 @@ public class TemplateAct {
 	}
 
 	// AJAX请求，不返回页面
+	@RequiresPermissions("template:o_ajaxUpdate")
 	@RequestMapping("/template/o_ajaxUpdate.do")
 	public void ajaxUpdate(String root, String name, String source,
 			HttpServletRequest request, HttpServletResponse response,
@@ -166,16 +183,17 @@ public class TemplateAct {
 		CmsSite site = CmsUtils.getSite(request);
 		WebErrors errors = validateUpdate(root, name, site.getTplPath(),source, request);
 		if (errors.hasErrors()) {
-			ResponseUtils.renderJson(response, "{success:false,msg:'"
+			ResponseUtils.renderJson(response, "{\"success\":false,\"msg\":'"
 					+ errors.getErrors().get(0) + "'}");
 		}
 		tplManager.update(name, source);
 		log.info("update Template name={}.", name);
 		cmsLogMng.operating(request, "template.log.update", "filename=" + name);
 		model.addAttribute("root", root);
-		ResponseUtils.renderJson(response, "{success:true}");
+		ResponseUtils.renderJson(response, "{\"success\":true}");
 	}
 
+	@RequiresPermissions("template:o_update")
 	@RequestMapping("/template/o_update.do")
 	public String update(String root, String name, String source,
 			HttpServletRequest request, HttpServletResponse response,
@@ -198,6 +216,7 @@ public class TemplateAct {
 		return "template/edit_" + EDITOR;
 	}
 
+	@RequiresPermissions("template:o_delete")
 	@RequestMapping("/template/o_delete.do")
 	public String delete(String root, String[] names,
 			HttpServletRequest request, ModelMap model) {
@@ -217,6 +236,7 @@ public class TemplateAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("template:o_delete_single")
 	@RequestMapping("/template/o_delete_single.do")
 	public String deleteSingle(HttpServletRequest request, ModelMap model) {
 		// TODO 输入验证
@@ -235,6 +255,7 @@ public class TemplateAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("template:v_rename")
 	@RequestMapping(value = "/template/v_rename.do", method = RequestMethod.GET)
 	public String renameInput(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -246,6 +267,7 @@ public class TemplateAct {
 		return "template/rename";
 	}
 
+	@RequiresPermissions("template:o_rename")
 	@RequestMapping(value = "/template/o_rename.do", method = RequestMethod.POST)
 	public String renameSubmit(String root, String origName, String distName,
 			HttpServletRequest request, ModelMap model) {
@@ -258,6 +280,7 @@ public class TemplateAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("template:o_swfupload")
 	@RequestMapping(value = "/template/o_swfupload.do", method = RequestMethod.POST)
 	public void swfUpload(
 			String root,
@@ -271,6 +294,7 @@ public class TemplateAct {
 		ResponseUtils.renderText(response, "");
 	}
 
+	@RequiresPermissions("template:v_setting")
 	@RequestMapping(value = "/template/v_setting.do")
 	public String setting(HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -281,14 +305,16 @@ public class TemplateAct {
 		return "template/setting";
 	}
 
+	@RequiresPermissions("template:o_def_template")
 	@RequestMapping(value = "/template/o_def_template.do")
 	public void defTempate(String solution, HttpServletRequest request,
 			HttpServletResponse response) {
 		CmsSite site = CmsUtils.getSite(request);
 		cmsSiteMng.updateTplSolution(site.getId(), solution);
-		ResponseUtils.renderJson(response, "{'success':true}");
+		ResponseUtils.renderJson(response, "{\"success\":true}");
 	}
 
+	@RequiresPermissions("template:o_export")
 	@RequestMapping(value = "/template/o_export.do")
 	public void exportSubmit(HttpServletRequest request,
 			HttpServletResponse response) throws UnsupportedEncodingException {
@@ -306,6 +332,7 @@ public class TemplateAct {
 		}
 	}
 
+	@RequiresPermissions("template:o_import")
 	@RequestMapping(value = "/template/o_import.do")
 	public String importSubmit(
 			@RequestParam(value = "tplZip", required = false) MultipartFile file,
@@ -360,11 +387,8 @@ public class TemplateAct {
 	private WebErrors validateEdit(String path, String name,String tplPath,
 			HttpServletRequest request) {
 		WebErrors errors = WebErrors.create(request);
-		if (vldExist(name, errors)) {
+		if (vldExist(path, errors)) {
 			return errors;
-		}
-		if (!name.startsWith(tplPath)) {
-			errors.addErrorCode(INVALID_PARAM);
 		}
 		if(isUnValidName(path, name, tplPath, errors)){
 			errors.addErrorCode(INVALID_PARAM);
@@ -372,7 +396,7 @@ public class TemplateAct {
 		return errors;
 	}
 
-	private WebErrors validateUpdate(String root, String name, String tplPath, String source,
+	private WebErrors validateUpdate(String root, String name, String tplPath,String source,
 			HttpServletRequest request) {
 		WebErrors errors = WebErrors.create(request);
 		if (vldExist(name, errors)) {
@@ -420,7 +444,7 @@ public class TemplateAct {
 	}
 
 	private String handerStyle(String style) {
-		if (TEXT_AREA.equals(style) || EDITOR.equals(style)) {
+		if (TEXT_AREA.equals(style) || EDITOR.equals(style) || VISUAL.equals(style)) {
 			return style;
 		}
 		return TEXT_AREA;
@@ -431,6 +455,8 @@ public class TemplateAct {
 	private TplManager tplManager;
 	private CmsResourceMng resourceMng;
 	private CmsSiteMng cmsSiteMng;
+	@Autowired
+	private CmsDirectiveTplMng directiveTplMng;
 
 	public void setTplManager(TplManager tplManager) {
 		this.tplManager = tplManager;

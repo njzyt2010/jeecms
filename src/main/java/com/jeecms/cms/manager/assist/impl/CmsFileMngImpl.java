@@ -29,6 +29,7 @@ public class CmsFileMngImpl implements CmsFileMng {
 		 dao.deleteByContentId(contentId);
 	}
 
+
 	public CmsFile findById(Integer id) {
 		return dao.findById(id);
 	}

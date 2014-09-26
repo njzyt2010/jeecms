@@ -2,26 +2,18 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd"
 	default-lazy-init="true">
 	
 	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
 		<property name="cacheSeconds" value="-1"/>
-		<property name="basenames">
-			<list>
-				<value>/WEB-INF/languages/jeecore_admin/messages</value>
-				<value>/WEB-INF/languages/jeecms_admin/messages</value>
-				<value>/WEB-INF/languages/jeecms_tpl/messages</value>
-				<value>/WEB-INF/languages/fck/messages</value>
-			</list>
-		</property>
+		<property name="basenames" value="#{propertyUtils.getList('messages.admin.')}"/>
 	</bean>
-
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
 	<!--
-		<bean id="multipartResolver" class="com.jeecms.common.web.cos.CosMultipartResolver"/>
-		-->
+	<bean id="multipartResolver" class="com.jeecms.common.web.cos.CosMultipartResolver"/>
+	-->
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
 		<property name="webBindingInitializer">
 			<bean class=" com.jeecms.common.web.springmvc.BindingInitializer"/>
@@ -46,9 +38,8 @@
 		</property>
 	</bean>
 	<bean id="adminContextInterceptor" class="com.jeecms.cms.web.AdminContextInterceptor">
+		<!--<property name="adminId" value="1"/>-->
 		<property name="auth" value="true"/>
-		<property name="loginUrl" value="/jeeadmin/jeecms/login.do"/>
-		<property name="returnUrl" value="/jeeadmin/jeecms/index.do"/>
 		<property name="excludeUrls">
 			<list>
 				<value>/login.do</value>
@@ -58,7 +49,12 @@
 	</bean>
 	<bean id="adminLocaleIntercept" class="com.jeecms.cms.web.AdminLocaleInterceptor"/>
 	
-	<bean id="fireWallInterceptor" class="com.jeecms.cms.web.FireWallInterceptor">
+	<bean id="fireWallInterceptor" class="com.jeecms.cms.web.FireWallInterceptor"/>
+	
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor">
+	</bean>
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+    	<property name="securityManager" ref="securityManager"/>
 	</bean>
 	
 	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
@@ -71,10 +67,13 @@
 				<prop key="org.springframework.web.bind.MissingServletRequestParameterException">/error/requiredParameter</prop>
 				<prop key="org.springframework.beans.TypeMismatchException">/error/mismatchParameter</prop>
 				<prop key="org.springframework.web.bind.ServletRequestBindingException">/error/bindException</prop>
-				<prop key="org.springframework.dao.DataIntegrityViolationException">/error/integrityViolation</prop>
+				<prop key="org.apache.shiro.authz.AuthorizationException">/error/authrizationException</prop>
 			</props>
 		</property>
 	</bean>
+	<!--
+	<bean class="com.jeecms.common.web.springmvc.HandlerExceptionResolver"/>
+	-->
 	<bean id="freemarkerViewResolver" class="com.jeecms.common.web.springmvc.RichFreeMarkerViewResolver">
 		<property name="prefix" value="/jeecms_sys/"/>
 		<property name="suffix" value=".html"/>
@@ -93,6 +92,8 @@
 				<entry key="cms_perm" value-ref="cms_perm"/>
 				<entry key="text_cut" value-ref="text_cut"/>
 				<entry key="html_cut" value-ref="html_cut"/>
+				<entry key="cms_content_list" value-ref="cms_content_list"/>
+				<entry key="cms_content_page" value-ref="cms_content_page"/>
 			</map>
 		</property>
 		<property name="freemarkerSettings">
@@ -115,5 +116,5 @@
 	<context:annotation-config/>
 	
 	<!--包含action-->
-	<import resource="jeecms-servlet-admin-action.xml"/>
+	<import resource="jeecms/jeecms-servlet-admin-action.xml"/>
 </beans>

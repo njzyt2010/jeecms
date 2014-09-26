@@ -71,7 +71,7 @@ public class LuceneContent {
 		return doc;
 	}
 
-	public static Query createQuery(String queryString,String category,String workplace, Integer siteId,
+	public static Query createQuery(String queryString, String category,String workplace,Integer siteId,
 			Integer channelId, Date startDate, Date endDate, Analyzer analyzer)
 			throws ParseException {
 		BooleanQuery bq = new BooleanQuery();

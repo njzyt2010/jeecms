@@ -7,19 +7,20 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.statistic.workload.CmsWorkLoadStatistic.CmsWorkLoadStatisticDateKind;
 import com.jeecms.cms.statistic.workload.CmsWorkLoadStatistic.CmsWorkLoadStatisticGroup;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.util.DateUtils;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * @author Tom
@@ -27,7 +28,7 @@ import com.jeecms.common.util.DateUtils;
 @Controller
 public class CmsWorkLoadStatisticAct {
 
-	@SuppressWarnings("unchecked")
+	@RequiresPermissions("workloadstatistic:v_list")
 	@RequestMapping("/workloadstatistic/v_list.do")
 	public String contentList(HttpServletRequest request, ModelMap model,
 			Integer channelId, Integer reviewerId, Integer authorId,

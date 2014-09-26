@@ -16,9 +16,9 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.jeecms.cms.entity.assist.CmsTask;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.manager.main.CmsSiteMng;
 import com.jeecms.cms.staticpage.StaticPageSvc;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsSiteMng;
 
 import freemarker.template.TemplateException;
 

@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -27,22 +28,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.jeecms.cms.entity.assist.CmsAcquisition;
 import com.jeecms.cms.entity.assist.CmsTask;
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsAcquisitionMng;
 import com.jeecms.cms.manager.assist.CmsTaskMng;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
+import com.jeecms.core.entity.CmsSite;
 import com.jeecms.core.entity.Ftp;
 import com.jeecms.core.manager.FtpMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsTaskAct {
 	private static final Logger log = LoggerFactory.getLogger(CmsTaskAct.class);
 
+	@RequiresPermissions("task:v_list")
 	@RequestMapping("/task/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request, ModelMap model) {
 		Pagination pagination = manager.getPage(CmsUtils.getSiteId(request),cpn(pageNo), CookieUtils
@@ -52,6 +54,7 @@ public class CmsTaskAct {
 		return "task/list";
 	}
 
+	@RequiresPermissions("task:v_add")
 	@RequestMapping("/task/v_add.do")
 	public String add(HttpServletRequest request,ModelMap model) {
 		List<Ftp>ftpList=ftpMng.getList();
@@ -67,6 +70,7 @@ public class CmsTaskAct {
 		return "task/add";
 	}
 
+	@RequiresPermissions("task:v_edit")
 	@RequestMapping("/task/v_edit.do")
 	public String edit(Integer id, Integer pageNo, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -92,6 +96,7 @@ public class CmsTaskAct {
 		return "task/edit";
 	}
 
+	@RequiresPermissions("task:o_save")
 	@RequestMapping("/task/o_save.do")
 	public String save(CmsTask bean, HttpServletRequest request, ModelMap model) throws ParseException, SchedulerException, ClassNotFoundException {
 		WebErrors errors = validateSave(bean, request);
@@ -121,6 +126,7 @@ public class CmsTaskAct {
 	}
 	
 
+	@RequiresPermissions("task:o_update")
 	@RequestMapping("/task/o_update.do")
 	public String update(CmsTask bean, Integer pageNo, HttpServletRequest request,
 			ModelMap model) throws SchedulerException, ParseException, ClassNotFoundException {
@@ -155,6 +161,7 @@ public class CmsTaskAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("task:o_delete")
 	@RequestMapping("/task/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo, HttpServletRequest request,
 			ModelMap model) throws SchedulerException {
@@ -181,7 +188,6 @@ public class CmsTaskAct {
 	 */
 	private void startTask(CmsTask task,String taskCode) throws ParseException, SchedulerException, ClassNotFoundException{
 		String cronExpress=manager.getCronExpressionFromDB(task.getId());
-		System.out.println(cronExpress);
 		if(cronExpress.indexOf("null")==-1){
 			JobDetail jobDetail = new JobDetail();
 			jobDetail.setName(taskCode);

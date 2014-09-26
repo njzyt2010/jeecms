@@ -70,7 +70,7 @@ public class CmsAdvertising extends BaseCmsAdvertising {
 	 */
 	public CmsAdvertising(java.lang.Integer id,
 			com.jeecms.cms.entity.assist.CmsAdvertisingSpace adspace,
-			com.jeecms.cms.entity.main.CmsSite site, java.lang.String name,
+			com.jeecms.core.entity.CmsSite site, java.lang.String name,
 			java.lang.String category, java.lang.Integer weight,
 			java.lang.Long displayCount, java.lang.Long clickCount,
 			java.lang.Boolean enabled) {

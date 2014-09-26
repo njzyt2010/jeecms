@@ -30,10 +30,12 @@
 		<property name="contentImgHeight" column="content_img_height" type="integer" not-null="true" length="10"/>
 		<property name="commentControl" column="comment_control" type="integer" not-null="true" length="10"/>
 		<property name="allowUpdown" column="allow_updown" type="java.lang.Boolean" not-null="false"/>
+		<property name="allowShare" column="allow_share" type="java.lang.Boolean" not-null="false"/>
+		<property name="allowScore" column="allow_score" type="java.lang.Boolean" not-null="false"/>
 		<property name="blank" column="is_blank" type="java.lang.Boolean" not-null="true"/>
 		<property name="title" column="title" type="string" not-null="false" length="255"/>
 		<property name="keywords" column="keywords" type="string" not-null="false" length="255"/>
-		<property name="description" column="description" type="string" not-null="false" length="255"/>
+		<property name="description" column="description" type="string" not-null="false" length="2000"/>
 		<one-to-one name="channel" class="Channel" constrained="true"/>
 	</class>
 </hibernate-mapping>

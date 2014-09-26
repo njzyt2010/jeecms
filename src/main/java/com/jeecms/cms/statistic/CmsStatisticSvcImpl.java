@@ -11,16 +11,11 @@ import static com.jeecms.cms.statistic.CmsStatistic.MEMBER;
 import static com.jeecms.cms.statistic.CmsStatistic.CONTENT;
 import static com.jeecms.cms.statistic.CmsStatistic.COMMENT;
 import static com.jeecms.cms.statistic.CmsStatistic.GUESTBOOK;
-import static com.jeecms.cms.statistic.CmsStatistic.PV;
-import static com.jeecms.cms.statistic.CmsStatistic.UNIQUEIP;
-import static com.jeecms.cms.statistic.CmsStatistic.UNIQUEVISITOR;
-import static com.jeecms.cms.statistic.CmsStatistic.AVGVIEWS;
 import static com.jeecms.cms.statistic.CmsStatistic.TODAY;
 import static com.jeecms.cms.statistic.CmsStatistic.YESTERDAY;
 import static com.jeecms.cms.statistic.CmsStatistic.THISWEEK;
 import static com.jeecms.cms.statistic.CmsStatistic.THISMONTH;
 import static com.jeecms.cms.statistic.CmsStatistic.THISYEAR;
-import static com.jeecms.common.util.ArithmeticUtils.dividend;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jeecms.cms.statistic.CmsStatistic.CmsStatisticModel;
 import com.jeecms.cms.statistic.CmsStatistic.TimeRange;
-import com.jeecms.common.page.Pagination;
 import com.jeecms.common.util.DateFormatUtils;
 
 @Service
@@ -197,217 +191,11 @@ public class CmsStatisticSvcImpl implements CmsStatisticSvc {
 		}
 		return 0;
 	}
-
-	private List<CmsStatistic> pvStatistic(Integer siteId) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		Date begin;
-		long count;
-		Calendar calendar = new GregorianCalendar();
-		calendar = clearTime(calendar);
-		begin = calendar.getTime();
-		count = dao.getPvCountByTimeRange(siteId, getTimeRange(TODAY));
-		CmsStatistic today = new CmsStatistic("statistic.pv.today", count);
-		today.setVice(DateFormatUtils.formatDate(begin));
-		list.add(today);
-		calendar.add(DATE, -1);
-		begin = calendar.getTime();
-		count = dao.getPvCountByTimeRange(siteId, getTimeRange(YESTERDAY));
-		CmsStatistic yesterday = new CmsStatistic("statistic.pv.yesterday",
-				count);
-		yesterday.setVice(DateFormatUtils.formatDate(begin));
-		list.add(yesterday);
-		count = avg(dao.getPvCountByGroup(siteId));
-		CmsStatistic avg = new CmsStatistic("statistic.pv.avg", count);
-		list.add(avg);
-		Object[] objs = max(dao.getPvCountByGroup(siteId));
-		count = (Integer) objs[0];
-		CmsStatistic max = new CmsStatistic("statistic.pv.max", count);
-		max.setVice((String) objs[1]);
-		list.add(max);
-		count = dao.getPvCount(siteId);
-		CmsStatistic total = new CmsStatistic("statistic.pv.total", count);
-		list.add(total);
-		return list;
-	}
-
-	private List<CmsStatistic> uniqueIpStatistic(Integer siteId) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		Date begin;
-		long count;
-		Calendar calendar = new GregorianCalendar();
-		calendar = clearTime(calendar);
-		begin = calendar.getTime();
-		count = dao.getUniqueIpCountByTimeRange(siteId, getTimeRange(TODAY));
-		CmsStatistic today = new CmsStatistic("statistic.uniqueIp.today", count);
-		today.setVice(DateFormatUtils.formatDate(begin));
-		list.add(today);
-		calendar.add(DATE, -1);
-		begin = calendar.getTime();
-		count = dao.getUniqueIpCountByTimeRange(siteId, getTimeRange(YESTERDAY));
-		CmsStatistic yesterday = new CmsStatistic(
-				"statistic.uniqueIp.yesterday", count);
-		yesterday.setVice(DateFormatUtils.formatDate(begin));
-		list.add(yesterday);
-		count = avg(dao.getUniqueIpCountByGroup(siteId));
-		CmsStatistic avg = new CmsStatistic("statistic.uniqueIp.avg", count);
-		list.add(avg);
-		Object[] objs = max(dao.getUniqueIpCountByGroup(siteId));
-		count = (Integer) objs[0];
-		CmsStatistic max = new CmsStatistic("statistic.uniqueIp.max", count);
-		max.setVice((String) objs[1]);
-		list.add(max);
-		count = dao.getUniqueIpCount(siteId);
-		CmsStatistic total = new CmsStatistic("statistic.uniqueIp.total", count);
-		list.add(total);
-		return list;
-	}
-
-	private List<CmsStatistic> uniqueVisitorStatistic(Integer siteId) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		Date begin;
-		long count;
-		Calendar calendar = new GregorianCalendar();
-		calendar = clearTime(calendar);
-		begin = calendar.getTime();
-		count = dao.getUniqueVisitorCountByTimeRange(siteId, getTimeRange(TODAY));
-		CmsStatistic today = new CmsStatistic("statistic.uniqueVisitor.today",
-				count);
-		today.setVice(DateFormatUtils.formatDate(begin));
-		list.add(today);
-		calendar.add(DATE, -1);
-		begin = calendar.getTime();
-		count = dao.getUniqueVisitorCountByTimeRange(siteId, getTimeRange(YESTERDAY));
-		CmsStatistic yesterday = new CmsStatistic(
-				"statistic.uniqueVisitor.yesterday", count);
-		yesterday.setVice(DateFormatUtils.formatDate(begin));
-		list.add(yesterday);
-		count = avg(dao.getUniqueVisitorCountByGroup(siteId));
-		CmsStatistic avg = new CmsStatistic("statistic.uniqueVisitor.avg",
-				count);
-		list.add(avg);
-		Object[] objs = max(dao.getUniqueVisitorCountByGroup(siteId));
-		count = (Integer) objs[0];
-		CmsStatistic max = new CmsStatistic("statistic.uniqueVisitor.max",
-				count);
-		max.setVice((String) objs[1]);
-		list.add(max);
-		count = dao.getUniqueVisitorCount(siteId);
-		CmsStatistic total = new CmsStatistic("statistic.uniqueVisitor.total",
-				count);
-		list.add(total);
-		return list;
-	}
-
-	private List<CmsStatistic> avgViewsStatistic(Integer siteId) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		Date begin;
-		long count, pvs, visitors;
-		Calendar calendar = new GregorianCalendar();
-		calendar = clearTime(calendar);
-		begin = calendar.getTime();
-		pvs = dao.getPvCountByTimeRange(siteId, getTimeRange(TODAY));
-		visitors = dao.getUniqueVisitorCountByTimeRange(siteId,getTimeRange(TODAY));
-		CmsStatistic today = new CmsStatistic("statistic.avgViews.today", pvs
-				/ dividend(visitors));
-		today.setVice(DateFormatUtils.formatDate(begin));
-		list.add(today);
-		calendar.add(DATE, -1);
-		begin = calendar.getTime();
-		pvs = dao.getPvCountByTimeRange(siteId, getTimeRange(YESTERDAY));
-		visitors = dao.getUniqueVisitorCountByTimeRange(siteId, getTimeRange(YESTERDAY));
-		CmsStatistic yesterday = new CmsStatistic(
-				"statistic.avgViews.yesterday", pvs / dividend(visitors));
-		yesterday.setVice(DateFormatUtils.formatDate(begin));
-		list.add(yesterday);
-		count = avg(dao.getPvCountByGroup(siteId), dao.getUniqueVisitorCountByGroup(siteId));
-		CmsStatistic avg = new CmsStatistic("statistic.avgViews.avg", count);
-		list.add(avg);
-		Object[] objs = max(dao.getPvCountByGroup(siteId), dao.getUniqueVisitorCountByGroup(siteId));
-		count = (Integer) objs[0];
-		CmsStatistic max = new CmsStatistic("statistic.avgViews.max", count);
-		max.setVice((String) objs[1]);
-		list.add(max);
-		pvs = dao.getPvCount(siteId);
-		visitors = dao.getUniqueVisitorCount(siteId);
-		CmsStatistic total = new CmsStatistic("statistic.avgViews.total", pvs
-				/ dividend(visitors));
-		list.add(total);
-		return list;
-	}
-
-	public List<CmsStatistic> flowStatistic(int type, Integer siteId) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		switch (type) {
-		case PV: {
-			return pvStatistic(siteId);
-		}
-		case UNIQUEIP: {
-			return uniqueIpStatistic(siteId);
-		}
-		case UNIQUEVISITOR: {
-			return uniqueVisitorStatistic(siteId);
-		}
-		case AVGVIEWS: {
-			return avgViewsStatistic(siteId);
-		}
-		}
-		return list;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Pagination flowAnalysisPage(String groupCondition, Integer siteId,
-			Integer pageNo, Integer pageSize) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		Pagination pagination = dao.flowAnalysisPage(groupCondition, siteId,
-				pageNo, pageSize);
-		long total = dao.flowAnalysisTotal(siteId);
-		for (Object[] objArr : (List<Object[]>) pagination.getList()) {
-			CmsStatistic cmsStatistic = new CmsStatistic((String) objArr[1],
-					(Long) objArr[0], total);
-			list.add(cmsStatistic);
-		}
-		pagination.setList(list);
-		return pagination;
-	}
-
-	public Map<String, List<CmsStatistic>> getWelcomeSiteFlowData(Integer siteId) {
-		Map<String, List<CmsStatistic>> map = new HashMap<String, List<CmsStatistic>>();
-		map.put("today", getListByTimeRange(siteId, getTimeRange(TODAY)));
-		map.put("yesterday",getListByTimeRange(siteId, getTimeRange(YESTERDAY)));
-		map.put("thisweek", getListByTimeRange(siteId, getTimeRange(THISWEEK)));
-		map.put("thismonth",getListByTimeRange(siteId, getTimeRange(THISMONTH)));
-		map.put("total",getListByTimeRange(siteId, getTimeRange(-1)));
-		return map;
-	}
-
-	@Transactional
-	public void flowInit(Integer siteId, Date startDate, Date endDate) {
-		dao.flowInit(siteId, startDate, endDate);
-	}
-
+	
 	@Autowired
 	private CmsStatisticDao dao;
 
-	private List<CmsStatistic> getListByTimeRange(Integer siteId,
-			TimeRange timeRange) {
-		List<CmsStatistic> list = new ArrayList<CmsStatistic>();
-		list.add(new CmsStatistic(getPvCountByTimeRange(siteId, timeRange)));
-		list.add(new CmsStatistic(getUniqueIpCountByTimeRange(siteId, timeRange)));
-		list.add(new CmsStatistic(getUniqueVisitorCountByTimeRange(siteId, timeRange)));
-		return list;
-	}
-
-	private long getPvCountByTimeRange(Integer siteId, TimeRange timeRange) {
-		return dao.getPvCountByTimeRange(siteId, timeRange);
-	}
-
-	private long getUniqueIpCountByTimeRange(Integer siteId, TimeRange timeRange) {
-		return dao.getUniqueIpCountByTimeRange(siteId, timeRange);
-	}
-
-	private long getUniqueVisitorCountByTimeRange(Integer siteId, TimeRange timeRange) {
-		return dao.getUniqueVisitorCountByTimeRange(siteId, timeRange);
-	}
+	
 
 	private String format(int time) {
 		Calendar calendar = clearTime(new GregorianCalendar());
@@ -439,59 +227,7 @@ public class CmsStatisticSvcImpl implements CmsStatisticSvc {
 	private void flush(Calendar calendar) {
 		calendar.getTime();
 	}
-
-	private int avg(List<Object[]> list) {
-		int count = 0;
-		for (Object[] obj : list) {
-			count += (Long) obj[0];
-		}
-		return count / dividend(list.size());
-	}
-
-	private int avg(List<Object[]> pvList, List<Object[]> visitorsList) {
-		int count = 0;
-		if (pvList.size() != visitorsList.size()) {
-			return count;
-		}
-		for (int i = 0; i < pvList.size(); i++) {
-			long pvCount = (Long) pvList.get(i)[0];
-			long visitorCount = (Long) visitorsList.get(i)[0];
-			count += pvCount / visitorCount;
-		}
-		return count / dividend((pvList.size()));
-	}
-
-	private Object[] max(List<Object[]> list) {
-		int max = 0;
-		String date = null;
-		for (Object[] objs : list) {
-			long curr = (Long) objs[0];
-			if (max < curr) {
-				max = (int) curr;
-				date = (String) objs[1];
-			}
-		}
-		return new Object[] { max, date };
-	}
-
-	private Object[] max(List<Object[]> pvList, List<Object[]> visitorsList) {
-		int max = 0;
-		String date = null;
-		if (pvList.size() != visitorsList.size()) {
-			return new Object[] { max, date };
-		}
-		for (int i = 0; i < pvList.size(); i++) {
-			long pvCount = (Long) pvList.get(i)[0];
-			long visitorCount = (Long) visitorsList.get(i)[0];
-			long curr = pvCount / visitorCount;
-			if (max < curr) {
-				max = (int) curr;
-				date = (String) pvList.get(i)[1];
-			}
-		}
-		return new Object[] { max, date };
-	}
-
+	
 	private TimeRange getTimeRange(int type){
 		return getTimeRange(type, new GregorianCalendar());
 	}

@@ -1,8 +1,8 @@
 package com.jeecms.cms.manager.assist.impl;
 
-import static com.jeecms.cms.web.FrontUtils.RES_EXP;
 import static com.jeecms.common.web.Constants.SPT;
 import static com.jeecms.common.web.Constants.UTF8;
+import static com.jeecms.core.web.util.FrontUtils.RES_EXP;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -27,14 +27,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jeecms.cms.entity.assist.CmsFile;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsFileMng;
 import com.jeecms.cms.manager.assist.CmsResourceMng;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.file.FileWrap;
 import com.jeecms.common.file.FileWrap.FileComparator;
 import com.jeecms.common.util.Zipper.FileEntry;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.FrontUtils;
 
 @Service
 public class CmsResourceMngImpl implements CmsResourceMng {
@@ -282,6 +282,119 @@ public class CmsResourceMngImpl implements CmsResourceMng {
 		}
 	}
 
+
+	public void unZipFile(File file) throws IOException {
+		// 用默认编码或UTF-8编码解压会乱码！windows7的原因吗？
+		//解压之前要坚持是否冲突
+		ZipFile zip = new ZipFile(file, "GBK");
+		ZipEntry entry;
+		String name;
+		String filename;
+		File outFile;
+		File pfile;
+		byte[] buf = new byte[1024];
+		int len;
+		InputStream is = null;
+		OutputStream os = null;
+		Enumeration<ZipEntry> en = zip.getEntries();
+		while (en.hasMoreElements()) {
+			entry = en.nextElement();
+			name = entry.getName();
+			if (!entry.isDirectory()) {
+				name = entry.getName();
+				filename =  name;
+				outFile = new File(realPathResolver.get(filename));
+				if(outFile.exists()){
+					break;
+				}
+				pfile = outFile.getParentFile();
+				if (!pfile.exists()) {
+					//	pfile.mkdirs();
+					createFolder(outFile);
+				}
+				try {
+					is = zip.getInputStream(entry);
+					os = new FileOutputStream(outFile);
+					while ((len = is.read(buf)) != -1) {
+						os.write(buf, 0, len);
+					}
+				} finally {
+					if (is != null) {
+						is.close();
+						is = null;
+					}
+					if (os != null) {
+						os.close();
+						os = null;
+					}
+				}
+			}
+		}
+		zip.close();
+	}
+	
+	public void deleteZipFile(File file) throws IOException {
+		//根据压缩包删除解压后的文件
+		// 用默认编码或UTF-8编码解压会乱码！windows7的原因吗
+		ZipFile zip = new ZipFile(file, "GBK");
+		ZipEntry entry;
+		String name;
+		String filename;
+		File directory;
+		//删除文件
+		Enumeration<ZipEntry> en = zip.getEntries();
+		while (en.hasMoreElements()) {
+			entry = en.nextElement();
+			if (!entry.isDirectory()) {
+				name = entry.getName();
+				filename =  name;
+				directory = new File(realPathResolver.get(filename));
+				if(directory.exists()){
+					directory.delete();
+				}
+			}
+		}
+		//删除空文件夹
+		en= zip.getEntries();
+		while (en.hasMoreElements()) {
+			entry = en.nextElement();
+			if (entry.isDirectory()) {
+				name = entry.getName();
+				filename =  name;
+				directory = new File(realPathResolver.get(filename));
+				if(!directoryHasFile(directory)){
+					directory.delete();
+				}
+			}
+		}
+		zip.close();
+	}
+	
+	private  void createFolder(File f){
+		File parent=f.getParentFile();
+		if(!parent.exists()){
+			parent.mkdirs();
+			createFolder(parent);
+		}
+	}
+	
+	//文件夹判断是否有文件
+	private  boolean directoryHasFile(File directory){
+		File[] files = directory.listFiles();
+		if(files!=null&&files.length>0){
+			for(File f:files){
+				if(directoryHasFile(f)){
+					return true;
+				}else{
+					continue;
+				}
+			}
+			return false;
+		}else{
+			return false;
+		}
+	}
+
 	// 文件夹和可编辑文件则显示
 	private FileFilter filter = new FileFilter() {
 		public boolean accept(File file) {
@@ -303,5 +416,6 @@ public class CmsResourceMngImpl implements CmsResourceMng {
 	public void setFileMng(CmsFileMng fileMng) {
 		this.fileMng = fileMng;
 	}
+
 	
 }

@@ -29,7 +29,7 @@ public class CmsReceiverMessageMngImpl implements CmsReceiverMessageMng {
 				pageSize);
 	}
 	
-	public List getList(Integer siteId, Integer sendUserId,
+	public List<CmsReceiverMessage> getList(Integer siteId, Integer sendUserId,
 			Integer receiverUserId, String title, Date sendBeginTime,
 			Date sendEndTime, Boolean status, Integer box, Boolean cacheable) {
 		return dao.getList(siteId, sendUserId, receiverUserId, title,

@@ -10,7 +10,7 @@ public interface CmsGuestbookDao {
 	public Pagination getPage(Integer siteId, Integer ctgId,Integer userId, Boolean recommend,
 			Boolean checked, boolean desc, boolean cacheable, int pageNo,
 			int pageSize);
-
+	
 	public List<CmsGuestbook> getList(Integer siteId, Integer ctgId,
 			Boolean recommend, Boolean checked, boolean desc,
 			boolean cacheable, int first, int max);

@@ -27,7 +27,7 @@ target: 是否新窗口打开；【0：原窗口；1：新窗口】不能为空
 <dl style="margin:0;padding:0;[#if picWidth!='']width:${picWidth}%;[/#if][#if picHeight!='']height:${picHeight}px;[/#if][#if picFloat=='1']float:left;[/#if]padding-right:${rightPadding}px;text-align:center;">
 	<dd style="margin-left:0;">[#rt/]
 		<a href="${ctt.url}" title="${ctt.tit?html}"[#if (ctt.target?? && ctt.target) || target=='1'] target="_blank"[/#if]>[#t/]
-			<img src="${imgUrl}" alt="${ctt.tit?html}" border="0"/>[#t/]
+			<img src="${imgUrl}" style="[#if picHeight!='']height:${picHeight}px;[/#if]" alt="${ctt.tit?html}" border="0"/>[#t/]
 		</a>[#t/]
 	</dd>[#lt/]
 	[#if !noTitle?? || noTitle!="1"]

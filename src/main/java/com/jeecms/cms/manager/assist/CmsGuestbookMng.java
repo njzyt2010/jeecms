@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jeecms.cms.entity.assist.CmsGuestbook;
 import com.jeecms.cms.entity.assist.CmsGuestbookExt;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsUser;
 
 public interface CmsGuestbookMng {
 	public Pagination getPage(Integer siteId, Integer ctgId,Integer userId, Boolean recommend,
@@ -34,4 +34,6 @@ public interface CmsGuestbookMng {
 	public CmsGuestbook deleteById(Integer id);
 
 	public CmsGuestbook[] deleteByIds(Integer[] ids);
+
+	public CmsGuestbook[] checkByIds(Integer[] ids,CmsUser checkUser,Boolean checkStatus);
 }

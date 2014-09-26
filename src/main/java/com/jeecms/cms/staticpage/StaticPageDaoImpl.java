@@ -21,18 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.entity.main.ContentCheck;
 import com.jeecms.cms.manager.assist.CmsKeywordMng;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.hibernate3.Finder;
 import com.jeecms.common.hibernate3.HibernateSimpleDao;
 import com.jeecms.common.page.Paginable;
 import com.jeecms.common.page.SimplePage;
 import com.jeecms.common.web.springmvc.RealPathResolver;
-import com.jeecms.core.web.front.URLHelper;
-import com.jeecms.core.web.front.URLHelper.PageInfo;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.FrontUtils;
+import com.jeecms.core.web.util.URLHelper;
+import com.jeecms.core.web.util.URLHelper.PageInfo;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -273,9 +273,11 @@ public class StaticPageDaoImpl extends HibernateSimpleDao implements
 				continue;
 			}
 			// 如果不需要生成静态页面，则不生成
+			/*
 			if(!c.getNeedRegenerate()){
 				continue;
 			}
+			*/
 			site = c.getSite();
 			tpl = conf.getTemplate(c.getTplContentOrDef());
 			FrontUtils.frontData(data, site, null, null, null);
@@ -323,6 +325,7 @@ public class StaticPageDaoImpl extends HibernateSimpleDao implements
 			}
 			c.setNeedRegenerate(false);
 			if (++count % 20 == 0) {
+				session.flush();
 				session.clear();
 			}
 		}
@@ -337,9 +340,11 @@ public class StaticPageDaoImpl extends HibernateSimpleDao implements
 			return false;
 		}
 		// 如果不需要生成静态页面，则不生成
+		/* 是否需要生成静态页这里判断过于简单话，模板变换 站点名称等参数变换均需重新生成
 		if(!c.getNeedRegenerate()){
 			return false;
 		}
+		*/
 		if (data == null) {
 			data = new HashMap<String, Object>();
 		}

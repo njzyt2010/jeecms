@@ -47,7 +47,7 @@ public abstract class BaseCmsFriendlink  implements Serializable {
 	public BaseCmsFriendlink (
 		java.lang.Integer id,
 		com.jeecms.cms.entity.assist.CmsFriendlinkCtg category,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.String name,
 		java.lang.String domain,
 		java.lang.Integer views,
@@ -86,7 +86,7 @@ public abstract class BaseCmsFriendlink  implements Serializable {
 
 	// many to one
 	private com.jeecms.cms.entity.assist.CmsFriendlinkCtg category;
-	private com.jeecms.cms.entity.main.CmsSite site;
+	private com.jeecms.core.entity.CmsSite site;
 
 
 
@@ -259,7 +259,7 @@ public abstract class BaseCmsFriendlink  implements Serializable {
 	/**
 	 * Return the value associated with the column: site_id
 	 */
-	public com.jeecms.cms.entity.main.CmsSite getSite () {
+	public com.jeecms.core.entity.CmsSite getSite () {
 		return site;
 	}
 
@@ -267,7 +267,7 @@ public abstract class BaseCmsFriendlink  implements Serializable {
 	 * Set the value related to the column: site_id
 	 * @param site the site_id value
 	 */
-	public void setSite (com.jeecms.cms.entity.main.CmsSite site) {
+	public void setSite (com.jeecms.core.entity.CmsSite site) {
 		this.site = site;
 	}
 

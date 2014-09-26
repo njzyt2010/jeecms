@@ -5,17 +5,35 @@
 <title></title>
 <#include "/jeecms_sys/head.html"/>
 <script type="text/javascript">
+$(function() {
+	$("#tableForm").validate({
+		rules: {
+			encoding:{
+				required: true
+			}
+		},
+		messages:{
+			encoding:$.validator.messages.required
+		}
+	});
+});
 function getTableForm() {
 	return document.getElementById('tableForm');
 }
 function optBackUp() {
 	if(Pn.checkedCount('tableNames')<=0) {
-		alert("<@s.m 'error.checkRecord'/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
 	var f = getTableForm();
 	f.action="o_backup.do";
-	f.submit();
+	if($(".error").length <=0){
+		f.submit();
+	}else {
+		if($(".error").is(":visible")==false){
+			f.submit();
+		}
+	}
 }
 </script>
 </head>
@@ -28,18 +46,19 @@ function optBackUp() {
 <form id="tableForm" method="post">
 <input type="hidden" name="pageNo" value="${pageNo!}"/>
 <@p.table value=tables;table,i,has_next><#rt/>
-	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"tableNames\",this.checked)'/>" width="20">
-		<input type='checkbox' name='tableNames' value='${table}'/><#t/>
+	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"tableNames\",this.checked)'/>" width="25" align="center">
+		<input type='checkbox' name='tableNames' value='${table}'  onclick="Pn.selectCheckBox('${table}',this.checked)"/><#t/>
 	</@p.column><#t/>
-	<@p.column code="db.tablename">
+	<@p.column code="db.tablename" align="center">
 		<a href="v_listfields.do?tablename=${table!}" class="pn-opt" target="_blank">${table}</a>
 	</@p.column><#t/>
 	<@p.column code="global.operate" align="center">
-		<a href="v_listfields.do?tablename=${table!}" class="pn-opt" target="_blank"><@s.m "db.viewtable"/></a> <#rt/>
+		<a href="v_listfields.do?tablename=${table!}" class="pn-opt" target="_blank"><@s.m "db.viewtable"/></a> <#t/>
 	</@p.column><#t/>
 </@p.table>
-<div style="margin-top:15px;">
-<input class="backup"  type="button" value="<@s.m "db.backup"/>" onclick="optBackUp();"/>
+<@s.m "db.backfile.encoding"/><input id="encoding" name="encoding" value="GBK" /><@s.m "db.backfile.encoding.help"/>
+<div style="background:url(${base}/res/common/img/theme/boxTitleBG.jpg) repeat-x; height:20px; overflow:hidden;">
+<input class="backup" type="button" value="<@s.m "db.backup"/>" onclick="optBackUp();"/ style="float:left; border-right:1px solid #ffffff;">
 </div>
 </form>
 </div>

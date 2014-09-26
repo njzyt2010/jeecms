@@ -21,11 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.MarkConfig;
-import com.jeecms.cms.manager.main.CmsUserMng;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.fck.Command;
 import com.jeecms.common.fck.ResourceType;
 import com.jeecms.common.fck.UploadResponse;
@@ -35,8 +30,13 @@ import com.jeecms.common.image.ImageUtils;
 import com.jeecms.common.upload.FileRepository;
 import com.jeecms.common.upload.UploadUtils;
 import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 import com.jeecms.core.entity.Ftp;
+import com.jeecms.core.entity.MarkConfig;
+import com.jeecms.core.manager.CmsUserMng;
 import com.jeecms.core.manager.DbFileMng;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * FCK服务器端接口
@@ -88,33 +88,35 @@ public class FckAct {
 		try {
 			MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 			// We upload just one file at the same time
-			MultipartFile uplFile = multipartRequest.getFileMap().entrySet()
-					.iterator().next().getValue();
+			MultipartFile uplFile = multipartRequest.getFileMap().entrySet().iterator().next().getValue();
+			String filename = FilenameUtils.getName(uplFile.getOriginalFilename());
 			CmsUser user = CmsUtils.getUser(request);
 			int fileSize = (int) (uplFile.getSize() / 1024);
 			// 文件太大，不允许上传
 			if (!user.isAllowMaxFile(fileSize)) {
 				log.warn("member fck upload warn: not allow max file: {}",
 						fileSize);
-				return UploadResponse.getFileUploadDisabledError(request);
+				return UploadResponse.getInvalidFileTooLargeError(request, filename, user.getGroup().getAllowMaxFile());
 			}
 			// 文件上传今日额度已经用完
 			if (!user.isAllowPerDay(fileSize)) {
 				log.warn("member fck upload warn: not allow per day: {}",
 						fileSize);
-				return UploadResponse.getFileUploadDisabledError(request);
+				long laveSize=user.getGroup().getAllowPerDay()-user.getUploadSize();
+				if(laveSize<0){
+					laveSize=0;
+				}
+				return UploadResponse.getInvalidUploadDailyLimitError(request, String.valueOf(laveSize));
 			}
 			// Some browsers transfer the entire source path not just the
 			// filename
-			String filename = FilenameUtils.getName(uplFile
-					.getOriginalFilename());
 			log.debug("Parameter NewFile: {}", filename);
 			String ext = FilenameUtils.getExtension(filename);
 			// 不允许上传的文件后缀
 			if (!user.isAllowSuffix(ext)) {
 				log.warn("member fck upload warn:"
 						+ " not allow file extension: {}", ext);
-				return UploadResponse.getFileUploadDisabledError(request);
+				return UploadResponse.getInvalidFileSuffixError(request);
 			}
 			if (type.isDeniedExtension(ext)) {
 				return UploadResponse.getInvalidFileTypeError(request);

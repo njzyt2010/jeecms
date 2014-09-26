@@ -9,24 +9,24 @@
 a:focus {outline:none;}
 html{height:100%;overflow:hidden;}
 body{height:100%;}
-#top{ background-color:#1d63c6; height:69px; width:100%;}
-.logo{width:215px; height:69px;}
-.topbg{background:url(${base}/res/jeecms/img/admin/top-tbg.png) no-repeat; height:38px;}
-.login-welcome{padding-left:20px; color:#fff; font-size:12px;background:url(${base}/res/jeecms/img/admin/topbg.gif) no-repeat;}
-.login-welcome a:link,.login-welcome a:visited{color:#fff; text-decoration:none;}
+#top{ background-color:#1d63c6; height:71px; width:100%;}
+.logo{width:209px; height:71px;}
+.topbg{ height:71px;}
+.login-welcome{padding-left:20px; color:#8099ae; font-size:12px;}
+.login-welcome a:link,.login-welcome a:visited{color:#8099ae; text-decoration:none;}
 
-#welcome {color: #FFFFFF;padding: 0 30px 0 5px;}
-#logout {color: #FFFFFF; padding-left: 5px;}
+#welcome {color: #8099ae;padding: 0 30px 0 5px;}
+#logout {color: #8099ae; padding-left: 5px;}
 
-.nav{height:31px; overflow:hidden;}
-.nav-menu{background:url(${base}/res/jeecms/img/admin/bg.png) repeat-x; height:31px; list-style:none; padding-left:20px; font-size:14px;}
-.nav .current {background: url(${base}/res/jeecms/img/admin/navcurrbg.gif) no-repeat 0px 2px; color:#fff; width:72px; text-align:center;} 
-.nav .current a{color:#fff;}
-.nav-menu li {height:31px;text-align:center; line-height:31px; float:left; }
-.nav-menu li a{color:#2b2b2b; font-weight:bold;}
-.nav-menu li.sep{background: url(${base}/res/jeecms/img/admin/step.png) no-repeat; width:2px; height:31px; margin:0px 5px;}
-.nav .normal{width:72px; text-align:center;}
-.top-bottom{width:100%; background: url(${base}/res/jeecms/img/admin/bg.png) repeat-x 0px -34px; height:3px;}
+.nav{height:28px; overflow:hidden;}
+.nav-menu{ height:28px; list-style:none; font-size:13px;}
+.nav .current {background: url(${base}/res/jeecms/img/admin/top_menu_selected.png) no-repeat center; color:#fff; text-align:center; width:100px; height:28px;} 
+.nav .current a{color:#093153;}
+.nav-menu li {height:28px;text-align:center; line-height:28px; float:left; }
+.nav-menu li a{color:#fff; font-weight:bold;}
+.nav-menu li.sep{background: url(${base}/res/jeecms/img/admin/top_menu_Divideline.png) no-repeat; width:3px; height:13px; margin:9px 0 0 0;}
+.nav .normal{text-align:center; width:100px;}
+
 .undis{display:none;}
 .dis{display:block;}
 </style>
@@ -54,6 +54,7 @@ function countUnreadMsg(){
 		}, "json");
 	 setTimeout( "countUnreadMsg() ",1000*60*10);    
 }
+
 $(function(){
 	$('a').bind("focus", function(){   
 	    $(this).blur();   
@@ -87,18 +88,18 @@ function mapDialog(){
 <body>
 <div id="top">
      <div class="top">
-          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background:url(${base}/res/jeecms/img/admin/newtopbg2.jpg) repeat-x;">
           <tr>
-            <td width="215"><div class="logo"><img src="${base}/res/jeecms/img/admin/logo.png" width="215" height="69" /></div></td>
-            <td valign="top">
+            <td width="209"><div class="logo"><img src="${base}/res/jeecms/img/admin/logo.gif" width="209" height="71" /></div></td>
+            <td valign="top" style="background:url(${base}/res/jeecms/img/admin/newtopbg1.jpg) no-repeat;">
                 <div class="topbg">
                      <div class="login-welcome">
                              <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                   <tr>
-                                    <td width="420" height="38">
-                                    <img src="${base}/res/jeecms/img/admin/welconlogin-icon.png"/><span id="welcome"><@s.ma code="global.admin.welcome" args=[user.username]/></span>
-                                    <img src="${base}/res/jeecms/img/admin/loginout-icon.png"/><a href="logout.do?returnUrl=index.do" target="_top" id="logout" onclick="return confirm('<@s.m "global.confirm.logout"/>');"><@s.m "global.admin.logout"/></a>　　
-                                    <img src="${base}/res/jeecms/img/admin/message-unread.png"/>&nbsp;<a href="message/v_list.do" target="rightFrame">您有<span id="countDiv"></span>条信息未读</a>
+                                    <td width="420" height="42">
+                                    <img src="${base}/res/jeecms/img/admin/top_useinfo_icon_01.png"/>&nbsp;<span id="welcome"><@s.ma code="global.admin.welcome" args=[user.username]/></span>
+                                    <img src="${base}/res/jeecms/img/admin/top_useinfo_icon_02.png"/>&nbsp;<a href="logout.do?returnUrl=index.do" target="_top" id="logout" onclick="return confirm('<@s.m "global.confirm.logout"/>');"><@s.m "global.admin.logout"/></a>　　
+                                    <img src="${base}/res/jeecms/img/admin/top_useinfo_icon_03.png"/>&nbsp;&nbsp;<a href="message/v_list.do" target="rightFrame"><@s.m "cmsUser.has"/>&nbsp;<span id="countDiv"></span>&nbsp;<@s.m "cmsUser.unreadcount"/></a>
                                     </td>
                                     <td align="right">
                                          <form action="index.do" target="_top" method="get">
@@ -110,7 +111,6 @@ function mapDialog(){
 							            </form>
                                     </td>
                                     <td width="180">
-                                   &nbsp; <a href="#" onclick="mapDialog()">【网站地图】</a>
                                     &nbsp;<a id="view_index" href="${site.url}" target="_blank"><@s.m "global.admin.viewFrontIndex"/></a>
                                     <!--
                                     &nbsp;<a style="color:#FFF" href="javascript:alert($(document).width()+','+$(document).height())">【窗口大小】</a>
@@ -122,42 +122,28 @@ function mapDialog(){
                      <div class="nav">
                      	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
                               <tr>
-                                <td style="background-image:url('${base}/res/jeecms/img/admin/nav-left.png')" width="14" height="31"></td>
                                 <td>
                                 	<ul class="nav-menu">
-                                    	<li class="current" id="tb_11" onclick="HoverLi(11);"><a href="main.do" target="mainFrame"><@s.m "global.admin.home"/></a></li>
-										<@cms_perm url="/frame/channel_main.do">			
-										<li class="sep"></li><li class="normal" id="tb_12" onclick="HoverLi(12);"><a href="frame/channel_main.do" target="mainFrame"><@s.m "cms.function.channel"/></a></li>
-										</@cms_perm>
+                                    	<li class="sep"></li>
+                                    	<li class="current" id="tb_11" onclick="HoverLi(11);"><a href="main.do" target="mainFrame"><@s.m "cms.function.workbench"/></a></li>
 										<@cms_perm url="/frame/content_main.do">
-										<li class="sep"></li><li class="normal" id="tb_13" onclick="HoverLi(13);"><a href="frame/content_main.do" target="mainFrame"><@s.m "cms.function.content"/></a></li>
-										</@cms_perm>
-										<@cms_perm url="/frame/template_main.do">
-										<li class="sep"></li><li class="normal" id="tb_14" onclick="HoverLi(14);"><a href="frame/template_main.do" target="mainFrame"><@s.m "cms.function.template"/></a></li>
-										</@cms_perm>
-										<@cms_perm url="/frame/resource_main.do">
-										<li class="sep"></li><li class="normal" id="tb_15" onclick="HoverLi(15);"><a href="frame/resource_main.do" target="mainFrame"><@s.m "cms.function.resource"/></a></li>
-										</@cms_perm>
-										<@cms_perm url="/frame/assistant_main.do">
-										<li class="sep"></li><li class="normal" id="tb_16" onclick="HoverLi(16);"><a href="frame/assistant_main.do" target="mainFrame"><@s.m "cms.function.assistant"/></a></li>
+										<li class="sep"></li><li class="normal" id="tb_12" onclick="HoverLi(12);"><a href="frame/content_main.do?source=top" target="mainFrame"><@s.m "cms.function.content"/></a></li>
 										</@cms_perm>
 										<@cms_perm url="/frame/maintain_main.do">
-										<li class="sep"></li><li class="normal" id="tb_17" onclick="HoverLi(17);"><a href="frame/maintain_main.do" target="mainFrame"><@s.m "cms.function.maintain"/></a></li>
-										</@cms_perm>
-										<@cms_perm url="/frame/generate_main.do">
-										<li class="sep"></li><li class="normal" id="tb_18" onclick="HoverLi(18);"><a href="frame/generate_main.do" target="mainFrame"><@s.m "cms.function.generate"/></a></li>
+										<li class="sep"></li><li class="normal" id="tb_13" onclick="HoverLi(13);"><a href="frame/maintain_main.do" target="mainFrame"><@s.m "cms.function.maintain"/></a></li>
 										</@cms_perm>
 										<@cms_perm url="/frame/user_main.do">
-										<li class="sep"></li><li class="normal" id="tb_19" onclick="HoverLi(19);"><a href="frame/user_main.do" target="mainFrame"><@s.m "cms.function.user"/></a></li>
+										<li class="sep"></li><li class="normal" id="tb_14" onclick="HoverLi(14);"><a href="frame/user_main.do" target="mainFrame"><@s.m "cms.function.user"/></a></li>
+										</@cms_perm>
+										<@cms_perm url="/frame/expand_main.do">
+										<li class="sep"></li><li class="normal" id="tb_15" onclick="HoverLi(15);"><a href="frame/expand_main.do" target="mainFrame"><@s.m "cms.function.expand"/></a></li>
+										</@cms_perm>
+										<@cms_perm url="/frame/statistic_main.do">
+										<li class="sep"></li><li class="normal" id="tb_16" onclick="HoverLi(16);"><a href="frame/statistic_main.do" target="mainFrame"><@s.m "cms.function.data"/></a></li>
 										</@cms_perm>
 										<@cms_perm url="/frame/config_main.do">
-										<li class="sep"></li><li class="normal" id="tb_110" onclick="HoverLi(110);"><a href="frame/config_main.do" target="mainFrame"><@s.m "cms.function.config"/></a></li>
+										<li class="sep"></li><li class="normal" id="tb_17" onclick="HoverLi(17);"><a href="frame/config_main.do" target="mainFrame"><@s.m "cms.function.config"/></a></li>
 										</@cms_perm>
-										<!-- 
-										<@cms_perm url="/frame/statistic_main.do">
-										<li class="sep"></li><li class="normal" id="tb_111" onclick="HoverLi(1,11,11);"><a href="frame/statistic_main.do" target="mainFrame"><@s.m "cms.function.statistic"/></a></li>
-										</@cms_perm>
-										 -->
                                     </ul>
                                 </td>
                               </tr>
@@ -168,6 +154,6 @@ function mapDialog(){
         </table>
      </div>
 </div>
-<div class="top-bottom"></div>
+
 </body>
 </html>

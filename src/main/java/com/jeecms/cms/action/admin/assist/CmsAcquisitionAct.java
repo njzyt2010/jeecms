@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -21,26 +22,27 @@ import com.jeecms.cms.entity.assist.CmsAcquisition;
 import com.jeecms.cms.entity.assist.CmsAcquisitionHistory;
 import com.jeecms.cms.entity.assist.CmsAcquisitionTemp;
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.ContentType;
 import com.jeecms.cms.manager.assist.CmsAcquisitionHistoryMng;
 import com.jeecms.cms.manager.assist.CmsAcquisitionMng;
 import com.jeecms.cms.manager.assist.CmsAcquisitionTempMng;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.ContentTypeMng;
 import com.jeecms.cms.service.AcquisitionSvc;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsAcquisitionAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsAcquisitionAct.class);
 	
+	@RequiresPermissions("acquisition:v_list")
 	@RequestMapping("/acquisition/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -49,6 +51,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/list";
 	}
 
+	@RequiresPermissions("acquisition:v_add")
 	@RequestMapping("/acquisition/v_add.do")
 	public String add(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -63,6 +66,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/add";
 	}
 
+	@RequiresPermissions("acquisition:v_edit")
 	@RequestMapping("/acquisition/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -82,6 +86,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/edit";
 	}
 
+	@RequiresPermissions("acquisition:o_save")
 	@RequestMapping("/acquisition/o_save.do")
 	public String save(CmsAcquisition bean, Integer channelId, Integer typeId,
 			HttpServletRequest request, ModelMap model) {
@@ -98,6 +103,7 @@ public class CmsAcquisitionAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("acquisition:o_update")
 	@RequestMapping("/acquisition/o_update.do")
 	public String update(CmsAcquisition bean, Integer channelId,
 			Integer typeId, HttpServletRequest request, ModelMap model) {
@@ -112,6 +118,7 @@ public class CmsAcquisitionAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("acquisition:o_delete")
 	@RequestMapping("/acquisition/o_delete.do")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			ModelMap model) {
@@ -128,6 +135,7 @@ public class CmsAcquisitionAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("acquisition:o_start")
 	@RequestMapping("/acquisition/o_start.do")
 	public String start(Integer[] ids, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -145,6 +153,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/progress";
 	}
 
+	@RequiresPermissions("acquisition:o_end")
 	@RequestMapping("/acquisition/o_end.do")
 	public String end(Integer id, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -163,6 +172,7 @@ public class CmsAcquisitionAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("acquisition:o_pause")
 	@RequestMapping("/acquisition/o_pause.do")
 	public String pause(Integer id, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -176,6 +186,7 @@ public class CmsAcquisitionAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("acquisition:o_cancel")
 	@RequestMapping("/acquisition/o_cancel.do")
 	public String cancel(Integer id, Integer sortId, Integer pageNo,
 			HttpServletRequest request, HttpServletResponse response,
@@ -190,6 +201,7 @@ public class CmsAcquisitionAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("acquisition:v_check_complete")
 	@RequestMapping("/acquisition/v_check_complete.do")
 	public void checkComplete(Integer id, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) throws JSONException {
@@ -201,6 +213,7 @@ public class CmsAcquisitionAct {
 		ResponseUtils.renderJson(response, json.toString());
 	}
 
+	@RequiresPermissions("acquisition:v_progress_data")
 	@RequestMapping("/acquisition/v_progress_data.do")
 	public String progressData(Integer id, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -214,6 +227,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/progress_data";
 	}
 
+	@RequiresPermissions("acquisition:v_progress")
 	@RequestMapping("/acquisition/v_progress.do")
 	public String progress(HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -226,6 +240,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/progress";
 	}
 
+	@RequiresPermissions("acquisition:v_history")
 	@RequestMapping("/acquisition/v_history.do")
 	public String history(Integer acquId, Integer pageNo,
 			HttpServletRequest request, HttpServletResponse response,
@@ -239,6 +254,7 @@ public class CmsAcquisitionAct {
 		return "acquisition/history";
 	}
 
+	@RequiresPermissions("acquisition:o_delete_history")
 	@RequestMapping("/acquisition/o_delete_history.do")
 	public String deleteHistory(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, HttpServletResponse response,

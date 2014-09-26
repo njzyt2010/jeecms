@@ -6,6 +6,6 @@
 		<id name="id" type="integer" column="friendlinkctg_id"><generator class="identity"/></id>
 		<property name="name" column="friendlinkctg_name" type="string" not-null="true" length="50"/>
 		<property name="priority" column="priority" type="integer" not-null="true" length="10"/>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"></many-to-one>
 	</class>
 </hibernate-mapping>

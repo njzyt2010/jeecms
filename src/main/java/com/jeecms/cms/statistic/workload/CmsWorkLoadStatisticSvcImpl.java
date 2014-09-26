@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.statistic.workload.CmsWorkLoadStatistic.CmsWorkLoadStatisticDateKind;
 import com.jeecms.cms.statistic.workload.CmsWorkLoadStatistic.CmsWorkLoadStatisticGroup;
 import com.jeecms.common.util.DateUtils;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsUserMng;
 
 @Service
 @Transactional(readOnly = true)

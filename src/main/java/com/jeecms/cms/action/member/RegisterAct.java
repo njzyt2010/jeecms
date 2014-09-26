@@ -4,6 +4,8 @@ import static com.jeecms.cms.Constants.TPLDIR_MEMBER;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,23 +20,25 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.jeecms.cms.entity.main.CmsConfig;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUserExt;
-import com.jeecms.cms.entity.main.MemberConfig;
-import com.jeecms.cms.manager.main.CmsUserMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.email.EmailSender;
 import com.jeecms.common.email.MessageTemplate;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
 import com.jeecms.common.web.session.SessionProvider;
+import com.jeecms.core.entity.CmsConfig;
+import com.jeecms.core.entity.CmsConfigItem;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUserExt;
+import com.jeecms.core.entity.MemberConfig;
 import com.jeecms.core.entity.UnifiedUser;
 import com.jeecms.core.manager.AuthenticationMng;
+import com.jeecms.core.manager.CmsConfigItemMng;
+import com.jeecms.core.manager.CmsUserMng;
 import com.jeecms.core.manager.ConfigMng;
 import com.jeecms.core.manager.UnifiedUserMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
 import com.octo.captcha.service.CaptchaServiceException;
 import com.octo.captcha.service.image.ImageCaptchaService;
 
@@ -65,8 +69,10 @@ public class RegisterAct {
 			return FrontUtils.showMessage(request, model,
 					"member.registerClose");
 		}
+		List<CmsConfigItem>items=cmsConfigItemMng.getList(site.getConfig().getId(), CmsConfigItem.CATEGORY_REGISTER);
 		FrontUtils.frontData(request, model, site);
 		model.addAttribute("mcfg", mcfg);
+		model.addAttribute("items", items);
 		return FrontUtils.getTplPath(request, site.getSolutionPath(),
 				TPLDIR_MEMBER, REGISTER);
 	}
@@ -77,14 +83,19 @@ public class RegisterAct {
 			HttpServletRequest request, HttpServletResponse response,
 			ModelMap model) throws IOException {
 		CmsSite site = CmsUtils.getSite(request);
-		CmsConfig config=site.getConfig();
+		CmsConfig config = site.getConfig();
 		WebErrors errors = validateSubmit(username, email, password, captcha,
 				site, request, response);
+		boolean disabled=false;
+		if(config.getMemberConfig().isCheckOn()){
+			disabled=true;
+		}
 		if (errors.hasErrors()) {
 			return FrontUtils.showError(request, response, model, errors);
 		}
 		String ip = RequestUtils.getIpAddr(request);
-		if(config.getEmailValidate()){
+		Map<String,String>attrs=RequestUtils.getRequestMap(request, "attr_");
+		if (config.getEmailValidate()) {
 			EmailSender sender = configMng.getEmailSender();
 			MessageTemplate msgTpl = configMng.getRegisterMessageTemplate();
 			if (sender == null) {
@@ -95,15 +106,15 @@ public class RegisterAct {
 				model.addAttribute("status", 5);
 			} else {
 				try {
-					cmsUserMng.registerMember(username, email, password, ip, null, userExt,
-							false, sender, msgTpl);
+					cmsUserMng.registerMember(username, email, password, ip,
+							null,disabled,userExt,attrs, false, sender, msgTpl);
 					model.addAttribute("status", 0);
 				} catch (UnsupportedEncodingException e) {
 					// 发送邮件异常
 					model.addAttribute("status", 100);
 					model.addAttribute("message", e.getMessage());
 					log.error("send email exception.", e);
-				}catch (MessagingException e) {
+				} catch (MessagingException e) {
 					// 发送邮件异常
 					model.addAttribute("status", 101);
 					model.addAttribute("message", e.getMessage());
@@ -119,21 +130,22 @@ public class RegisterAct {
 				return FrontUtils.getTplPath(request, site.getSolutionPath(),
 						TPLDIR_MEMBER, REGISTER_RESULT);
 			}
-		}else{
-			cmsUserMng.registerMember(username, email, password, ip, null, userExt);
+		} else {
+			cmsUserMng.registerMember(username, email, password, ip, null,null,disabled,userExt,attrs);
 			log.info("member register success. username={}", username);
 			FrontUtils.frontData(request, model, site);
 			FrontUtils.frontPageData(request, model);
-			model.addAttribute("success",true);
+			model.addAttribute("success", true);
 			return FrontUtils.getTplPath(request, site.getSolutionPath(),
 					TPLDIR_MEMBER, LOGIN_INPUT);
 		}
-		
+
 	}
 
 	@RequestMapping(value = "/active.jspx", method = RequestMethod.GET)
-	public String active(String username, String key,HttpServletRequest request, 
-			HttpServletResponse response,ModelMap model) throws IOException {
+	public String active(String username, String key,
+			HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws IOException {
 		CmsSite site = CmsUtils.getSite(request);
 		WebErrors errors = validateActive(username, key, request, response);
 		if (errors.hasErrors()) {
@@ -269,4 +281,6 @@ public class RegisterAct {
 	private ConfigMng configMng;
 	@Autowired
 	private AuthenticationMng authMng;
+	@Autowired
+	private CmsConfigItemMng cmsConfigItemMng;
 }

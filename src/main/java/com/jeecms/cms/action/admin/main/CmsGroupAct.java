@@ -1,10 +1,14 @@
 package com.jeecms.cms.action.admin.main;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +17,19 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsGroup;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.web.WebErrors;
 
 @Controller
 public class CmsGroupAct {
-	private static final Logger log = LoggerFactory
-			.getLogger(CmsGroupAct.class);
+	private static final Logger log = LoggerFactory.getLogger(CmsGroupAct.class);
 
+	@RequiresPermissions("group:v_list")
 	@RequestMapping("/group/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		List<CmsGroup> list = manager.getList();
@@ -33,6 +37,7 @@ public class CmsGroupAct {
 		return "group/list";
 	}
 
+	@RequiresPermissions("group:v_add")
 	@RequestMapping("/group/v_add.do")
 	public String add(HttpServletRequest request,ModelMap model) {
 		List<CmsSite> siteList = cmsSiteMng.getList();
@@ -40,18 +45,29 @@ public class CmsGroupAct {
 		return "group/add";
 	}
 
+	@RequiresPermissions("group:v_edit")
 	@RequestMapping("/group/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
 		}
+		CmsGroup group=manager.findById(id);
 		List<CmsSite> siteList = cmsSiteMng.getList();
+		Map<String, Set<Integer>>viewChannelsMap=new HashMap<String, Set<Integer>>();
+		Map<String, Set<Integer>>contriChannelsMap=new HashMap<String, Set<Integer>>();
+		for(CmsSite site:siteList){
+			viewChannelsMap.put(site.getId().toString(), group.getViewChannelIds(site.getId()));
+			contriChannelsMap.put(site.getId().toString(), group.getContriChannelIds(site.getId()));
+		}
 		model.addAttribute("siteList", siteList);
-		model.addAttribute("cmsGroup", manager.findById(id));
+		model.addAttribute("cmsGroup", group);
+		model.addAttribute("viewGroupIds", viewChannelsMap);
+		model.addAttribute("contriGroupIds",contriChannelsMap);
 		return "group/edit";
 	}
 
+	@RequiresPermissions("group:o_save")
 	@RequestMapping("/group/o_save.do")
 	public String save(CmsGroup bean,  Integer[] viewGroupIds, Integer[] contriGroupIds,
 		HttpServletRequest request, ModelMap model) {
@@ -66,6 +82,7 @@ public class CmsGroupAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("group:o_update")
 	@RequestMapping("/group/o_update.do")
 	public String update(CmsGroup bean, Integer[] viewGroupIds, Integer[] contriGroupIds,
 			HttpServletRequest request,ModelMap model) {
@@ -80,6 +97,7 @@ public class CmsGroupAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("group:o_delete")
 	@RequestMapping("/group/o_delete.do")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			ModelMap model) {
@@ -96,6 +114,7 @@ public class CmsGroupAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("group:o_priority")
 	@RequestMapping("/group/o_priority.do")
 	public String priority(Integer[] wids, Integer[] priority,
 			Integer regDefId, HttpServletRequest request, ModelMap model) {
@@ -109,12 +128,14 @@ public class CmsGroupAct {
 		return list(request, model);
 	}
 	
+	@RequiresPermissions("group:v_channels_add")
 	@RequestMapping(value = "/group/v_channels_add.do")
 	public String channelsAdd(Integer siteId, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
 		return channelsAddJson(siteId, request, response, model);
 	}
 
+	@RequiresPermissions("group:v_channels_edit")
 	@RequestMapping(value = "/group/v_channels_edit.do")
 	public String channelsEdit(Integer groupId, Integer siteId,Integer type,
 			HttpServletRequest request, HttpServletResponse response,

@@ -16,7 +16,7 @@ public class CmsGuestbookDaoImpl extends
 	public Pagination getPage(Integer siteId, Integer ctgId,Integer userId,Boolean recommend,
 			Boolean checked, boolean asc, boolean cacheable, int pageNo,
 			int pageSize) {
-		Finder f = createFinder(siteId, ctgId, userId,recommend, checked, asc,
+		Finder f = createFinder(siteId, ctgId,userId,recommend, checked, asc,
 				cacheable);
 		return find(f, pageNo, pageSize);
 	}
@@ -25,7 +25,7 @@ public class CmsGuestbookDaoImpl extends
 	public List<CmsGuestbook> getList(Integer siteId, Integer ctgId,
 			Boolean recommend, Boolean checked, boolean desc,
 			boolean cacheable, int first, int max) {
-		Finder f = createFinder(siteId, ctgId, null,recommend, checked, desc,
+		Finder f = createFinder(siteId, ctgId,null,recommend, checked, desc,
 				cacheable);
 		f.setFirstResult(first);
 		f.setMaxResults(max);
@@ -40,7 +40,7 @@ public class CmsGuestbookDaoImpl extends
 			f.setParam("siteId", siteId);
 		}
 		if (ctgId != null) {
-			f.append(" and bean.ctg.id=:ctgId");
+			f.append(" and bean.ctg.id =:ctgId");
 			f.setParam("ctgId", ctgId);
 		}
 		if (userId != null) {

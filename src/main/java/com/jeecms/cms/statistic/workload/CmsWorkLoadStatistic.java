@@ -3,7 +3,7 @@ package com.jeecms.cms.statistic.workload;
 import java.util.Date;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsUser;
+import com.jeecms.core.entity.CmsUser;
 
 /**
  * @author Tom

@@ -10,9 +10,9 @@ function setDefSolution() {
 		"solution" : $("#defSolution").val()
 	}, function(data) {
 		if (data.success) {
-			alert("<@s.m "global.success.save"/>");
+			$.alert("<@s.m 'global.prompt'/>","<@s.m 'global.success.save'/>");
 		} else {
-			alert(data.msg);
+			$.alert("<@s.m 'global.prompt'/>",data.msg);
 		}
 	}, "json");
 }
@@ -45,7 +45,7 @@ function importTpl() {
 <@p.form id="jvForm">
 <@cms_perm url="/template/o_def_template.do">
 <@p.td label="template.default">
-	<@p.select id="defSolution" list=solutions value=defSolution/>
+	<@p.select id="defSolution" list=solutions value=defSolution!/>
 &nbsp; <input class="setting" type="button" onclick="setDefSolution();" value="<@s.m "template.setting"/>"/>
 </@p.td><@p.tr/>
 </@cms_perm>

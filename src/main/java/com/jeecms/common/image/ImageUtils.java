@@ -1,7 +1,11 @@
 package com.jeecms.common.image;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 图片辅助类
@@ -126,5 +130,22 @@ public abstract class ImageUtils {
 			this.y = y;
 		}
 	}
+	
+
+	public static  List<String> getImageSrc(String htmlCode) {  
+        List<String> imageSrcList = new ArrayList<String>();  
+        String regular="<img(.*?)src=\"(.*?)\"";  
+        String img_pre="(?i)<img(.*?)src=\"";
+        String img_sub="\"";
+        Pattern p=Pattern.compile(regular,Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(htmlCode);  
+        String src = null;  
+        while (m.find()) {  
+        	src=m.group();
+        	src=src.replaceAll(img_pre, "").replaceAll(img_sub, "").trim();
+            imageSrcList.add(src);  
+        }  
+        return imageSrcList;  
+    }
 
 }

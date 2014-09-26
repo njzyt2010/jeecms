@@ -17,7 +17,7 @@
 		<property name="restrictCookie" column="is_restrict_cookie" type="java.lang.Boolean" not-null="true"/>
 		<property name="disabled" column="is_disabled" type="java.lang.Boolean" not-null="true"/>
 		<property name="def" column="is_def" type="java.lang.Boolean" not-null="true"/>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"></many-to-one>
 		<set name="subtopics" inverse="true" cascade="delete-orphan" sort="com.jeecms.common.hibernate3.PriorityComparator">
 			<key column="votetopic_id"/>
 			<one-to-many class="CmsVoteSubTopic"/>

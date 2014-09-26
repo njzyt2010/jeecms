@@ -55,21 +55,21 @@
 		<many-to-one
 			name="msgReceiverUser"
 			column="msg_receiver_user"
-			class="com.jeecms.cms.entity.main.CmsUser"
+			class="com.jeecms.core.entity.CmsUser"
 			not-null="true"
 		>
 		</many-to-one>
 		<many-to-one
 			name="msgSendUser"
 			column="msg_send_user"
-			class="com.jeecms.cms.entity.main.CmsUser"
+			class="com.jeecms.core.entity.CmsUser"
 			not-null="true"
 		>
 		</many-to-one>
 		<many-to-one
 			name="site"
 			column="site_id"
-			class="com.jeecms.cms.entity.main.CmsSite"
+			class="com.jeecms.core.entity.CmsSite"
 			not-null="true"
 		>
 		</many-to-one>

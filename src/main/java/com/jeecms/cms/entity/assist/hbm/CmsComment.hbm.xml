@@ -12,9 +12,9 @@
 		<property name="recommend" column="is_recommend" type="java.lang.Boolean" not-null="true"/>
 		<property name="checked" column="is_checked" type="java.lang.Boolean" not-null="true"/>
 		<one-to-one name="commentExt" class="CmsCommentExt" cascade="delete"/>
-		<many-to-one name="replayUser" column="reply_user_id" class="com.jeecms.cms.entity.main.CmsUser" not-null="false"></many-to-one>
 		<many-to-one name="content" column="content_id" class="com.jeecms.cms.entity.main.Content" not-null="true"></many-to-one>
-		<many-to-one name="commentUser" column="comment_user_id" class="com.jeecms.cms.entity.main.CmsUser" not-null="false"></many-to-one>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"></many-to-one>
+		<many-to-one name="replayUser" column="reply_user_id" class="com.jeecms.core.entity.CmsUser" not-null="false"></many-to-one>
+		<many-to-one name="commentUser" column="comment_user_id" class="com.jeecms.core.entity.CmsUser" not-null="false"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"></many-to-one>
 	</class>
 </hibernate-mapping>

@@ -65,7 +65,7 @@ public class CmsComment extends BaseCmsComment {
 	public CmsComment (
 		java.lang.Integer id,
 		com.jeecms.cms.entity.main.Content content,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsSite site,
 		java.util.Date createTime,
 		java.lang.Short ups,
 		java.lang.Short downs,

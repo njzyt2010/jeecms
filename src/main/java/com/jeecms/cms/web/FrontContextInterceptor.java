@@ -4,19 +4,21 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.manager.main.CmsSiteMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
-import com.jeecms.common.web.session.SessionProvider;
-import com.jeecms.core.manager.AuthenticationMng;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * CMS上下文信息拦截器
@@ -24,6 +26,7 @@ import com.jeecms.core.manager.AuthenticationMng;
  * 包括登录信息、权限信息、站点信息
  */
 public class FrontContextInterceptor extends HandlerInterceptorAdapter {
+	public static final String SITE_COOKIE = "_site_id_cookie";
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 			HttpServletResponse response, Object handler)
@@ -75,28 +78,30 @@ public class FrontContextInterceptor extends HandlerInterceptorAdapter {
 		}
 		
 		CmsUtils.setSite(request, site);
-
-		CmsUser user = null;
-		Integer userId = authMng.retrieveUserIdFromSession(session, request);
-		if (userId != null) {
-			user = cmsUserMng.findById(userId);
-		}
-		
-		if (user != null) {
+		CmsThreadVariable.setSite(site);
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isAuthenticated()|| subject.isRemembered()) {
+			String username =  (String) subject.getPrincipal();
+			CmsUser user = cmsUserMng.findByUsername(username);
 			CmsUtils.setUser(request, user);
+			// Site加入线程变量
+			CmsThreadVariable.setUser(user);
 		}
+		createJsessionId(request, response, site);
 		return true;
 	}
+	
+	
+	private void createJsessionId(HttpServletRequest request,HttpServletResponse response,CmsSite site){
+		 String JSESSIONID = request.getSession().getId();//获取当前JSESSIONID （不管是从主域还是二级域访问产生）
+		 Cookie cookie = new Cookie("JSESSIONID", JSESSIONID);
+		 cookie.setDomain(site.getBaseDomain()); //关键在这里，将cookie设成主域名访问，确保不同域之间都能获取到该cookie的值，从而确保session统一
+		 response.addCookie(cookie);  //将cookie返回到客户端
+	}
 
-	private SessionProvider session;
 	private CmsSiteMng cmsSiteMng;
 	private CmsUserMng cmsUserMng;
-	private AuthenticationMng authMng;
 
-	@Autowired
-	public void setSession(SessionProvider session) {
-		this.session = session;
-	}
 
 	@Autowired
 	public void setCmsSiteMng(CmsSiteMng cmsSiteMng) {
@@ -106,10 +111,5 @@ public class FrontContextInterceptor extends HandlerInterceptorAdapter {
 	@Autowired
 	public void setCmsUserMng(CmsUserMng cmsUserMng) {
 		this.cmsUserMng = cmsUserMng;
-	}
-
-	@Autowired
-	public void setAuthMng(AuthenticationMng authMng) {
-		this.authMng = authMng;
 	}
 }

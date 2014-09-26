@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,16 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.main.CmsModel;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.CmsModelMng;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
 
 @Controller
 public class CmsModelAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsModelAct.class);
 
+	@RequiresPermissions("model:v_list")
 	@RequestMapping("/model/v_list.do")
 	public String list(HttpServletRequest request, ModelMap model) {
 		List<CmsModel> list = manager.getList(true,null);
@@ -28,11 +30,13 @@ public class CmsModelAct {
 		return "model/list";
 	}
 
+	@RequiresPermissions("model:v_add")
 	@RequestMapping("/model/v_add.do")
 	public String add(ModelMap model) {
 		return "model/add";
 	}
 
+	@RequiresPermissions("model:v_edit")
 	@RequestMapping("/model/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -43,6 +47,7 @@ public class CmsModelAct {
 		return "model/edit";
 	}
 
+	@RequiresPermissions("model:o_save")
 	@RequestMapping("/model/o_save.do")
 	public String save(CmsModel bean, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateSave(bean, request);
@@ -56,6 +61,7 @@ public class CmsModelAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("model:o_update")
 	@RequestMapping("/model/o_update.do")
 	public String update(CmsModel bean, HttpServletRequest request,
 			ModelMap model) {
@@ -70,6 +76,7 @@ public class CmsModelAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("model:o_delete")
 	@RequestMapping("/model/o_delete.do")
 	public String delete(Integer[] ids, HttpServletRequest request,
 			ModelMap model) {
@@ -86,6 +93,7 @@ public class CmsModelAct {
 		return list(request, model);
 	}
 
+	@RequiresPermissions("model:o_priority")
 	@RequestMapping("/model/o_priority.do")
 	public String priority(Integer[] wids, Integer[] priority,
 			Boolean[] disabled, Integer defId, HttpServletRequest request,

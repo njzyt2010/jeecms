@@ -12,7 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
-import com.jeecms.cms.entity.main.CmsSite;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.web.util.CmsUtils;
 
 /**
  * 前台本地化信息拦截器

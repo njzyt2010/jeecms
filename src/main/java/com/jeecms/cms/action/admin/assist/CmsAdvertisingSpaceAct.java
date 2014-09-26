@@ -3,7 +3,11 @@ package com.jeecms.cms.action.admin.assist;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +16,19 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.assist.CmsAdvertisingSpace;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsAdvertisingSpaceMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
+import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsAdvertisingSpaceAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsAdvertisingSpaceAct.class);
 
+	@RequiresPermissions("advertising_space:v_list")
 	@RequestMapping("/advertising_space/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -32,11 +38,13 @@ public class CmsAdvertisingSpaceAct {
 		return "advertising_space/list";
 	}
 
+	@RequiresPermissions("advertising_space:v_add")
 	@RequestMapping("/advertising_space/v_add.do")
 	public String add(ModelMap model) {
 		return "advertising_space/add";
 	}
 
+	@RequiresPermissions("advertising_space:v_edit")
 	@RequestMapping("/advertising_space/v_edit.do")
 	public String edit(Integer id, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -48,7 +56,22 @@ public class CmsAdvertisingSpaceAct {
 		model.addAttribute("pageNo", pageNo);
 		return "advertising_space/edit";
 	}
+	
+	@RequiresPermissions("advertising_space:v_ajax_edit")
+	@RequestMapping("/advertising_space/v_ajax_edit.do")
+	public void ajaxEdit(Integer id, HttpServletRequest request,HttpServletResponse response, ModelMap model) throws JSONException {
+		JSONObject object = new JSONObject();
+		CmsAdvertisingSpace space=manager.findById(id);
+		if(space!=null){
+			object.put("id", space.getId());
+			object.put("name", space.getName());
+			object.put("description", space.getDescription());
+			object.put("enabled", space.getEnabled());
+		}
+		ResponseUtils.renderJson(response, object.toString());
+	}
 
+	@RequiresPermissions("advertising_space:o_save")
 	@RequestMapping("/advertising_space/o_save.do")
 	public String save(CmsAdvertisingSpace bean, HttpServletRequest request,
 			ModelMap model) {
@@ -63,6 +86,7 @@ public class CmsAdvertisingSpaceAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("advertising_space:o_update")
 	@RequestMapping("/advertising_space/o_update.do")
 	public String update(CmsAdvertisingSpace bean, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
@@ -77,6 +101,7 @@ public class CmsAdvertisingSpaceAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("advertising_space:o_delete")
 	@RequestMapping("/advertising_space/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {

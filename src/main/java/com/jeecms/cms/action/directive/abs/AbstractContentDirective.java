@@ -1,5 +1,6 @@
 package com.jeecms.cms.action.directive.abs;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +10,14 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.ContentTag;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
 import com.jeecms.cms.manager.main.ContentMng;
 import com.jeecms.cms.manager.main.ContentTagMng;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.web.freemarker.DirectiveUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsSiteMng;
+import com.jeecms.core.web.util.FrontUtils;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveModel;
@@ -105,10 +106,35 @@ public abstract class AbstractContentDirective implements
 	 */
 	public static final String PARAM_ORDER_BY = "orderBy";
 	/**
+	 * 开放（0私有，1公开的，2不设置该参数 忽略该参数值）
+	 */
+	public static final String PARAM_OPEN = "open";
+	/**
 	 * 输入参数，不包含的文章ID。用于按tag查询相关文章。
 	 */
 	public static final String PARAM_EXCLUDE_ID = "excludeId";
-
+	
+	/**
+	 * 自定义字段前缀(类似string_author)
+	 */
+	public static final String PARAM_ATTR_STRING_PERFIX = "s_";
+	/**
+	 * 自定义字段运算操作前缀
+	 */
+	public static final String PARAM_ATTR_OPERATE_PREFIX = "o_";
+	
+	/**
+	 * （start左包含，end右包含，like包含，eq等于，gt大于，gte大于等于，lt小于，lte小于等于，默认等于）
+	 */
+	public static final String PARAM_ATTR_START = "start";
+	public static final String PARAM_ATTR_END = "end";
+	public static final String PARAM_ATTR_LIKE = "like";
+	public static final String PARAM_ATTR_EQ = "eq";
+	public static final String PARAM_ATTR_GT = "gt";
+	public static final String PARAM_ATTR_GTE = "gte";
+	public static final String PARAM_ATTR_LT = "lt";
+	public static final String PARAM_ATTR_LTE = "lte";
+	
 	protected Integer[] getTagIds(Map<String, TemplateModel> params)
 			throws TemplateException {
 		Integer[] ids = DirectiveUtils.getIntArray(PARAM_TAG_ID, params);
@@ -281,6 +307,34 @@ public abstract class AbstractContentDirective implements
 			return orderBy;
 		}
 	}
+	
+	/**
+	 * 返回key为字段名 value为字段值、字段类型、查询操作（大于或者等于等）
+	 * @param params
+	 * @return
+	 * @throws TemplateException
+	 */
+	protected Map<String,String[]> getAttrMap(Map<String, TemplateModel> params)
+	throws TemplateException {
+		Set<String>keys = DirectiveUtils.getKeysByPrefix(PARAM_ATTR_STRING_PERFIX, params);
+		Map<String,String[]>attrStringMap=new HashMap<String, String[]>();
+		if (keys==null) {
+			return null;
+		}
+		for(String key:keys){
+			String value=DirectiveUtils.getString(key, params);
+			key=key.split(PARAM_ATTR_STRING_PERFIX)[1];
+			String operate=DirectiveUtils.getString(PARAM_ATTR_OPERATE_PREFIX+key, params);
+			//默认操作等于
+			if(StringUtils.isBlank(operate)){
+				operate=PARAM_ATTR_EQ;
+			}
+			String[] mapValue=new String[]{value,operate};
+			//去除前缀
+			attrStringMap.put(key, mapValue);
+		}
+		return attrStringMap;
+	}
 
 	protected Object getData(Map<String, TemplateModel> params, Environment env)
 			throws TemplateException {
@@ -290,7 +344,9 @@ public abstract class AbstractContentDirective implements
 		Integer[] typeIds = getTypeIds(params);
 		Integer[] siteIds = getSiteIds(params);
 		String title = getTitle(params);
+		Map<String,String[]>attr=getAttrMap(params);
 		int count = FrontUtils.getCount(params);
+		
 
 		Integer[] tagIds = getTagIds(params);
 		if (tagIds != null) {
@@ -300,12 +356,12 @@ public abstract class AbstractContentDirective implements
 				int pageNo = FrontUtils.getPageNo(env);
 				return contentMng.getPageByTagIdsForTag(tagIds, siteIds,
 						channelIds, typeIds, excludeId, titleImg, recommend,
-						title, orderBy, pageNo, count);
+						title, attr,orderBy, pageNo, count);
 			} else {
 				int first = FrontUtils.getFirst(params);
 				return contentMng.getListByTagIdsForTag(tagIds, siteIds,
 						channelIds, typeIds, excludeId, titleImg, recommend,
-						title, orderBy, first, count);
+						title,attr, orderBy, first, count);
 			}
 		}
 		Integer topicId = getTopicId(params);
@@ -314,12 +370,12 @@ public abstract class AbstractContentDirective implements
 			if (isPage()) {
 				int pageNo = FrontUtils.getPageNo(env);
 				return contentMng.getPageByTopicIdForTag(topicId, siteIds,
-						channelIds, typeIds, titleImg, recommend, title,
+						channelIds, typeIds, titleImg, recommend, title,attr,
 						orderBy, pageNo, count);
 			} else {
 				int first = FrontUtils.getFirst(params);
 				return contentMng.getListByTopicIdForTag(topicId, siteIds,
-						channelIds, typeIds, titleImg, recommend, title,
+						channelIds, typeIds, titleImg, recommend, title,attr,
 						orderBy, first, count);
 			}
 		}
@@ -329,12 +385,12 @@ public abstract class AbstractContentDirective implements
 			if (isPage()) {
 				int pageNo = FrontUtils.getPageNo(env);
 				return contentMng.getPageByChannelIdsForTag(channelIds,
-						typeIds, titleImg, recommend, title, orderBy, option,
+						typeIds, titleImg, recommend, title,attr, orderBy, option,
 						pageNo, count);
 			} else {
 				int first = FrontUtils.getFirst(params);
 				return contentMng.getListByChannelIdsForTag(channelIds,
-						typeIds, titleImg, recommend, title, orderBy, option,
+						typeIds, titleImg, recommend, title, attr,orderBy, option,
 						first, count);
 			}
 		}
@@ -360,12 +416,12 @@ public abstract class AbstractContentDirective implements
 					if (isPage()) {
 						int pageNo = FrontUtils.getPageNo(env);
 						return contentMng.getPageByChannelIdsForTag(channelIds,
-								typeIds, titleImg, recommend, title, orderBy,
-								option, pageNo, count);
+								typeIds, titleImg, recommend, title, attr, orderBy,
+								option,pageNo, count);
 					} else {
 						int first = FrontUtils.getFirst(params);
 						return contentMng.getListByChannelIdsForTag(channelIds,
-								typeIds, titleImg, recommend, title, orderBy,
+								typeIds, titleImg, recommend, title,attr, orderBy,
 								option, first, count);
 					}
 				} else {
@@ -375,12 +431,12 @@ public abstract class AbstractContentDirective implements
 				if (isPage()) {
 					int pageNo = FrontUtils.getPageNo(env);
 					return contentMng.getPageByChannelPathsForTag(channelPaths,
-							siteIds, typeIds, titleImg, recommend, title,
+							siteIds, typeIds, titleImg, recommend, title,attr,
 							orderBy, pageNo, count);
 				} else {
 					int first = FrontUtils.getFirst(params);
 					return contentMng.getListByChannelPathsForTag(channelPaths,
-							siteIds, typeIds, titleImg, recommend, title,
+							siteIds, typeIds, titleImg, recommend, title,attr,
 							orderBy, first, count);
 				}
 			}
@@ -389,11 +445,11 @@ public abstract class AbstractContentDirective implements
 		if (isPage()) {
 			int pageNo = FrontUtils.getPageNo(env);
 			return contentMng.getPageBySiteIdsForTag(siteIds, typeIds,
-					titleImg, recommend, title, orderBy, pageNo, count);
+					titleImg, recommend, title, attr,orderBy, pageNo, count);
 		} else {
 			int first = FrontUtils.getFirst(params);
 			return contentMng.getListBySiteIdsForTag(siteIds, typeIds,
-					titleImg, recommend, title, orderBy, first, count);
+					titleImg, recommend, title,attr,orderBy, first, count);
 		}
 	}
 

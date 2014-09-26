@@ -1,10 +1,12 @@
 package com.jeecms.common.security;
 
+import org.apache.shiro.authc.AccountException;
+
 /**
  * 登录异常
  */
 @SuppressWarnings("serial")
-public class AuthenticationException extends Exception {
+public class AuthenticationException extends AccountException {
 	private Object extraInformation;
 
 	public AuthenticationException() {

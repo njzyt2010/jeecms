@@ -3,21 +3,23 @@ package com.jeecms.cms.action.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.CmsUserExt;
-import com.jeecms.cms.manager.main.CmsUserExtMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.CmsUserExt;
+import com.jeecms.core.manager.CmsUserExtMng;
+import com.jeecms.core.manager.CmsUserMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class PersonalAct {
+	@RequiresPermissions("personal:v_profile")
 	@RequestMapping("/personal/v_profile.do")
 	public String profileEdit(HttpServletRequest request, ModelMap model) {
 		CmsUser user = CmsUtils.getUser(request);
@@ -25,6 +27,7 @@ public class PersonalAct {
 		return "personal/profile";
 	}
 
+	@RequiresPermissions("personal:o_profile")
 	@RequestMapping("/personal/o_profile.do")
 	public String profileUpdate(String origPwd, String newPwd, String email,
 			String realname, HttpServletRequest request, ModelMap model) {
@@ -53,6 +56,7 @@ public class PersonalAct {
 	 * @param request
 	 * @param response
 	 */
+	@RequiresPermissions("personal:v_checkPwd")
 	@RequestMapping("/personal/v_checkPwd.do")
 	public void checkPwd(String origPwd, HttpServletRequest request,
 			HttpServletResponse response) {

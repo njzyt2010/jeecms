@@ -29,7 +29,7 @@ target: 是否新窗口打开；【0：原窗口；1：新窗口】不能为空
 [#--类别--]
 [#if ctgForm=='0']
 [#elseif ctgForm='1']
-<a href="${ctt.ctgUrl}" class="${ctgClass!}" target="_blank">[${ctt.ctgName}]</a> [#rt/]
+<a href="${ctt.ctgUrl}" class="${ctgClass!}" target="_blank">[[#if ctt.siteId!=site.id]${channel.name}[#else]${ctt.ctgName}[/#if]]</a>[#rt/]
 [#elseif ctgForm='2']
 <a href="${ctt.siteUrl}" class="${ctgClass!}" target="_blank">[${ctt.siteName}]</a> [#rt/]
 [/#if]

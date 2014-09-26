@@ -13,6 +13,6 @@
 		<property name="refererKeyword" column="referer_keyword" type="string" length="255"/>
 		<property name="area" type="string" length="50"/>
 		<property name="sessionId" column="session_id" type="string" not-null="true" length="50"/>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"/>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"/>
 	</class>
 </hibernate-mapping>

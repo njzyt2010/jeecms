@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,33 +20,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.jeecms.cms.entity.main.Channel;
 import com.jeecms.cms.entity.main.ChannelExt;
 import com.jeecms.cms.entity.main.ChannelTxt;
-import com.jeecms.cms.entity.main.CmsGroup;
 import com.jeecms.cms.entity.main.CmsModel;
 import com.jeecms.cms.entity.main.CmsModelItem;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.CmsModelItemMng;
 import com.jeecms.cms.manager.main.CmsModelMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.web.RequestUtils;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.manager.CmsUserMng;
 import com.jeecms.core.tpl.TplManager;
-import com.jeecms.core.web.CoreUtils;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.CoreUtils;
 
 @Controller
 public class ChannelAct {
 	private static final Logger log = LoggerFactory.getLogger(ChannelAct.class);
-
+	
+	@RequiresPermissions("channel:channel_main")
+	@RequestMapping("/channel/channel_main.do")
+	public String channelMain(ModelMap model) {
+		return "channel/channel_main";
+	}
+	
+	@RequiresPermissions("channel:v_left")
 	@RequestMapping("/channel/v_left.do")
 	public String left() {
 		return "channel/left";
 	}
 
+	@RequiresPermissions("channel:v_tree")
 	@RequestMapping(value = "/channel/v_tree.do")
 	public String tree(String root, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
@@ -78,6 +87,7 @@ public class ChannelAct {
 		return "channel/tree";
 	}
 
+	@RequiresPermissions("channel:v_list")
 	@RequestMapping("/channel/v_list.do")
 	public String list(Integer root, HttpServletRequest request, ModelMap model) {
 		List<Channel> list;
@@ -92,6 +102,7 @@ public class ChannelAct {
 		return "channel/list";
 	}
 
+	@RequiresPermissions("channel:v_add")
 	@RequestMapping("/channel/v_add.do")
 	public String add(Integer root, Integer modelId,
 			HttpServletRequest request, ModelMap model) {
@@ -108,7 +119,6 @@ public class ChannelAct {
 		List<String> channelTplList = getTplChannel(site, m, null);
 		// 内容模板列表
 		List<String> contentTplList = getTplContent(site, m, null);
-		//模型列表和各个模型模板
 		List<CmsModel> models=cmsModelMng.getList(false,true);
 		Map<String,List<String>>modelTplMap=new HashMap<String, List<String>>();
 		for(CmsModel tempModel:models){
@@ -149,6 +159,7 @@ public class ChannelAct {
 		return "channel/add";
 	}
 
+	@RequiresPermissions("channel:v_edit")
 	@RequestMapping("/channel/v_edit.do")
 	public String edit(Integer id, Integer root, HttpServletRequest request,
 			ModelMap model) {
@@ -182,11 +193,9 @@ public class ChannelAct {
 				channel, false);
 
 		// 栏目模板列表
-		List<String> channelTplList = getTplChannel(site, m, channel
-				.getTplChannel());
+		List<String> channelTplList = getTplChannel(site, m, channel.getTplChannel());
 		// 内容模板列表
-		List<String> contentTplList = getTplContent(site, m, channel
-				.getTplContent());
+		List<String> contentTplList = getTplContent(site, m, channel.getTplContent());
 		//模型列表和各个模型模板
 		List<CmsModel> models=cmsModelMng.getList(false,true);
 		Map<String,List<String>>modelTplMap=new HashMap<String, List<String>>();
@@ -239,11 +248,12 @@ public class ChannelAct {
 		return "channel/edit";
 	}
 
+	@RequiresPermissions("channel:o_save")
 	@RequestMapping("/channel/o_save.do")
 	public String save(Integer root, Channel bean, ChannelExt ext,
 			ChannelTxt txt, Integer[] viewGroupIds, Integer[] contriGroupIds,
-			Integer[] userIds, Integer modelId, Integer[] modelIds,String[] tpls, HttpServletRequest request,
-			ModelMap model) {
+			Integer[] userIds, Integer modelId,
+			Integer[] modelIds,String[] tpls, HttpServletRequest request,ModelMap model) {
 		WebErrors errors = validateSave(bean, request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
@@ -274,11 +284,12 @@ public class ChannelAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("channel:o_update")
 	@RequestMapping("/channel/o_update.do")
 	public String update(Integer root, Channel bean, ChannelExt ext,
 			ChannelTxt txt, Integer[] viewGroupIds, Integer[] contriGroupIds,
-			Integer[] userIds, Integer parentId, Integer[] modelIds,String[] tpls, HttpServletRequest request,
-			ModelMap model) {
+			Integer[] userIds, Integer parentId,
+			Integer[] modelIds,String[] tpls,HttpServletRequest request,ModelMap model) {
 		WebErrors errors = validateUpdate(bean.getId(), request);
 		if (errors.hasErrors()) {
 			return errors.showErrorPage(model);
@@ -294,7 +305,7 @@ public class ChannelAct {
 		}
 		if(tpls!=null&&tpls.length>0){
 			for(int t=0;t<tpls.length;t++){
-				if (!StringUtils.isBlank(tpls[t])) {
+				if (!StringUtils.isBlank(tpls[t])&&!tpls[t].startsWith(tplPath)) {
 					tpls[t]=tplPath+tpls[t];
 				}
 			}
@@ -308,6 +319,7 @@ public class ChannelAct {
 		return list(root, request, model);
 	}
 
+	@RequiresPermissions("channel:o_delete")
 	@RequestMapping("/channel/o_delete.do")
 	public String delete(Integer root, Integer[] ids,
 			HttpServletRequest request, ModelMap model) {
@@ -324,6 +336,7 @@ public class ChannelAct {
 		return list(root, request, model);
 	}
 
+	@RequiresPermissions("channel:o_priority")
 	@RequestMapping("/channel/o_priority.do")
 	public String priority(Integer root, Integer[] wids, Integer[] priority,
 			HttpServletRequest request, ModelMap model) {
@@ -335,11 +348,31 @@ public class ChannelAct {
 		model.addAttribute("message", "global.success");
 		return list(root, request, model);
 	}
+	
+	@RequiresPermissions("channel:v_check_path")
+	@RequestMapping(value = "/channel/v_check_path.do")
+	public void checkPath(Integer cid,String path,HttpServletRequest request, HttpServletResponse response) {
+		String pass;
+		if (StringUtils.isBlank(path)) {
+			pass = "false";
+		} else {
+			Channel c = manager.findByPath(path, CmsUtils.getSiteId(request));
+			if(c==null){
+				pass="true" ;
+			}else{
+				if(c.getId().equals(cid)){
+					pass= "true";
+				}else{
+					pass="false";
+				}
+			}
+		}
+		ResponseUtils.renderJson(response, pass);
+	}
 
 	private List<String> getTplChannel(CmsSite site, CmsModel model, String tpl) {
 		String sol = site.getSolutionPath();
-		List<String> tplList = tplManager.getNameListByPrefix(model
-				.getTplChannel(sol, false));
+		List<String> tplList = tplManager.getNameListByPrefix(model.getTplChannel(sol, false));
 		return CoreUtils.tplTrim(tplList, site.getTplPath(), tpl);
 	}
 

@@ -6,7 +6,7 @@
 <#include "/jeecms_sys/head.html"/>
 <script type="text/javascript">
 $(function(){
-	Cms.lmenu('lmenu');
+	Cms.leftLi();
 });
 </script>
 </head>
@@ -14,7 +14,6 @@ $(function(){
 <div class="left">
 <#include "/jeecms_sys/date.html"/>
      <ul class="w-lful">
-		<li><a href="user_right.do" target="rightFrame"><@s.m "global.admin.index"/></a></li>
 		<@cms_perm url="/member/v_list.do">
 		<li><a href="../member/v_list.do" target="rightFrame"><@s.m "cmsMember.function"/></a></li>
 		</@cms_perm>
@@ -29,6 +28,9 @@ $(function(){
 		</@cms_perm>
 		<@cms_perm url="/role/v_list.do">
 		<li><a href="../role/v_list.do" target="rightFrame"><@s.m "cmsRole.function"/></a></li>
+		</@cms_perm>
+		<@cms_perm url="/account/v_list.do">
+		<li><a href="../account/v_list.do" target="rightFrame"><@s.m "cms.account.function"/></a></li>
 		</@cms_perm>
 		<@cms_perm url="/log/v_list_operating.do">
 		<li><a href="../log/v_list_operating.do" target="rightFrame"><@s.m "cmsLog.function.operating"/></a></li>

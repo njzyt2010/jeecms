@@ -2,7 +2,6 @@ package com.jeecms.cms.dao.assist.impl;
 
 import java.util.List;
 
-import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
 import com.jeecms.cms.dao.assist.CmsFileDao;
@@ -69,6 +68,7 @@ public class CmsFileDaoImpl extends HibernateBaseDao<CmsFile, Integer>
 		String sql="delete from CmsFile file where file.content.id=:contentId";
 		getSession().createQuery(sql).setParameter("contentId", contentId).executeUpdate();
 	}
+
 
 	@Override
 	protected Class<CmsFile> getEntityClass() {

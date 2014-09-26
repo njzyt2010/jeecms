@@ -12,7 +12,6 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -52,6 +51,7 @@ public class UnifiedUserMngImpl implements UnifiedUserMng {
 			final EmailSender email, final MessageTemplate tpl) {
 		JavaMailSenderImpl sender = new JavaMailSenderImpl();
 		sender.setHost(email.getHost());
+		sender.setPort(email.getPort());
 		sender.setUsername(email.getUsername());
 		sender.setPassword(email.getPassword());
 		sender.send(new MimeMessagePreparator() {

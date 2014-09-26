@@ -46,6 +46,7 @@ public class CmsModelDaoImpl extends HibernateBaseDao<CmsModel, Integer>
 		return entity;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public CmsModel findByPath(String path){
 		String hql = "from CmsModel bean where bean.path=:path";
 		List<CmsModel> list = getSession().createQuery(hql).setParameter("path", path).setMaxResults(1).list();
@@ -55,7 +56,6 @@ public class CmsModelDaoImpl extends HibernateBaseDao<CmsModel, Integer>
 			return null;
 		}
 	}
-
 
 	public CmsModel save(CmsModel bean) {
 		getSession().save(bean);

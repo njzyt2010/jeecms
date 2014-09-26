@@ -27,8 +27,7 @@ public final class MessageResolver {
 	 */
 	public static String getMessage(HttpServletRequest request, String code,
 			Object... args) {
-		WebApplicationContext messageSource = RequestContextUtils
-				.getWebApplicationContext(request);
+		WebApplicationContext messageSource = RequestContextUtils.getWebApplicationContext(request);
 		if (messageSource == null) {
 			throw new IllegalStateException("WebApplicationContext not found!");
 		}

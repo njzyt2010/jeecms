@@ -125,7 +125,7 @@ public class Config extends BaseConfig {
 		}
 
 		public Integer getPort() {
-			String port = getAttr().get(EMAIL_HOST);
+			String port = getAttr().get(EMAIL_PORT);
 			if (StringUtils.isNotBlank(port) && NumberUtils.isDigits(port)) {
 				return Integer.parseInt(port);
 			} else {

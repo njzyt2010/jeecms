@@ -15,13 +15,13 @@ import com.jeecms.cms.entity.assist.CmsVoteItem;
 import com.jeecms.cms.entity.assist.CmsVoteReply;
 import com.jeecms.cms.entity.assist.CmsVoteSubTopic;
 import com.jeecms.cms.entity.assist.CmsVoteTopic;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.assist.CmsVoteRecordMng;
 import com.jeecms.cms.manager.assist.CmsVoteReplyMng;
 import com.jeecms.cms.manager.assist.CmsVoteSubTopicMng;
 import com.jeecms.cms.manager.assist.CmsVoteTopicMng;
 import com.jeecms.common.hibernate3.Updater;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsUser;
 
 @Service
 @Transactional

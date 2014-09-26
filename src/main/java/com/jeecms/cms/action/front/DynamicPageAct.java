@@ -1,13 +1,14 @@
 package com.jeecms.cms.action.front;
 
-import static com.jeecms.cms.Constants.TPLDIR_INDEX;
 import static com.jeecms.common.web.Constants.INDEX;
 
+import java.io.File;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +18,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsGroup;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.entity.main.Content;
+import com.jeecms.cms.entity.main.ContentCheck;
 import com.jeecms.cms.manager.assist.CmsKeywordMng;
 import com.jeecms.cms.manager.main.ChannelMng;
 import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.FrontUtils;
 import com.jeecms.common.page.Paginable;
 import com.jeecms.common.page.SimplePage;
-import com.jeecms.core.web.front.URLHelper;
-import com.jeecms.core.web.front.URLHelper.PageInfo;
+import com.jeecms.common.web.springmvc.RealPathResolver;
+import com.jeecms.core.entity.CmsConfig;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.FrontUtils;
+import com.jeecms.core.web.util.URLHelper;
+import com.jeecms.core.web.util.URLHelper.PageInfo;
 
 @Controller
 public class DynamicPageAct {
@@ -40,6 +44,8 @@ public class DynamicPageAct {
 	 */
 	public static final String TPL_INDEX = "tpl.index";
 	public static final String GROUP_FORBIDDEN = "login.groupAccessForbidden";
+	public static final String CONTENT_STATUS_FORBIDDEN ="content.notChecked";
+	
 
 	/**
 	 * TOMCAT的默认路径
@@ -49,11 +55,20 @@ public class DynamicPageAct {
 	 * @return
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String index(HttpServletRequest request, ModelMap model) {
+	public String index(HttpServletRequest request,HttpServletResponse response, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
 		FrontUtils.frontData(request, model, site);
-		return FrontUtils.getTplPath(request, site.getSolutionPath(),
-				TPLDIR_INDEX, TPL_INDEX);
+		//带有其他路径则是非法请求
+		String uri=URLHelper.getURI(request);
+		if(StringUtils.isNotBlank(uri)&&!uri.equals("/")){
+			return FrontUtils.pageNotFound(request, response, model);
+		}
+		//使用静态首页而且静态首页存在
+		if(site.getStaticIndex()&&new File(realPathResolver.get(site.getStaticDir()+INDEX)).exists()){
+			return FrontUtils.getTplPath("", site.getStaticDir(), INDEX);
+		}else{
+			return site.getTplIndexOrDef();
+		}
 	}
 
 	/**
@@ -64,8 +79,8 @@ public class DynamicPageAct {
 	 * @return
 	 */
 	@RequestMapping(value = "/index.jhtml", method = RequestMethod.GET)
-	public String indexForWeblogic(HttpServletRequest request, ModelMap model) {
-		return index(request, model);
+	public String indexForWeblogic(HttpServletRequest request,HttpServletResponse response, ModelMap model) {
+		return index(request,response, model);
 	}
 
 	/**
@@ -84,12 +99,12 @@ public class DynamicPageAct {
 		int len = paths.length;
 		if (len == 1) {
 			// 单页
-			return channel(paths[0], pageNo, params, info, request, response,
+			return channel(paths[0],true, pageNo, params, info, request, response,
 					model);
 		} else if (len == 2) {
 			if (paths[1].equals(INDEX)) {
 				// 栏目页
-				return channel(paths[0], pageNo, params, info, request,
+				return channel(paths[0],false, pageNo, params, info, request,
 						response, model);
 			} else {
 				// 内容页
@@ -108,7 +123,7 @@ public class DynamicPageAct {
 		}
 	}
 
-	public String channel(String path, int pageNo, String[] params,
+	public String channel(String path,boolean checkAlone, int pageNo, String[] params,
 			PageInfo info, HttpServletRequest request,
 			HttpServletResponse response, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -117,7 +132,12 @@ public class DynamicPageAct {
 			log.debug("Channel path not found: {}", path);
 			return FrontUtils.pageNotFound(request, response, model);
 		}
-
+		//检查是否单页
+		if(checkAlone){
+			if(channel.getHasContent()){
+				return FrontUtils.pageNotFound(request, response, model);
+			}
+		}
 		model.addAttribute("channel", channel);
 		FrontUtils.frontData(request, model, site);
 		FrontUtils.frontPageData(request, model);
@@ -131,6 +151,16 @@ public class DynamicPageAct {
 		if (content == null) {
 			log.debug("Content id not found: {}", id);
 			return FrontUtils.pageNotFound(request, response, model);
+		}
+		Integer pageCount=content.getPageCount();
+		if(pageNo>pageCount||pageNo<0){
+			return FrontUtils.pageNotFound(request, response, model);
+		}
+		//非终审文章
+		CmsConfig config=CmsUtils.getSite(request).getConfig();
+		Boolean preview=config.getConfigAttr().getPreview();
+		if(config.getViewOnlyChecked()&&!content.getStatus().equals(ContentCheck.CHECKED)){
+			return FrontUtils.showMessage(request, model, CONTENT_STATUS_FORBIDDEN);
 		}
 		CmsUser user = CmsUtils.getUser(request);
 		CmsSite site = content.getSite();
@@ -151,10 +181,16 @@ public class DynamicPageAct {
 					break;
 				}
 			}
-			if (!right) {
+			//无权限且不支持预览
+			if (!right&&!preview) {
 				String gname = user.getGroup().getName();
 				return FrontUtils.showMessage(request, model, GROUP_FORBIDDEN,
 						gname);
+			}
+			//无权限支持预览
+			if(!right&&preview){
+				model.addAttribute("preview", preview);
+				model.addAttribute("groups", groups);
 			}
 		}
 		String txt = content.getTxtByNo(pageNo);
@@ -178,4 +214,6 @@ public class DynamicPageAct {
 	private ContentMng contentMng;
 	@Autowired
 	private CmsKeywordMng cmsKeywordMng;
+	@Autowired
+	private RealPathResolver realPathResolver;
 }

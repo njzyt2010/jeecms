@@ -1,7 +1,7 @@
 package com.jeecms.cms.web;
 
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 
 /**
  * CMS线程变量

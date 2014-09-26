@@ -15,7 +15,7 @@ import com.jeecms.common.page.Pagination;
 public class ChannelDaoImpl extends HibernateBaseDao<Channel, Integer>
 		implements ChannelDao {
 	@SuppressWarnings("unchecked")
-	public List<Channel> getTopList(Integer siteId, boolean hasContentOnly,
+	public List<Channel> getTopList(Integer siteId,boolean hasContentOnly,
 			boolean displayOnly, boolean cacheable) {
 		Finder f = getTopFinder(siteId, hasContentOnly, displayOnly, cacheable);
 		return find(f);
@@ -57,12 +57,42 @@ public class ChannelDaoImpl extends HibernateBaseDao<Channel, Integer>
 		f.append(" order by bean.priority asc,bean.id asc");
 		return find(f);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Channel> getTopListForDepartId(Integer departId,Integer siteId,boolean hasContentOnly){
+		Finder f = Finder.create("select distinct bean from Channel bean");
+		f.append(" left join bean.departments depart");
+		f.append(" where 1=1 ");
+		if(departId!=null){
+			f.append(" and depart.id =:departId");
+			f.setParam("departId", departId);
+		}
+		f.append(" and bean.site.id=:siteId").setParam("siteId", siteId);
+		if (hasContentOnly) {
+			f.append(" and bean.hasContent=true");
+		}
+		f.append(" and bean.parent.id is null");
+		f.append(" order by bean.priority asc,bean.id asc");
+		return find(f);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Channel> getChildList(Integer parentId, boolean hasContentOnly,
 			boolean displayOnly, boolean cacheable) {
 		Finder f = getChildFinder(parentId, hasContentOnly, displayOnly,
 				cacheable);
+		return find(f);
+	}
+	
+	public List<Channel> getBottomList(Integer siteId,boolean hasContentOnly){
+		Finder f = Finder.create("select  bean from Channel bean");
+		f.append(" where bean.site.id=:siteId").setParam("siteId", siteId);
+		if (hasContentOnly) {
+			f.append(" and bean.hasContent=true");
+		}
+		f.append(" and size(bean.child) <= 0");
+	//	f.append(" and bean.id not in(select channel.parent.id from Channel channel where channel.parent.id is not null)");
+		f.append(" order by bean.priority asc,bean.id asc");
 		return find(f);
 	}
 
@@ -101,6 +131,25 @@ public class ChannelDaoImpl extends HibernateBaseDao<Channel, Integer>
 		f.append(" order by bean.priority asc,bean.id asc");
 		return find(f);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Channel> getChildListByDepartId(Integer departId,Integer siteId,
+			Integer parentId, boolean hasContentOnly){
+		Finder f = Finder.create("select distinct bean from Channel bean");
+		f.append(" left join bean.departments depart");
+		f.append(" where  bean.parent.id=:parentId");
+		f.setParam("parentId", parentId);
+		if(departId!=null){
+			f.append(" and depart.id =:departId ");
+			f.setParam("departId", departId);
+		}
+		f.append(" and bean.site.id=:siteId").setParam("siteId", siteId);
+		if (hasContentOnly) {
+			f.append(" and bean.hasContent=true");
+		}
+		f.append(" order by bean.priority asc,bean.id asc");
+		return find(f);
+	}
 
 	public Channel findById(Integer id) {
 		Channel entity = get(id);
@@ -127,6 +176,12 @@ public class ChannelDaoImpl extends HibernateBaseDao<Channel, Integer>
 			getSession().delete(entity);
 		}
 		return entity;
+	}
+	
+	public void initWorkFlow(Integer workflowId){
+		String hql = "update Channel bean set bean.workflow.id=null  where bean.workflow.id=:workflowId";
+		Query query = getSession().createQuery(hql).setParameter("workflowId", workflowId);
+		query.executeUpdate();
 	}
 
 	@Override

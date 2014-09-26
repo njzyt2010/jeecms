@@ -25,7 +25,7 @@ public class CmsJobApply extends BaseCmsJobApply {
 	public CmsJobApply (
 		java.lang.Integer id,
 		com.jeecms.cms.entity.main.Content content,
-		com.jeecms.cms.entity.main.CmsUser user,
+		com.jeecms.core.entity.CmsUser user,
 		java.util.Date applyTime) {
 
 		super (

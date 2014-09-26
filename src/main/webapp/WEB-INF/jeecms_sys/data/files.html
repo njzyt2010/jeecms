@@ -14,20 +14,20 @@ function getTableForm() {
 	return document.getElementById("tableForm");
 }
 function optDelete() {
-	if(Pn.checkedCount("names")<=0) {
-		alert("<@s.m "error.checkRecord"/>");
+	if(Pn.checkedCount('names')<=0) {
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
-	if(!confirm("<@s.m "global.confirm.delete"/>")) {
-		return;
-	}
+	$.confirm(doDelete,"<@s.m 'global.confirm'/>","<@s.m 'global.confirm.delete'/>");
+}
+function doDelete(){
 	var f = getTableForm();
 	f.action="o_delete.do";
 	f.submit();
 }
 function optExport() {
 	if(Pn.checkedCount('names')<=0) {
-		alert("<@s.m 'error.checkRecord'/>");
+		$.alert("<@s.m 'global.prompt'/>","<@s.m 'error.checkRecord'/>");
 		return;
 	}
 	var f = getTableForm();
@@ -46,7 +46,7 @@ function optExport() {
 <form id="tableForm" method="post">
 <@p.table value=list;file,i,has_next><#rt/>
 	<@p.column title="<input type='checkbox' onclick='Pn.checkbox(\"names\",this.checked)'/>" width="20">
-		<input type="checkbox" name="names" value="${file.name}"/><#t/>
+		<input type="checkbox" name="names" value="${file.name}" /><#t/>
 	</@p.column><#t/>
 	<@p.column title=" " width="20" align="center"><img src="${base}/res/common/img/file/${file.ico}.gif"/></@p.column><#t/>
 	<@p.column code="resource.filename">
@@ -62,7 +62,7 @@ function optExport() {
 		<a href="v_rename.do?name=${file.name?url}" class="pn-opt"><@s.m "resource.rename"/></a> | <#rt/>
 		</@cms_perm>
 		<@cms_perm url="/data/o_delete_single.do">
-		<a href="o_delete_single.do?name=${file.name?url}" onclick="if(!confirm('<@s.m "global.confirm.delete"/>')) {return false;}" class="pn-opt"><@s.m "global.delete"/></a><#t/>
+		<a href="o_delete_single.do?name=${file.name?url}" onclick="if(!$.confirmToUrl(this.href)) {return false;}" class="pn-opt"><@s.m "global.delete"/></a><#t/>
 		</@cms_perm>
 	</@p.column><#t/>
 </@p.table>

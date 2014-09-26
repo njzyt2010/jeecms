@@ -10,13 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jeecms.cms.dao.assist.CmsGuestbookDao;
 import com.jeecms.cms.entity.assist.CmsGuestbook;
 import com.jeecms.cms.entity.assist.CmsGuestbookExt;
-import com.jeecms.cms.entity.main.CmsUser;
 import com.jeecms.cms.manager.assist.CmsGuestbookCtgMng;
 import com.jeecms.cms.manager.assist.CmsGuestbookExtMng;
 import com.jeecms.cms.manager.assist.CmsGuestbookMng;
-import com.jeecms.cms.manager.main.CmsSiteMng;
 import com.jeecms.common.hibernate3.Updater;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.manager.CmsSiteMng;
 
 @Service
 @Transactional
@@ -91,6 +91,26 @@ public class CmsGuestbookMngImpl implements CmsGuestbookMng {
 		}
 		return beans;
 	}
+	
+	public CmsGuestbook[] checkByIds(Integer[] ids,CmsUser checkUser,Boolean checkStatus) {
+		CmsGuestbook[] beans = new CmsGuestbook[ids.length];
+		for (int i = 0, len = ids.length; i < len; i++) {
+			beans[i] = checkById(ids[i],checkUser,checkStatus);
+		}
+		return beans;
+	}
+	
+	private CmsGuestbook checkById(Integer id,CmsUser checkUser,Boolean checkStatus){
+		CmsGuestbook bean=findById(id);
+		Updater<CmsGuestbook> updater = new Updater<CmsGuestbook>(bean);
+		bean = dao.updateByUpdater(updater);
+		if(checkStatus){
+			bean.setAdmin(checkUser);
+		}
+		bean.setChecked(checkStatus);
+		return bean;
+	}
+	
 
 	private CmsGuestbookCtgMng cmsGuestbookCtgMng;
 	private CmsGuestbookExtMng cmsGuestbookExtMng;
@@ -116,4 +136,5 @@ public class CmsGuestbookMngImpl implements CmsGuestbookMng {
 	public void setCmsSiteMng(CmsSiteMng cmsSiteMng) {
 		this.cmsSiteMng = cmsSiteMng;
 	}
+
 }

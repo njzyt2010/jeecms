@@ -14,7 +14,7 @@
 		<property name="endTime" column="end_time" type="date" not-null="false" length="19"/>
 		<property name="enabled" column="is_enabled" type="java.lang.Boolean" not-null="true" length="1"/>
 		<many-to-one name="adspace" column="adspace_id" class="CmsAdvertisingSpace" not-null="true"></many-to-one>
-		<many-to-one name="site" column="site_id" class="com.jeecms.cms.entity.main.CmsSite" not-null="true"></many-to-one>
+		<many-to-one name="site" column="site_id" class="com.jeecms.core.entity.CmsSite" not-null="true"></many-to-one>
 		<map name="attr" table="jc_advertising_attr" cascade="all-delete-orphan">
 			<cache usage="read-write"/>
 			<key column="advertising_id" not-null="true"/>

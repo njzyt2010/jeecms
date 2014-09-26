@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -35,8 +36,7 @@ import org.springframework.web.multipart.support.AbstractMultipartHttpServletReq
  * @see CosMultipartResolver
  * @see com.CosMultipartRequest.servlet.MultipartRequest
  */
-public class CosMultipartHttpServletRequest extends
-		AbstractMultipartHttpServletRequest {
+public class CosMultipartHttpServletRequest extends AbstractMultipartHttpServletRequest {
 
 	protected static final Logger logger = LoggerFactory
 			.getLogger(CosMultipartHttpServletRequest.class);
@@ -201,6 +201,14 @@ public class CosMultipartHttpServletRequest extends
 						+ dest.getAbsolutePath() + "]");
 			}
 		}
+	}
+	//以下添加于2014.1.9
+	public HttpHeaders getMultipartHeaders(String arg0) {
+		return super.getRequestHeaders();
+	}
+
+	public String getMultipartContentType(String arg0) {
+		return super.getContentType();
 	}
 
 }

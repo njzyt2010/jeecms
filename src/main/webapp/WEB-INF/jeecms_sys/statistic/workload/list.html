@@ -60,11 +60,11 @@ function resetDateInput(date){
 	<div class="clear"></div>
 </div>
 <div class="body-box">
-<form id="queryForm" action="v_list.do" method="post" style="padding-top:5px;">
+<form id="queryForm" action="v_list.do" method="post">
 <input type="hidden" name="year"/>
 <input type="hidden" name="month"/>
 <input type="hidden" name="day"/>
-<div style="padding-top:5px">
+<div style="padding-top:5px;padding-bottom:5px; text-indent:10px; border-top:1px solid #fff;">
 	<@s.m "statistic.channel"/>:
 	<select id="channelId" name="channelId">
 	<option value="" <#if !channelId??>selected="selected"</#if>><@s.m "global.pleaseSelect"/></option>
@@ -98,11 +98,11 @@ function resetDateInput(date){
 </div>
 </form>
 <@p.table value=list;cmsStatistic,i,has_next><#rt/>
-	<@p.column code="cmsStatic.channel"><#if cmsStatistic.channel??>${cmsStatistic.channel.name}</#if></@p.column><#t/>
-	<@p.column code="statistic.content.contents">${cmsStatistic.count!}</@p.column><#t/>
-	<@p.column code="content.user"><#if cmsStatistic.author??>${cmsStatistic.author.username}</#if></@p.column><#t/>
-	<@p.column code="content.checker"><#if cmsStatistic.reviewer??>${cmsStatistic.reviewer.username}</#if></@p.column><#t/>
-	<@p.column code="cms.statistic.date">
+	<@p.column code="cmsStatic.channel" align="center"><#if cmsStatistic.channel??>${cmsStatistic.channel.name}</#if></@p.column><#t/>
+	<@p.column code="statistic.content.contents" align="center">${cmsStatistic.count!}</@p.column><#t/>
+	<@p.column code="content.user" align="center"><#if cmsStatistic.author??>${cmsStatistic.author.username}</#if></@p.column><#t/>
+	<@p.column code="content.checker" align="center"><#if cmsStatistic.reviewer??>${cmsStatistic.reviewer.username}</#if></@p.column><#t/>
+	<@p.column code="cms.statistic.date" align="center">
 		<#if group=="year">${cmsStatistic.date?string("yyyy")}
 		<#elseif group=="month">${cmsStatistic.date?string("yyyy-MM")}
 		<#elseif group=="day">${cmsStatistic.date?string("yyyy-MM-dd")}

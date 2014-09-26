@@ -15,14 +15,14 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.jeecms.cms.entity.main.CmsConfig;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.entity.main.ContentAttachment;
 import com.jeecms.cms.manager.main.ContentCountMng;
 import com.jeecms.cms.manager.main.ContentMng;
-import com.jeecms.cms.web.CmsUtils;
 import com.jeecms.common.security.encoder.PwdEncoder;
 import com.jeecms.common.web.ResponseUtils;
+import com.jeecms.core.entity.CmsConfig;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class AttachmentAct {
@@ -33,6 +33,9 @@ public class AttachmentAct {
 	public void attachment(Integer cid, Integer i, Long t, String k,
 			HttpServletRequest request, HttpServletResponse response,
 			ModelMap model) throws IOException {
+		if(cid==null){
+			ResponseUtils.renderText(response, "downlaod error!");
+		}
 		CmsConfig config = CmsUtils.getSite(request).getConfig();
 		String code = config.getDownloadCode();
 		int h = config.getDownloadTime() * 60 * 60 * 1000;
@@ -59,7 +62,7 @@ public class AttachmentAct {
 		} else {
 			log.info("download key error!");
 		}
-		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+		ResponseUtils.renderText(response, "downlaod error!");
 	}
 
 	/**

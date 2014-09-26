@@ -14,10 +14,9 @@
 $(function() {
    	CKEDITOR.replace( '${name}' ,
    			{
-		   		filebrowserUploadUrl : '${base+appBase}/fck/upload.do',  
+		   		filebrowserUploadUrl : '${base+appBase}/fck/upload.do?Type=File',  
 		   		filebrowserImageUploadUrl : '${base+appBase}/fck/upload.do?Type=Image',  
-		   		filebrowserFlashUploadUrl : '${base+appBase}/fck/upload.do?Type=Flash',
-		   		filebrowserMediaUploadURL : '${base+appBase}/fck/upload.do?Type=Media'
+		   		filebrowserFlashUploadUrl : '${base+appBase}/fck/upload.do?Type=Flash'  
    		     }
    	);  
  });

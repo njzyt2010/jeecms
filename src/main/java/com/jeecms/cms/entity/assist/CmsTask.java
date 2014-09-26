@@ -3,8 +3,8 @@ package com.jeecms.cms.entity.assist;
 import java.util.Calendar;
 
 import com.jeecms.cms.entity.assist.base.BaseCmsTask;
-import com.jeecms.cms.entity.main.CmsSite;
-import com.jeecms.cms.entity.main.CmsUser;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
 
 
 
@@ -111,8 +111,8 @@ public class CmsTask extends BaseCmsTask {
 	 */
 	public CmsTask (
 		java.lang.Integer id,
-		com.jeecms.cms.entity.main.CmsUser user,
-		com.jeecms.cms.entity.main.CmsSite site,
+		com.jeecms.core.entity.CmsUser user,
+		com.jeecms.core.entity.CmsSite site,
 		java.lang.Integer type,
 		java.lang.String name,
 		java.lang.String jobClass,

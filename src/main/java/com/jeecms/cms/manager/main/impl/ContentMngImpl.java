@@ -19,11 +19,7 @@ import org.springframework.util.Assert;
 import com.jeecms.cms.dao.main.ContentDao;
 import com.jeecms.cms.entity.assist.CmsFile;
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsGroup;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.CmsTopic;
-import com.jeecms.cms.entity.main.CmsUser;
-import com.jeecms.cms.entity.main.CmsUserSite;
 import com.jeecms.cms.entity.main.Content;
 import com.jeecms.cms.entity.main.ContentCheck;
 import com.jeecms.cms.entity.main.ContentCount;
@@ -35,10 +31,7 @@ import com.jeecms.cms.entity.main.Content.ContentStatus;
 import com.jeecms.cms.manager.assist.CmsCommentMng;
 import com.jeecms.cms.manager.assist.CmsFileMng;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsGroupMng;
-import com.jeecms.cms.manager.main.CmsModelMng;
 import com.jeecms.cms.manager.main.CmsTopicMng;
-import com.jeecms.cms.manager.main.CmsUserMng;
 import com.jeecms.cms.manager.main.ContentCheckMng;
 import com.jeecms.cms.manager.main.ContentCountMng;
 import com.jeecms.cms.manager.main.ContentExtMng;
@@ -56,6 +49,12 @@ import com.jeecms.cms.staticpage.exception.TemplateNotFoundException;
 import com.jeecms.cms.staticpage.exception.TemplateParseException;
 import com.jeecms.common.hibernate3.Updater;
 import com.jeecms.common.page.Pagination;
+import com.jeecms.core.entity.CmsGroup;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.entity.CmsUser;
+import com.jeecms.core.entity.CmsUserSite;
+import com.jeecms.core.manager.CmsGroupMng;
+import com.jeecms.core.manager.CmsUserMng;
 
 import freemarker.template.TemplateException;
 
@@ -63,10 +62,10 @@ import freemarker.template.TemplateException;
 @Transactional
 public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 	@Transactional(readOnly = true)
-	public Pagination getPageByRight(String title, Integer typeId,
+	public Pagination getPageByRight(String title, Integer typeId,Integer currUserId,
 			Integer inputUserId, boolean topLevel, boolean recommend,
 			ContentStatus status, Byte checkStep, Integer siteId,
-			Integer channelId, Integer userId, int orderBy, int pageNo,
+			Integer channelId,Integer userId, int orderBy, int pageNo,
 			int pageSize) {
 		CmsUser user = cmsUserMng.findById(userId);
 		CmsUserSite us = user.getUserSite(siteId);
@@ -80,25 +79,26 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 					orderBy, pageNo, pageSize);
 		} else if (allChannel && !selfData) {
 			// 拥有所有栏目权限，能够管理不属于自己的数据
-			p = dao.getPage(title, typeId, inputUserId, topLevel, recommend,
-					status, checkStep, siteId, channelId, orderBy, pageNo,
+			p = dao.getPage(title, typeId,currUserId, inputUserId, topLevel, recommend,
+					status, checkStep, siteId,null,channelId,orderBy, pageNo,
 					pageSize);
 		} else {
-			p = dao.getPageByRight(title, typeId, inputUserId, topLevel,
+			p = dao.getPageByRight(title, typeId, currUserId,inputUserId, topLevel,
 					recommend, status, checkStep, siteId, channelId, userId,
 					selfData, orderBy, pageNo, pageSize);
 		}
 		return p;
 	}
-
-	public Pagination getPageForMember(String title, Integer channelId,
-			Integer siteId, Integer memberId, int pageNo, int pageSize) {
-		return dao
-				.getPage(title, null, memberId, false, false,
-						ContentStatus.all, null, siteId, channelId, 0, pageNo,
-						pageSize);
+	
+	public Pagination getPageBySite(String title, Integer typeId,Integer inputUserId,boolean topLevel,
+			boolean recommend,ContentStatus status, Integer siteId,int orderBy, int pageNo,int pageSize){
+		return dao.getPage(title, typeId, null, inputUserId, topLevel, recommend, status, null, siteId, null, null, orderBy, pageNo, pageSize);
 	}
 
+	public Pagination getPageForMember(String title, Integer channelId,Integer siteId,Integer modelId, Integer memberId, int pageNo, int pageSize) {
+		return dao.getPage(title, null,memberId,memberId, false, false,ContentStatus.all, null, siteId,modelId,  channelId, 0, pageNo,pageSize);
+	}
+	
 	@Transactional(readOnly = true)
 	public Content getSide(Integer id, Integer siteId, Integer channelId,
 			boolean next) {
@@ -125,78 +125,78 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 	@Transactional(readOnly = true)
 	public Pagination getPageBySiteIdsForTag(Integer[] siteIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int pageNo, int pageSize) {
+			String title,Map<String,String[]>attr, int orderBy, int pageNo, int pageSize) {
 		return dao.getPageBySiteIdsForTag(siteIds, typeIds, titleImg,
-				recommend, title, orderBy, pageNo, pageSize);
+				recommend, title, attr,orderBy, pageNo, pageSize);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Content> getListBySiteIdsForTag(Integer[] siteIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, Integer first, Integer count) {
+			String title, Map<String,String[]>attr,int orderBy, Integer first, Integer count) {
 		return dao.getListBySiteIdsForTag(siteIds, typeIds, titleImg,
-				recommend, title, orderBy, first, count);
+				recommend, title,attr, orderBy, first, count);
 	}
 
 	@Transactional(readOnly = true)
 	public Pagination getPageByChannelIdsForTag(Integer[] channelIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int option, int pageNo, int pageSize) {
+			String title,Map<String,String[]>attr, int orderBy, int option, int pageNo, int pageSize) {
 		return dao.getPageByChannelIdsForTag(channelIds, typeIds, titleImg,
-				recommend, title, orderBy, option, pageNo, pageSize);
+				recommend, title,attr, orderBy, option, pageNo, pageSize);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Content> getListByChannelIdsForTag(Integer[] channelIds,
 			Integer[] typeIds, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int option, Integer first, Integer count) {
+			String title, Map<String,String[]>attr,int orderBy, int option,Integer first, Integer count) {
 		return dao.getListByChannelIdsForTag(channelIds, typeIds, titleImg,
-				recommend, title, orderBy, option, first, count);
+				recommend, title,attr, orderBy, option,first, count);
 	}
 
 	@Transactional(readOnly = true)
 	public Pagination getPageByChannelPathsForTag(String[] paths,
 			Integer[] siteIds, Integer[] typeIds, Boolean titleImg,
-			Boolean recommend, String title, int orderBy, int pageNo,
+			Boolean recommend, String title,Map<String,String[]>attr, int orderBy, int pageNo,
 			int pageSize) {
 		return dao.getPageByChannelPathsForTag(paths, siteIds, typeIds,
-				titleImg, recommend, title, orderBy, pageNo, pageSize);
+				titleImg, recommend, title,attr, orderBy, pageNo, pageSize);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Content> getListByChannelPathsForTag(String[] paths,
 			Integer[] siteIds, Integer[] typeIds, Boolean titleImg,
-			Boolean recommend, String title, int orderBy, Integer first,
+			Boolean recommend, String title,Map<String,String[]>attr, int orderBy, Integer first,
 			Integer count) {
 		return dao.getListByChannelPathsForTag(paths, siteIds, typeIds,
-				titleImg, recommend, title, orderBy, first, count);
+				titleImg, recommend, title,attr, orderBy, first, count);
 	}
 
 	@Transactional(readOnly = true)
 	public Pagination getPageByTopicIdForTag(Integer topicId,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
-			Boolean titleImg, Boolean recommend, String title, int orderBy,
+			Boolean titleImg, Boolean recommend, String title, Map<String,String[]>attr,int orderBy,
 			int pageNo, int pageSize) {
 		return dao.getPageByTopicIdForTag(topicId, siteIds, channelIds,
-				typeIds, titleImg, recommend, title, orderBy, pageNo, pageSize);
+				typeIds, titleImg, recommend, title,attr, orderBy, pageNo, pageSize);
 	}
 
 	@Transactional(readOnly = true)
 	public List<Content> getListByTopicIdForTag(Integer topicId,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
-			Boolean titleImg, Boolean recommend, String title, int orderBy,
+			Boolean titleImg, Boolean recommend, String title, Map<String,String[]>attr,int orderBy,
 			Integer first, Integer count) {
 		return dao.getListByTopicIdForTag(topicId, siteIds, channelIds,
-				typeIds, titleImg, recommend, title, orderBy, first, count);
+				typeIds, titleImg, recommend, title,attr, orderBy, first, count);
 	}
 
 	@Transactional(readOnly = true)
 	public Pagination getPageByTagIdsForTag(Integer[] tagIds,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
 			Integer excludeId, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, int pageNo, int pageSize) {
+			String title, Map<String,String[]>attr,int orderBy, int pageNo, int pageSize) {
 		return dao.getPageByTagIdsForTag(tagIds, siteIds, channelIds, typeIds,
-				excludeId, titleImg, recommend, title, orderBy, pageNo,
+				excludeId, titleImg, recommend, title, attr,orderBy, pageNo,
 				pageSize);
 	}
 
@@ -204,9 +204,9 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 	public List<Content> getListByTagIdsForTag(Integer[] tagIds,
 			Integer[] siteIds, Integer[] channelIds, Integer[] typeIds,
 			Integer excludeId, Boolean titleImg, Boolean recommend,
-			String title, int orderBy, Integer first, Integer count) {
+			String title, Map<String,String[]>attr,int orderBy, Integer first, Integer count) {
 		return dao.getListByTagIdsForTag(tagIds, siteIds, channelIds, typeIds,
-				excludeId, titleImg, recommend, title, orderBy, first, count);
+				excludeId, titleImg, recommend, title,attr, orderBy, first, count);
 	}
 
 	@Transactional(readOnly = true)
@@ -214,14 +214,14 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		Content entity = dao.findById(id);
 		return entity;
 	}
-	
+
 	public Content save(Content bean, ContentExt ext, ContentTxt txt,
 			Integer[] channelIds, Integer[] topicIds, Integer[] viewGroupIds,
 			String[] tagArr, String[] attachmentPaths,
 			String[] attachmentNames, String[] attachmentFilenames,
-			String[] picPaths, String[] picDescs, Integer channelId, 
-			Integer typeId, Boolean draft, CmsUser user, boolean forMember) {
-		saveContent(bean, ext, txt, channelId,typeId, draft, user, forMember);
+			String[] picPaths, String[] picDescs, Integer channelId,
+			Integer typeId, Boolean draft,Boolean contribute, CmsUser user, boolean forMember) {
+		saveContent(bean, ext, txt, channelId, typeId, draft,contribute,user, forMember);
 		// 保存副栏目
 		if (channelIds != null && channelIds.length > 0) {
 			for (Integer cid : channelIds) {
@@ -267,9 +267,19 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		return bean;
 	}
 	
-	private Content saveContent(Content bean, ContentExt ext, ContentTxt txt,
+	//导入word执行
+	public Content save(Content bean, ContentExt ext, ContentTxt txt,
 			Integer channelId,Integer typeId, Boolean draft, CmsUser user, boolean forMember){
-		bean.setChannel(channelMng.findById(channelId));
+		saveContent(bean, ext, txt, channelId, typeId, draft,false, user, forMember);
+		// 执行监听器
+		afterSave(bean);
+		return bean;
+	}
+	
+	private Content saveContent(Content bean, ContentExt ext, ContentTxt txt,
+			Integer channelId,Integer typeId, Boolean draft,Boolean contribute,CmsUser user, boolean forMember){
+		Channel channel = channelMng.findById(channelId);
+		bean.setChannel(channel);
 		bean.setType(contentTypeMng.findById(typeId));
 		bean.setUser(user);
 		Byte userStep;
@@ -280,7 +290,11 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 			CmsSite site = bean.getSite();
 			userStep = user.getCheckStep(site.getId());
 		}
-		if (draft != null && draft) {
+		// 流程处理
+		if(contribute!=null&&contribute){
+			bean.setStatus(ContentCheck.CONTRIBUTE);
+		}else if (draft != null && draft) {
+			// 草稿
 			bean.setStatus(ContentCheck.DRAFT);
 		} else {
 			if (userStep >= bean.getChannel().getFinalStepExtends()) {
@@ -335,6 +349,14 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 			} else {
 				bean.setStatus(ContentCheck.CHECKING);
 			}
+		}
+		//修改后退回
+		if (after == AfterCheckEnum.BACK_UPDATE) {
+			--userStep;
+			if(userStep<0){
+				userStep=0;
+			}
+			reject(bean.getId(), user, userStep,"");
 		}
 		// 草稿
 		if (draft != null) {
@@ -421,6 +443,35 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		afterChange(bean, mapList);
 		return bean;
 	}
+	
+	public Content update(Content bean){
+		Updater<Content> updater = new Updater<Content>(bean);
+		bean = dao.updateByUpdater(updater);
+		return bean;
+	}
+	
+	public Content updateByChannelIds(Integer contentId,Integer[]channelIds){
+		Content bean=findById(contentId);
+		Set<Channel>channels=bean.getChannels();
+		channels.clear();
+		if (channelIds != null && channelIds.length > 0) {
+			for (Integer cid : channelIds) {
+				channels.add(channelMng.findById(cid));
+			}
+		}
+		return bean;
+	}
+	
+	public Content addContentToTopics(Integer contentId,Integer[]topicIds){
+		Content bean=findById(contentId);
+		Set<CmsTopic>topics=bean.getTopics();
+		if (topicIds != null && topicIds.length > 0) {
+			for (Integer tid : topicIds) {
+				topics.add(cmsTopicMng.findById(tid));
+			}
+		}
+		return bean;
+	}
 
 	public Content check(Integer id, CmsUser user) {
 		Content content = findById(id);
@@ -461,15 +512,11 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		}
 		return beans;
 	}
-	
-	public Content update(Content bean){
-		Updater<Content> updater = new Updater<Content>(bean);
-		bean = dao.updateByUpdater(updater);
-		return bean;
-	}
 
 	public Content reject(Integer id, CmsUser user, Byte step, String opinion) {
 		Content content = findById(id);
+		// 执行监听器
+		List<Map<String, Object>> mapList = preChange(content);
 		Integer siteId = content.getSite().getId();
 		byte userStep = user.getCheckStep(siteId);
 		byte contentStep = content.getCheckStep();
@@ -477,8 +524,6 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		if (userStep < contentStep) {
 			return content;
 		}
-		// 执行监听器
-		List<Map<String, Object>> mapList = preChange(content);
 		ContentCheck check = content.getContentCheck();
 		if (!StringUtils.isBlank(opinion)) {
 			check.setCheckOpinion(opinion);
@@ -508,11 +553,10 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		return content;
 	}
 
-	public Content[] reject(Integer[] ids, CmsUser user, Byte step,
-			String opinion) {
+	public Content[] reject(Integer[] ids, CmsUser user, Byte step,String opinion) {
 		Content[] beans = new Content[ids.length];
 		for (int i = 0, len = ids.length; i < len; i++) {
-			beans[i] = reject(ids[i], user, step, opinion);
+			beans[i] = reject(ids[i], user,step,opinion);
 		}
 		return beans;
 	}
@@ -584,7 +628,7 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 		}
 		return beans;
 	}
-
+	
 	public Content[] contentStatic(Integer[] ids)
 			throws TemplateNotFoundException, TemplateParseException,
 			GeneratedZeroStaticPageException, StaticPageNotOpenException, ContentNotCheckedException {
@@ -637,6 +681,9 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 			fileMng.update(tempFile);
 		}
 	}
+	
+	
+	
 
 	public String checkForChannelDelete(Integer channelId) {
 		int count = dao.countByChannelId(channelId);
@@ -646,6 +693,8 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 			return null;
 		}
 	}
+	
+	
 
 	private void preSave(Content content) {
 		if (listenerList != null) {
@@ -726,8 +775,6 @@ public class ContentMngImpl implements ContentMng, ChannelDeleteChecker {
 	private ContentDao dao;
 	private StaticPageSvc staticPageSvc;
 	private CmsFileMng fileMng;
-	@Autowired
-	protected CmsModelMng cmsModelMng;
 
 	@Autowired
 	public void setChannelMng(ChannelMng channelMng) {

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,26 +23,26 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.jeecms.cms.entity.main.Channel;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.entity.main.CmsTopic;
 import com.jeecms.cms.manager.assist.CmsFileMng;
 import com.jeecms.cms.manager.main.ChannelMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
 import com.jeecms.cms.manager.main.CmsTopicMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.ResponseUtils;
 import com.jeecms.common.web.springmvc.MessageResolver;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
 import com.jeecms.core.tpl.TplManager;
-import com.jeecms.core.web.CoreUtils;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
+import com.jeecms.core.web.util.CoreUtils;
 
 @Controller
 public class CmsTopicAct {
-	private static final Logger log = LoggerFactory
-			.getLogger(CmsTopicAct.class);
+	private static final Logger log = LoggerFactory.getLogger(CmsTopicAct.class);
 
+	@RequiresPermissions("topic:v_list")
 	@RequestMapping("/topic/v_list.do")
 	public String list(Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -51,6 +52,7 @@ public class CmsTopicAct {
 		return "topic/list";
 	}
 
+	@RequiresPermissions("topic:v_add")
 	@RequestMapping("/topic/v_add.do")
 	public String add(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -65,6 +67,7 @@ public class CmsTopicAct {
 		return "topic/add";
 	}
 
+	@RequiresPermissions("topic:v_edit")
 	@RequestMapping("/topic/v_edit.do")
 	public String edit(Integer id, HttpServletRequest request, ModelMap model) {
 		WebErrors errors = validateEdit(id, request);
@@ -88,10 +91,12 @@ public class CmsTopicAct {
 				true);
 		model.addAttribute("tplList", tplList);
 		model.addAttribute("channelList", channelList);
+		model.addAttribute("tplContent", topic.getTplContentShort(site.getTplPath()));
 		model.addAttribute("cmsTopic", topic);
 		return "topic/edit";
 	}
 
+	@RequiresPermissions("topic:o_save")
 	@RequestMapping("/topic/o_save.do")
 	public String save(CmsTopic bean, Integer channelId,
 			HttpServletRequest request, ModelMap model) {
@@ -112,6 +117,7 @@ public class CmsTopicAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("topic:o_update")
 	@RequestMapping("/topic/o_update.do")
 	public String update(CmsTopic bean, Integer channelId, 
 			String oldTitleImg,String oldContentImg,
@@ -137,6 +143,7 @@ public class CmsTopicAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("topic:o_delete")
 	@RequestMapping("/topic/o_delete.do")
 	public String delete(Integer[] ids, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
@@ -155,6 +162,7 @@ public class CmsTopicAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("topic:o_priority")
 	@RequestMapping("/topic/o_priority.do")
 	public String priority(Integer[] wids, Integer[] priority, Integer pageNo,
 			HttpServletRequest request, ModelMap model) {
@@ -167,19 +175,23 @@ public class CmsTopicAct {
 		return list(pageNo, request, model);
 	}
 
+	@RequiresPermissions("topic:by_channel")
 	@RequestMapping("/topic/by_channel.do")
 	public void topicsByChannel(Integer channelId, HttpServletResponse response)
 			throws JSONException {
 		JSONArray arr = new JSONArray();
+		JSONObject o;
+		List<CmsTopic> list;
 		if (channelId != null) {
-			List<CmsTopic> list = manager.getListByChannel(channelId);
-			JSONObject o;
-			for (CmsTopic t : list) {
-				o = new JSONObject();
-				o.put("id", t.getId());
-				o.put("name", t.getName());
-				arr.put(o);
-			}
+			list = manager.getListByChannel(channelId);
+		}else{
+		    list = manager.getListForTag(null, false, Integer.MAX_VALUE);
+		}
+		for (CmsTopic t : list) {
+			o = new JSONObject();
+			o.put("id", t.getId());
+			o.put("name", t.getName());
+			arr.put(o);
 		}
 		ResponseUtils.renderJson(response, arr.toString());
 	}

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,27 +19,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.jeecms.cms.entity.assist.CmsGuestbook;
 import com.jeecms.cms.entity.assist.CmsGuestbookCtg;
 import com.jeecms.cms.entity.assist.CmsGuestbookExt;
-import com.jeecms.cms.entity.main.CmsSite;
 import com.jeecms.cms.manager.assist.CmsGuestbookCtgMng;
 import com.jeecms.cms.manager.assist.CmsGuestbookMng;
-import com.jeecms.cms.manager.main.CmsLogMng;
-import com.jeecms.cms.web.CmsUtils;
-import com.jeecms.cms.web.WebErrors;
 import com.jeecms.common.page.Pagination;
 import com.jeecms.common.web.CookieUtils;
 import com.jeecms.common.web.RequestUtils;
+import com.jeecms.core.entity.CmsSite;
+import com.jeecms.core.manager.CmsLogMng;
+import com.jeecms.core.web.WebErrors;
+import com.jeecms.core.web.util.CmsUtils;
 
 @Controller
 public class CmsGuestbookAct {
 	private static final Logger log = LoggerFactory
 			.getLogger(CmsGuestbookAct.class);
 
+	@RequiresPermissions("guestbook:v_list")
 	@RequestMapping("/guestbook/v_list.do")
 	public String list(Integer queryCtgId, Boolean queryRecommend,
 			Boolean queryChecked, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
-		Pagination pagination = manager.getPage(site.getId(), queryCtgId,null,
+		Pagination pagination = manager.getPage(site.getId(),queryCtgId,null,
 				queryRecommend, queryChecked, true, false, cpn(pageNo),
 				CookieUtils.getPageSize(request));
 		model.addAttribute("pagination", pagination);
@@ -46,6 +48,7 @@ public class CmsGuestbookAct {
 		return "guestbook/list";
 	}
 
+	@RequiresPermissions("guestbook:v_add")
 	@RequestMapping("/guestbook/v_add.do")
 	public String add(HttpServletRequest request, ModelMap model) {
 		CmsSite site = CmsUtils.getSite(request);
@@ -55,6 +58,7 @@ public class CmsGuestbookAct {
 		return "guestbook/add";
 	}
 
+	@RequiresPermissions("guestbook:v_edit")
 	@RequestMapping("/guestbook/v_edit.do")
 	public String edit(Integer id, Integer pageNo, HttpServletRequest request,
 			ModelMap model) {
@@ -73,6 +77,7 @@ public class CmsGuestbookAct {
 		return "guestbook/edit";
 	}
 
+	@RequiresPermissions("guestbook:o_save")
 	@RequestMapping("/guestbook/o_save.do")
 	public String save(CmsGuestbook bean, CmsGuestbookExt ext, Integer ctgId,
 			HttpServletRequest request, ModelMap model) {
@@ -88,6 +93,7 @@ public class CmsGuestbookAct {
 		return "redirect:v_list.do";
 	}
 
+	@RequiresPermissions("guestbook:o_update")
 	@RequestMapping("/guestbook/o_update.do")
 	public String update(Integer queryCtgId, Boolean queryRecommend,
 			Boolean queryChecked, String oldreply,CmsGuestbook bean, CmsGuestbookExt ext,
@@ -116,6 +122,7 @@ public class CmsGuestbookAct {
 				model);
 	}
 
+	@RequiresPermissions("guestbook:o_delete")
 	@RequestMapping("/guestbook/o_delete.do")
 	public String delete(Integer queryCtgId, Boolean queryRecommend,
 			Boolean queryChecked, Integer[] ids, Integer pageNo,
@@ -128,6 +135,44 @@ public class CmsGuestbookAct {
 		for (CmsGuestbook bean : beans) {
 			log.info("delete CmsGuestbook id={}", bean.getId());
 			cmsLogMng.operating(request, "cmsGuestbook.log.delete", "id="
+					+ bean.getId() + ";title=" + bean.getTitle());
+		}
+		return list(queryCtgId, queryRecommend, queryChecked, pageNo, request,
+				model);
+	}
+	
+	@RequiresPermissions("guestbook:o_check")
+	@RequestMapping("/guestbook/o_check.do")
+	public String check(Integer queryCtgId, Boolean queryRecommend,
+			Boolean queryChecked, Integer[] ids, Integer pageNo,
+			HttpServletRequest request, ModelMap model) {
+		WebErrors errors = validateDelete(ids, request);
+		if (errors.hasErrors()) {
+			return errors.showErrorPage(model);
+		}
+		CmsGuestbook[] beans = manager.checkByIds(ids,CmsUtils.getUser(request),true);
+		for (CmsGuestbook bean : beans) {
+			log.info("delete CmsGuestbook id={}", bean.getId());
+			cmsLogMng.operating(request, "cmsGuestbook.log.check", "id="
+					+ bean.getId() + ";title=" + bean.getTitle());
+		}
+		return list(queryCtgId, queryRecommend, queryChecked, pageNo, request,
+				model);
+	}
+	
+	@RequiresPermissions("guestbook:o_check_cancel")
+	@RequestMapping("/guestbook/o_check_cancel.do")
+	public String cancel_check(Integer queryCtgId, Boolean queryRecommend,
+			Boolean queryChecked, Integer[] ids, Integer pageNo,
+			HttpServletRequest request, ModelMap model) {
+		WebErrors errors = validateDelete(ids, request);
+		if (errors.hasErrors()) {
+			return errors.showErrorPage(model);
+		}
+		CmsGuestbook[] beans = manager.checkByIds(ids,CmsUtils.getUser(request),false);
+		for (CmsGuestbook bean : beans) {
+			log.info("delete CmsGuestbook id={}", bean.getId());
+			cmsLogMng.operating(request, "cmsGuestbook.log.check", "id="
 					+ bean.getId() + ";title=" + bean.getTitle());
 		}
 		return list(queryCtgId, queryRecommend, queryChecked, pageNo, request,

@@ -55,6 +55,10 @@ public class CmsAcquisitionHistoryMngImpl implements CmsAcquisitionHistoryMng {
 		}
 		return beans;
 	}
+
+	public void deleteByAcquisition(Integer acquId) {
+		 dao.deleteByAcquisition(acquId);
+	}
 	
 	public Boolean checkExistByProperties(Boolean title, String value){
 		return dao.checkExistByProperties(title, value);
