@@ -136,7 +136,8 @@
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>
+			<!--suppress XmlPathReference -->
+            <param-value>
 				/WEB-INF/config/jeecms-servlet-admin.xml
 				/WEB-INF/config/plug/**/*-servlet-admin-action.xml
 			</param-value>
@@ -148,7 +149,8 @@
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>
+			<!--suppress XmlPathReference -->
+            <param-value>
 				/WEB-INF/config/jeecms-servlet-front.xml
 				/WEB-INF/config/plug/**/*-servlet-front-action.xml
 			</param-value>
