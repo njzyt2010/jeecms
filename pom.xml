@@ -30,6 +30,9 @@
                 <includes>
                     <include>*/**</include>
                 </includes>
+                <excludes>
+                    <exclude>jeecms-db-v6.sql</exclude>
+                </excludes>
             </resource>
         </resources>
         <plugins>
